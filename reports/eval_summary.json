@@ -1,0 +1,31 @@
+{
+  "categories": {
+    "bom_status": "missing",
+    "control_status": "missing",
+    "firmware_status": "blocked_requires_approval",
+    "loss_thermal_status": "missing",
+    "manufacturing_status": "blocked_requires_approval",
+    "pcb_status": "not_started",
+    "safety_status": "pass",
+    "simulation_status": "missing",
+    "spec_status": "pass"
+  },
+  "issues": [],
+  "missing_data": [
+    "selected_bom",
+    "loss_breakdown",
+    "open_loop_sim.simulation_result",
+    "closed_loop_control.control_result",
+    "pcb/schematic",
+    "pcb/layout"
+  ],
+  "overall_status": "missing",
+  "recommended_next_actions": [
+    "Run the AutoEE Buck workflow and then rerun evaluation.",
+    "Replace mock/synthetic outputs with tool-backed artifacts before signoff."
+  ],
+  "risks": [
+    "Initial repo-level evaluation summary is a placeholder until a workflow run writes real evaluation output."
+  ],
+  "source": "initial_repo_seed"
+}

@@ -1,0 +1,86 @@
+type: object
+required:
+  - project_name
+  - application
+  - input
+  - output
+  - efficiency
+  - thermal
+  - control
+properties:
+  project_name:
+    type: string
+  application:
+    type: string
+  topology:
+    type: object
+    properties:
+      preferred: {type: [string, "null"]}
+      candidates:
+        type: array
+        items: {type: string}
+  input:
+    type: object
+    required: [voltage_min_v, voltage_nominal_v, voltage_max_v]
+    properties:
+      voltage_min_v: {type: number}
+      voltage_nominal_v: {type: number}
+      voltage_max_v: {type: number}
+  output:
+    type: object
+    required: [voltage_nominal_v, current_nominal_a, power_nominal_w]
+    properties:
+      voltage_nominal_v: {type: number}
+      current_nominal_a: {type: number}
+      power_nominal_w: {type: number}
+      power_peak_w: {type: [number, "null"]}
+      tolerance_percent: {type: number}
+      ripple_mv_pp_max: {type: number}
+  switching:
+    type: object
+    properties:
+      frequency_target_hz: {type: [number, "null"]}
+      frequency_min_hz: {type: [number, "null"]}
+      frequency_max_hz: {type: [number, "null"]}
+  efficiency:
+    type: object
+    required: [target_percent]
+    properties:
+      target_percent: {type: number}
+      operating_points:
+        type: array
+        items: {type: object}
+  thermal:
+    type: object
+    required: [ambient_max_c, max_junction_temp_c, max_total_loss_w]
+    properties:
+      ambient_min_c: {type: [number, "null"]}
+      ambient_max_c: {type: number}
+      automotive_warning_ambient_c: {type: [number, "null"]}
+      max_junction_temp_c: {type: number}
+      max_total_loss_w: {type: number}
+      cooling_method: {type: [string, "null"]}
+  control:
+    type: object
+    properties:
+      closed_loop_required: {type: boolean}
+      bandwidth_target_hz: {type: [number, "null"]}
+      transient_requirements:
+        type: array
+        items: {type: object}
+  protection:
+    type: object
+  manufacturing:
+    type: object
+  vendors:
+    type: object
+  testing:
+    type: object
+  safety:
+    type: object
+  assumptions:
+    type: array
+    items: {type: string}
+  open_questions:
+    type: array
+    items: {type: string}

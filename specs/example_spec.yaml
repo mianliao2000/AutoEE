@@ -1,0 +1,57 @@
+project_name: example_power_converter
+application: power_electronics_converter
+topology:
+  preferred: null
+  candidates:
+    - buck
+    - boost
+    - isolated_dab
+input:
+  voltage_min_v: null
+  voltage_nominal_v: null
+  voltage_max_v: null
+output:
+  voltage_nominal_v: null
+  current_nominal_a: null
+  power_nominal_w: null
+  power_peak_w: null
+  tolerance_percent: null
+  ripple_mv_pp_max: null
+switching:
+  frequency_target_hz: null
+  frequency_min_hz: null
+  frequency_max_hz: null
+efficiency:
+  target_percent: null
+  operating_points: []
+thermal:
+  ambient_min_c: null
+  ambient_max_c: null
+  max_junction_temp_c: null
+  max_total_loss_w: null
+  cooling_method: null
+control:
+  closed_loop_required: true
+  bandwidth_target_hz: null
+  transient_requirements: []
+protection:
+  over_current: true
+  over_voltage: true
+  under_voltage: true
+  over_temperature: true
+manufacturing:
+  preferred_vendor: null
+  assembly_required: false
+  max_bom_cost_usd: null
+vendors:
+  component_distributors:
+    - DigiKey
+    - Mouser
+    - LCSC
+testing:
+  operating_points: []
+  required_reports: []
+safety:
+  human_approval_required_for: []
+assumptions: []
+open_questions: []

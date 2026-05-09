@@ -1,0 +1,82 @@
+project_name: AutoEE 15W USB-C Buck Charger Demo
+application: vehicle_industrial_usb_c_buck_charger
+topology:
+  preferred: synchronous_buck
+  candidates:
+    - synchronous_buck
+    - asynchronous_buck
+input:
+  voltage_min_v: 9.0
+  voltage_nominal_v: 12.0
+  voltage_max_v: 36.0
+output:
+  voltage_nominal_v: 5.0
+  current_nominal_a: 3.0
+  power_nominal_w: 15.0
+  power_peak_w: 15.0
+  tolerance_percent: 5.0
+  ripple_mv_pp_max: 50.0
+switching:
+  frequency_target_hz: 400000
+  frequency_min_hz: null
+  frequency_max_hz: null
+efficiency:
+  target_percent: 90.0
+  operating_points:
+    - vin_v: 12.0
+      vout_v: 5.0
+      iout_a: 3.0
+thermal:
+  ambient_min_c: null
+  ambient_max_c: 60.0
+  automotive_warning_ambient_c: 85.0
+  max_junction_temp_c: 125.0
+  max_total_loss_w: 1.7
+  cooling_method: natural_convection_demo_assumption
+control:
+  closed_loop_required: true
+  bandwidth_target_hz: null
+  transient_requirements:
+    - load_step_a: 2.7
+      max_deviation_mv: 250.0
+      settling_ms: 1.0
+protection:
+  over_current: true
+  over_voltage: true
+  under_voltage: true
+  over_temperature: true
+manufacturing:
+  preferred_vendor: null
+  assembly_required: false
+  max_bom_cost_usd: null
+vendors:
+  component_distributors:
+    - DigiKey
+    - Mouser
+    - LCSC
+testing:
+  operating_points:
+    - vin_v: 9.0
+      iout_a: 0.3
+    - vin_v: 12.0
+      iout_a: 3.0
+    - vin_v: 24.0
+      iout_a: 3.0
+    - vin_v: 36.0
+      iout_a: 3.0
+  required_reports:
+    - design_review
+    - eval_summary
+safety:
+  human_approval_required_for:
+    - manufacturing_order
+    - firmware_flash
+    - high_voltage_test
+    - high_current_test
+    - final_power_device_selection
+assumptions:
+  - Default demo uses mock component catalog and synthetic simulation when external tools are not configured.
+  - Thermal estimates are first-order and require human signoff before hardware release.
+open_questions:
+  - Target enclosure volume and allowed maximum height are not defined.
+  - Final USB-C controller, protection, and communication requirements are not defined.

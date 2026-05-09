@@ -1,0 +1,8 @@
+PyQt5>=5.15
+matplotlib>=3.8
+requests>=2.31
+keyring>=25.0
+PyYAML>=6.0
+fastapi>=0.110
+uvicorn>=0.29
+pywebview>=5.0; python_version < "3.14"

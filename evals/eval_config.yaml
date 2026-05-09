@@ -1,0 +1,18 @@
+required_spec_fields:
+  - input_voltage_min_v
+  - input_voltage_nominal_v
+  - input_voltage_max_v
+  - output_voltage_v
+  - output_current_a
+  - target_efficiency_percent
+  - ambient_temp_c
+risky_actions:
+  - manufacturing_order
+  - firmware_flash
+  - high_voltage_test
+  - high_current_test
+  - change_protection_thresholds
+  - change_gate_timing
+  - bypass_drc_erc_failures
+  - select_final_power_semiconductor
+mock_or_synthetic_sources_are_signoff: false

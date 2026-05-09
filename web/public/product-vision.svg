@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 560" role="img" aria-labelledby="title desc">
+  <title id="title">AutoEE target hardware product collage</title>
+  <desc id="desc">Illustrative collage of PCB assemblies and battery charger hardware that AutoEE aims to generate.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#0f172a" flood-opacity="0.14"/>
+    </filter>
+    <linearGradient id="pcbGreen" x1="0" x2="1">
+      <stop offset="0" stop-color="#18a66a"/>
+      <stop offset="1" stop-color="#0b7f55"/>
+    </linearGradient>
+    <linearGradient id="pcbBlue" x1="0" x2="1">
+      <stop offset="0" stop-color="#123f76"/>
+      <stop offset="1" stop-color="#0b2a55"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="1">
+      <stop offset="0" stop-color="#f4c95d"/>
+      <stop offset="1" stop-color="#b58121"/>
+    </linearGradient>
+  </defs>
+  <rect width="980" height="560" fill="#ffffff"/>
+
+  <g filter="url(#shadow)">
+    <g transform="translate(40 40) rotate(-14)">
+      <rect x="0" y="0" width="260" height="150" rx="8" fill="url(#pcbGreen)" stroke="#0f6f4d" stroke-width="3"/>
+      <g fill="#e6fff6" opacity="0.92">
+        <rect x="18" y="20" width="42" height="28" rx="3"/>
+        <rect x="76" y="20" width="28" height="20" rx="3"/>
+        <rect x="118" y="20" width="28" height="20" rx="3"/>
+        <rect x="160" y="20" width="68" height="18" rx="3"/>
+        <circle cx="226" cy="114" r="19"/>
+        <circle cx="184" cy="116" r="16"/>
+      </g>
+      <g fill="#1f2937">
+        <rect x="46" y="74" width="46" height="28" rx="4"/>
+        <rect x="102" y="70" width="46" height="32" rx="4"/>
+        <rect x="158" y="74" width="46" height="28" rx="4"/>
+      </g>
+      <g stroke="#f8fafc" stroke-width="4" stroke-linecap="round" opacity="0.75">
+        <path d="M20 60H232"/>
+        <path d="M24 122H150"/>
+        <path d="M64 20V132"/>
+        <path d="M214 36V96"/>
+      </g>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)" transform="translate(354 42)">
+    <rect x="0" y="76" width="475" height="126" rx="9" fill="url(#pcbBlue)" stroke="#091e42" stroke-width="3"/>
+    <rect x="45" y="0" width="135" height="82" rx="8" fill="url(#gold)"/>
+    <rect x="285" y="0" width="150" height="82" rx="8" fill="#b89b5a"/>
+    <rect x="5" y="202" width="465" height="42" rx="7" fill="#13283f"/>
+    <g fill="#eab308">
+      <rect x="40" y="108" width="28" height="13" rx="2"/>
+      <rect x="84" y="108" width="28" height="13" rx="2"/>
+      <rect x="128" y="108" width="28" height="13" rx="2"/>
+      <rect x="172" y="108" width="28" height="13" rx="2"/>
+      <rect x="250" y="108" width="28" height="13" rx="2"/>
+      <rect x="294" y="108" width="28" height="13" rx="2"/>
+      <rect x="338" y="108" width="28" height="13" rx="2"/>
+      <rect x="382" y="108" width="28" height="13" rx="2"/>
+      <rect x="40" y="150" width="28" height="13" rx="2"/>
+      <rect x="84" y="150" width="28" height="13" rx="2"/>
+      <rect x="128" y="150" width="28" height="13" rx="2"/>
+      <rect x="172" y="150" width="28" height="13" rx="2"/>
+      <rect x="250" y="150" width="28" height="13" rx="2"/>
+      <rect x="294" y="150" width="28" height="13" rx="2"/>
+      <rect x="338" y="150" width="28" height="13" rx="2"/>
+      <rect x="382" y="150" width="28" height="13" rx="2"/>
+    </g>
+    <g fill="#d1d5db">
+      <circle cx="22" cy="94" r="10"/>
+      <circle cx="452" cy="94" r="10"/>
+      <circle cx="22" cy="184" r="10"/>
+      <circle cx="452" cy="184" r="10"/>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)" transform="translate(84 310) rotate(-6)">
+    <rect x="0" y="0" width="292" height="166" rx="22" fill="#13a06b" stroke="#0f7f57" stroke-width="3"/>
+    <rect x="84" y="42" width="104" height="60" rx="10" fill="#f6e9a9"/>
+    <rect x="190" y="70" width="46" height="34" rx="6" fill="#d1d5db"/>
+    <rect x="238" y="70" width="34" height="34" rx="6" fill="#d1d5db"/>
+    <circle cx="34" cy="52" r="24" fill="#e5e7eb"/>
+    <circle cx="34" cy="52" r="17" fill="#47d5d1"/>
+    <circle cx="58" cy="105" r="16" fill="#fca5a5"/>
+    <circle cx="94" cy="120" r="16" fill="#fca5a5"/>
+    <rect x="20" y="112" width="32" height="35" rx="5" fill="#1f2937"/>
+    <g stroke="#f8fafc" stroke-width="4" opacity="0.55">
+      <path d="M18 26H260"/>
+      <path d="M18 148H246"/>
+      <path d="M116 24V144"/>
+    </g>
+  </g>
+
+  <g filter="url(#shadow)" transform="translate(498 304)">
+    <rect x="0" y="0" width="360" height="188" rx="16" fill="url(#pcbGreen)" stroke="#0e7651" stroke-width="3"/>
+    <rect x="120" y="48" width="68" height="46" rx="7" fill="#374151"/>
+    <rect x="206" y="48" width="68" height="46" rx="7" fill="#374151"/>
+    <rect x="280" y="90" width="38" height="58" rx="5" fill="#1f2937"/>
+    <rect x="178" y="125" width="48" height="34" rx="5" fill="#f7e38a"/>
+    <rect x="26" y="34" width="50" height="74" rx="6" fill="#111827"/>
+    <circle cx="42" cy="132" r="16" fill="#e5e7eb"/>
+    <circle cx="78" cy="140" r="16" fill="#e5e7eb"/>
+    <rect x="310" y="138" width="34" height="24" rx="4" fill="#111827"/>
+    <g fill="#dbeafe">
+      <circle cx="22" cy="22" r="8"/>
+      <circle cx="338" cy="22" r="8"/>
+      <circle cx="22" cy="166" r="8"/>
+      <circle cx="338" cy="166" r="8"/>
+    </g>
+    <g stroke="#f8fafc" stroke-width="3" opacity="0.55">
+      <path d="M18 70H334"/>
+      <path d="M92 22V166"/>
+      <path d="M246 22V166"/>
+    </g>
+  </g>
+
+  <text x="490" y="286" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="31" font-weight="800" fill="#111827">
+    Target: PCB Manufacturing and Assembly
+  </text>
+  <text x="490" y="524" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600" fill="#475569">
+    Specs -> simulation -> control -> PCB/3D package -> manufacturable charger hardware
+  </text>
+</svg>

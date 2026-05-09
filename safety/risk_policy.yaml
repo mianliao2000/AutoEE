@@ -1,0 +1,44 @@
+risky_actions:
+  manufacturing_order:
+    default: blocked
+    approval: required
+  export_production_manufacturing_package:
+    default: blocked
+    approval: required
+  firmware_flash:
+    default: blocked
+    approval: required
+  high_voltage_test:
+    default: blocked
+    approval: required
+  high_current_test:
+    default: blocked
+    approval: required
+  change_protection_thresholds:
+    default: blocked
+    approval: required
+  change_gate_timing:
+    default: blocked
+    approval: required
+  bypass_drc_erc_failures:
+    default: blocked
+    approval: required
+  select_final_power_semiconductor:
+    default: blocked
+    approval: required
+  change_isolation_assumptions:
+    default: blocked
+    approval: required
+  change_creepage_clearance:
+    default: blocked
+    approval: required
+  mark_validated:
+    default: blocked
+    approval: required
+  mark_production_ready:
+    default: blocked
+    approval: required
+approval_mechanisms:
+  cli_flag: --approve
+  environment_variable: HARDWARE_AGENT_APPROVAL=YES
+natural_language_approval_is_valid: false
