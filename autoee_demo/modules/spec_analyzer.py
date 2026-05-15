@@ -66,6 +66,62 @@ class SpecAnalyzer(AutoEESkill):
                 "human_signoff_required": True,
             },
         }
+        execution_plan = [
+            {
+                "step": "Parts",
+                "goal": "Select a reviewable first-pass BOM for the buck power stage.",
+                "inputs": ["constraint matrix", "topology seed", "voltage/current margins"],
+                "outputs": ["MOSFETs", "inductor", "input/output capacitors", "price and stock table"],
+                "sourceType": "fake_digikey_mouser",
+                "realCapabilityStatus": "not_connected",
+                "nextIntegration": "Replace mock distributor records with DigiKey and Mouser API responses.",
+            },
+            {
+                "step": "Analysis",
+                "goal": "Estimate power loss, efficiency, and component temperature risk from selected parts.",
+                "inputs": ["selected BOM", "datasheet-like parameters", "electrical specs"],
+                "outputs": ["loss breakdown", "thermal cards", "efficiency estimate"],
+                "sourceType": "first_order_demo_model",
+                "realCapabilityStatus": "demo_estimate_not_signoff",
+                "nextIntegration": "Calibrate loss and thermal equations against real datasheets and measured board data.",
+            },
+            {
+                "step": "Simulation",
+                "goal": "Generate waveform evidence for output ripple, inductor current, and load-step response.",
+                "inputs": ["power-stage candidate", "loss model", "load transient spec"],
+                "outputs": ["Vout waveform", "inductor current", "switch node", "load current trace"],
+                "sourceType": "synthetic_waveform",
+                "realCapabilityStatus": "not_connected",
+                "nextIntegration": "Replace synthetic waveform generation with PLECS or LTspice export.",
+            },
+            {
+                "step": "Control",
+                "goal": "Create a first closed-loop compensation seed and stability target.",
+                "inputs": ["plant estimate", "BOM parasitics", "simulation metrics"],
+                "outputs": ["control mode", "compensator type", "PID/Type-3 seed", "Bode metrics"],
+                "sourceType": "analytical_synthetic_loop_gain",
+                "realCapabilityStatus": "demo_estimate_not_signoff",
+                "nextIntegration": "Replace analytical seed with simulation-backed or bench auto-tuning.",
+            },
+            {
+                "step": "PCB",
+                "goal": "Plan library generation, schematic creation, placement/routing, Gerber export, and manufacturing handoff.",
+                "inputs": ["selected parts", "datasheet package data", "layout constraints"],
+                "outputs": ["symbol/footprint plan", "schematic plan", "layout plan", "Gerber/JLCPCB handoff plan"],
+                "sourceType": "fake_kicad_jlcpcb_pipeline",
+                "realCapabilityStatus": "not_connected",
+                "nextIntegration": "Connect KiCad automation, DRC/ERC, Gerber export, and JLCPCB API handoff.",
+            },
+            {
+                "step": "Test",
+                "goal": "Define post-prototype firmware download, tuning, data capture, and report generation.",
+                "inputs": ["assembled prototype", "firmware seed", "bench instruments"],
+                "outputs": ["firmware flash log", "tuning record", "efficiency sweep", "test report"],
+                "sourceType": "fake_lab_workflow",
+                "realCapabilityStatus": "not_connected",
+                "nextIntegration": "Connect firmware build/flash tooling and lab instrument automation.",
+            },
+        ]
         summary = (
             "Prepared 15W USB-C Buck charger constraints and selected a 400 kHz, "
             "10 uH, 94 uF starting point."
@@ -86,7 +142,9 @@ class SpecAnalyzer(AutoEESkill):
                         "Maxwell placeholder",
                         "KiCad/FreeCAD placeholder",
                     ],
+                    "execution_plan": execution_plan,
+                    "sourceType": "deterministic_demo_planner",
+                    "realCapabilityStatus": "demo_data_not_signoff",
                 },
             ),
         )
-

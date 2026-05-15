@@ -133,6 +133,36 @@ class LossEstimator(AutoEESkill):
             f"Estimated {loss.total_loss_w:.2f}W loss and {loss.efficiency_percent:.1f}% efficiency; "
             f"max temperature estimate {thermal.max_junction_temp_c:.1f}C."
         )
+        summary_cards = [
+            {
+                "label": "Total Loss",
+                "value": loss.total_loss_w,
+                "display": f"{loss.total_loss_w:.2f} W",
+                "status": "pass" if loss.total_loss_w <= spec.max_total_loss_w else "warn",
+                "note": "First-order estimate from fake datasheet-like parameters.",
+            },
+            {
+                "label": "Efficiency",
+                "value": loss.efficiency_percent,
+                "display": f"{loss.efficiency_percent:.2f}%",
+                "status": "pass" if loss.efficiency_percent >= spec.target_efficiency_percent else "warn",
+                "note": "Not signoff; replace with bench and simulation correlation.",
+            },
+            {
+                "label": "Max Temperature",
+                "value": thermal.max_junction_temp_c,
+                "display": f"{thermal.max_junction_temp_c:.1f} C",
+                "status": "warn" if thermal.max_junction_temp_c >= spec.automotive_warning_ambient_c else "pass",
+                "note": "Board airflow, copper area, and package thermal path are placeholders.",
+            },
+            {
+                "label": "Model Status",
+                "value": "demo_estimate_not_signoff",
+                "display": "Demo estimate",
+                "status": "demo",
+                "note": "Real thermal simulation and lab measurement are not connected yet.",
+            },
+        ]
         return self.complete(
             state,
             SkillRunResult(
@@ -149,7 +179,9 @@ class LossEstimator(AutoEESkill):
                         "input_cap_rms_a": round(icin_rms, 4),
                         "output_cap_rms_a": round(icout_rms, 4),
                     },
+                    "summary_cards": summary_cards,
+                    "sourceType": "first_order_demo_model",
+                    "realCapabilityStatus": "demo_estimate_not_signoff",
                 },
             ),
         )
-

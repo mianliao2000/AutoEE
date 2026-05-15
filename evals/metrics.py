@@ -93,8 +93,10 @@ def evaluate_design_state(state: DesignState) -> EvaluationSummary:
         summary.missing_data.extend([f"selected_bom.{part}" for part in missing_parts])
         _add_issue(summary, "bom", "missing", "Selected BOM is incomplete or not generated.", "high")
     else:
-        summary.categories["bom_status"] = "partial" if component.get("backend") == "mock_digikey" else "pass"
-        if component.get("backend") == "mock_digikey":
+        backend = str(component.get("backend") or "")
+        is_demo_catalog = backend in {"mock_digikey", "fake_digikey_mouser"}
+        summary.categories["bom_status"] = "partial" if is_demo_catalog else "pass"
+        if is_demo_catalog:
             summary.risks.append("BOM uses mock DigiKey data and must be replaced with distributor/datasheet-backed parts.")
         for part_name in required_parts:
             part_dict = _safe_dict(bom.get(part_name))
@@ -173,9 +175,34 @@ def evaluate_design_state(state: DesignState) -> EvaluationSummary:
     summary.risks.append(approval.reason)
     summary.missing_data.extend(["pcb/manufacturing/gerber", "pcb/manufacturing/drill", "pcb/manufacturing/cpl"])
 
-    firmware_approval = check_approval("firmware_flash", approve=False, dry_run=False)
-    summary.categories["firmware_status"] = "blocked_requires_approval" if not firmware_approval.allowed else "not_started"
-    summary.missing_data.extend(["firmware/generated", "firmware/build"])
+    firmware = _safe_dict(results.get("embedded_coding_download"))
+    if firmware:
+        summary.categories["firmware_status"] = "partial"
+        summary.risks.append("Firmware build, flashing, and target communication are demo data; no real prototype has been programmed.")
+    else:
+        firmware_approval = check_approval("firmware_flash", approve=False, dry_run=False)
+        summary.categories["firmware_status"] = "blocked_requires_approval" if not firmware_approval.allowed else "not_started"
+        summary.missing_data.extend(["firmware/generated", "firmware/build"])
+
+    test_modules = {
+        "embedded_coding_download": "firmware bring-up",
+        "closed_loop_tuning": "closed-loop bench tuning",
+        "efficiency_logging": "efficiency and thermal data logging",
+        "test_report": "post-prototype test report",
+    }
+    completed_test_modules = [module_id for module_id in test_modules if module_id in results]
+    if completed_test_modules:
+        summary.categories["post_prototype_test_status"] = "partial"
+        summary.risks.append("Post-prototype test results are fake lab data and are not measured signoff evidence.")
+        missing_test_modules = [
+            description
+            for module_id, description in test_modules.items()
+            if module_id not in results
+        ]
+        for description in missing_test_modules:
+            summary.missing_data.append(f"post-prototype test module missing: {description}")
+    else:
+        summary.categories["post_prototype_test_status"] = "not_started"
 
     summary.categories["safety_status"] = "pass"
 

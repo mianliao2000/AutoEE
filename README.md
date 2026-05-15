@@ -1,3 +1,75 @@
+# AutoEE Project Maintenance Rule
+
+After every implementation, UI, workflow, or content change, update this README and any relevant start-here/module documentation in the same change. The documentation update should reflect the current project architecture, module responsibilities, demo capabilities, fake or not-connected capability boundaries, and run instructions. Treat README maintenance as part of the engineering task, not optional cleanup. The same convention is also recorded in `skills/project_maintenance.md`.
+
+---
+
+# Current Technical Architecture Snapshot
+
+AutoEE is now structured as an AI-native modular EE design platform. Power electronics remains the first executable domain pack and still powers the buck charger demo, but the frontend architecture no longer assumes every project is a power converter.
+
+Current web architecture:
+
+- `web/src/domain/workflow.ts` defines typed domain/workflow objects:
+  - `ProjectDomain`
+  - `ProjectClassification`
+  - `DomainPack`
+  - `CapabilityModule`
+  - `WorkflowStep`
+  - `MetricDefinition`
+  - `ArtifactDefinition`
+  - `ModuleSelectionResult`
+- The deterministic workflow planner classifies project request text with keyword rules, selects one or more domain packs, and returns:
+  - project classification
+  - selected domain packs
+  - workflow sections and steps
+  - required/recommended/optional modules
+  - domain-specific metrics
+  - domain-specific artifacts
+- Power Electronics is the first executable pack. It maps to the existing backend demo stages and still supports:
+  - specifications
+  - component selection
+  - loss/thermal estimates
+  - synthetic waveform simulation
+  - control seed
+  - PCB automation plan
+  - fake post-prototype test workflow
+- Placeholder/config-driven packs are available for:
+  - RF / Communication
+  - Analog / Sensor
+  - Embedded / MCU
+  - High-Speed Digital
+  - General PCB
+- Placeholder packs are planning previews only. They show the intended workflow, module selection, metrics, and artifact package, but they do not run real solvers or external integrations yet.
+- The investor-facing web UI now renders from the workflow planner:
+  - Project Understanding
+  - Selected Workflow / System Map
+  - Active Engineering Modules
+  - Dynamic Metrics
+  - Generated EE Package
+- All domain-pack roadmaps use the same two-section System Map layout:
+  - Design / Before PCB Prototype Fabrication
+  - Test / After PCB Prototype Returns
+  The steps inside those two rows change by project domain, but the visual structure stays consistent.
+- The Engineering Console still preserves the detailed power-electronics tabs for the current executable buck charger demo.
+- The web and desktop demo runner now use a 0.5 second minimum visual dwell time per module.
+
+Demo request examples available in the web UI:
+
+- Power Electronics: `Design a vehicle/industrial 9-36 V to 5 V/3 A USB-C buck charger.`
+- RF / Embedded: `Design a 2.4 GHz BLE wireless temperature sensor node powered by a coin cell.`
+- Analog / Sensor: `Design a low-noise thermocouple measurement front-end with ADC output.`
+- High-Speed Digital: `Design an FPGA board with DDR memory and USB 3.0 interface.`
+- General PCB: `Design a small controller board with connectors, LEDs, and a programming header.`
+
+Current executable boundary:
+
+- Running the 3-minute demo still executes the power-electronics buck charger workflow.
+- Non-power domain packs are not connected to backend execution yet.
+- All fake distributor, fake KiCad/JLCPCB, fake firmware flashing, fake lab tuning, fake efficiency logging, and fake report outputs remain clearly labeled as demo data / not connected / not signoff.
+
+---
+
 # 面向电力电子的 AI-native 设计编辑器 / 工程平台 —— 商业计划书（升级草稿）
 
 **对投资人：** AI-native power design platform / experience system  

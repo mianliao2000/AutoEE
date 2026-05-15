@@ -66,9 +66,14 @@ class PartCandidate:
     footprint: str
     datasheet_url: str = ""
     source: str = "mock_catalog"
+    quantity: int = 1
+    supplier_links: Dict[str, str] = field(default_factory=dict)
+    compliance: str = "meets_demo_requirements"
 
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        data["line_total_usd"] = round(float(self.unit_price_usd) * int(self.quantity), 4)
+        return data
 
 
 @dataclass

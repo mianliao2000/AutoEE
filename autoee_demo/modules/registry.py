@@ -8,6 +8,12 @@ from .control import ControlTunerBackend
 from .emag import EmagSimulationBackend
 from .library_pcb import LibraryPcbMechanicalSkill
 from .loss_thermal import LossEstimator
+from .post_prototype_test import (
+    AutoTestReportSkill,
+    ClosedLoopTuningSkill,
+    EfficiencyLoggingSkill,
+    EmbeddedCodingDownloadSkill,
+)
 from .report_generator import ReportGenerator
 from .simulation import CircuitSimulationBackend
 from .skill_memory import SkillMemoryWriter
@@ -24,6 +30,10 @@ def build_default_skills() -> List[AutoEESkill]:
         EmagSimulationBackend(),
         ControlTunerBackend(),
         LibraryPcbMechanicalSkill(),
+        EmbeddedCodingDownloadSkill(),
+        ClosedLoopTuningSkill(),
+        EfficiencyLoggingSkill(),
+        AutoTestReportSkill(),
         ValidationSkill(),
         ReportGenerator(),
         SkillMemoryWriter(),

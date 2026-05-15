@@ -55,6 +55,71 @@ class LibraryPcbMechanicalSkill(AutoEESkill):
             "debug_assistant": "reserved",
             "test_loop_backend": "reserved",
         }
+        automation_steps = [
+            {
+                "step": "Datasheet Extraction",
+                "status": "demo_data",
+                "output": "outputs/datasheet_fields.json",
+                "artifactPath": "fake://datasheets/extracted_package_pin_land_pattern.json",
+                "notice": "Not connected to real datasheet parsing yet.",
+            },
+            {
+                "step": "Symbol Generation",
+                "status": "demo_data",
+                "output": "libs/kicad/AutoEE_Demo.kicad_sym",
+                "artifactPath": "fake://kicad/symbols/AutoEE_Demo.kicad_sym",
+                "notice": "Not connected to real KiCad symbol writer yet.",
+            },
+            {
+                "step": "Footprint Generation",
+                "status": "demo_data",
+                "output": "libs/kicad/AutoEE_Demo.pretty/*.kicad_mod",
+                "artifactPath": "fake://kicad/footprints/AutoEE_Demo.pretty",
+                "notice": "Not connected to real footprint generation yet.",
+            },
+            {
+                "step": "Schematic Generation",
+                "status": "demo_data",
+                "output": "autoee_usb_c_buck.kicad_sch",
+                "artifactPath": "fake://kicad/project/autoee_usb_c_buck.kicad_sch",
+                "notice": "Not connected to real KiCad schematic automation yet.",
+            },
+            {
+                "step": "Placement",
+                "status": "demo_data",
+                "output": "placement_plan.json",
+                "artifactPath": "fake://layout/placement/hot_loop_minimized.json",
+                "notice": "Not connected to real placement optimizer yet.",
+            },
+            {
+                "step": "Routing",
+                "status": "demo_data",
+                "output": "routing_plan.json",
+                "artifactPath": "fake://layout/routing/power_and_signal_routes.json",
+                "notice": "Not connected to real autorouter yet.",
+            },
+            {
+                "step": "DRC / ERC",
+                "status": "demo_data",
+                "output": "reports/drc_erc_summary.md",
+                "artifactPath": "fake://reports/drc_erc_summary.md",
+                "notice": "Not connected to real KiCad DRC/ERC yet.",
+            },
+            {
+                "step": "Gerber Export",
+                "status": "demo_data",
+                "output": "manufacturing/gerbers/autoee_usb_c_buck.zip",
+                "artifactPath": "fake://manufacturing/gerbers/autoee_usb_c_buck.zip",
+                "notice": "No real Gerber files are created in this demo.",
+            },
+            {
+                "step": "JLCPCB Handoff",
+                "status": "blocked_not_connected",
+                "output": "manufacturing/jlcpcb_order_payload.json",
+                "artifactPath": "fake://manufacturing/jlcpcb_order_payload.json",
+                "notice": "Not connected to real JLCPCB API; no order is placed.",
+            },
+        ]
         summary = "Prepared KiCad/FreeCAD artifact plan and reserved PCB/manufacturing/firmware interfaces."
         return self.complete(
             state,
@@ -62,8 +127,14 @@ class LibraryPcbMechanicalSkill(AutoEESkill):
                 self.module_id,
                 self.title,
                 summary,
-                {"library_generation_plan": plan, "downstream_interfaces": downstream},
+                {
+                    "library_generation_plan": plan,
+                    "downstream_interfaces": downstream,
+                    "automation_steps": automation_steps,
+                    "sourceType": "fake_kicad_jlcpcb_pipeline",
+                    "realCapabilityStatus": "not_connected",
+                    "capabilityNotice": "Demo data only. KiCad, FreeCAD, Gerber export, and JLCPCB ordering are not connected.",
+                },
                 source="placeholder",
             ),
         )
-

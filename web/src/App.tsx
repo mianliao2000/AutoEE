@@ -1,4 +1,6 @@
 import React from "react";
+import { DEMO_PROJECT_REQUESTS, planWorkflow, validateWorkflowPlannerSamples } from "./domain/workflow";
+import type { ArtifactDefinition, CapabilityModule, MetricDefinition, WorkflowPlan, WorkflowStep } from "./domain/workflow";
 
 type AnyRecord = Record<string, any>;
 
@@ -13,6 +15,13 @@ const EMPTY_STATE: AnyRecord = {
   lossThermal: { available: false, sweep: {}, pies: [], thermal: { componentTempsC: [] } },
   designRationale: { sections: [], formulas: [], risks: [], missingData: [], nextActions: [] },
   riskSummary: { risks: [], missingData: [], recommendedNextActions: [] },
+  executionPlan: { available: false, items: [] },
+  partsCatalog: { available: false, items: [] },
+  analysisSummary: { available: false, cards: [] },
+  controlPlan: { available: false, parameters: [], validation: [] },
+  pcbAutomationPlan: { available: false, automationSteps: [] },
+  testWorkflow: { available: false, cards: [] },
+  fakeCapabilityNotices: [],
   evidenceBadges: [],
   progressEvents: [],
   rawState: {}
@@ -37,8 +46,9 @@ function titleCase(value: string | undefined): string {
 }
 
 function metricDisplay(metric: AnyRecord | undefined): string {
-  if (!metric) return "-";
-  return String(metric.display ?? metric.label ?? metric.value ?? "-");
+  if (!metric) return "Pending";
+  const value = String(metric.display ?? metric.label ?? metric.value ?? "Pending");
+  return value === "-" ? "Pending" : value;
 }
 
 async function postJson(path: string, body?: AnyRecord): Promise<AnyRecord> {
@@ -86,22 +96,38 @@ function useAutoEEState() {
   const actions = {
     runDemo: async () => {
       setNotice("");
-      const payload = await postJson("/api/run-demo");
-      setState(payload.state);
+      try {
+        const payload = await postJson("/api/run-demo");
+        setState(payload.state);
+      } catch (exc: any) {
+        setNotice(`Run demo failed: ${exc.message}`);
+      }
     },
     stop: async () => {
-      const payload = await postJson("/api/stop");
-      setState(payload.state);
+      try {
+        const payload = await postJson("/api/stop");
+        setState(payload.state);
+      } catch (exc: any) {
+        setNotice(`Stop failed: ${exc.message}`);
+      }
     },
     reset: async () => {
       setNotice("");
-      const payload = await postJson("/api/reset");
-      setState(payload.state);
+      try {
+        const payload = await postJson("/api/reset");
+        setState(payload.state);
+      } catch (exc: any) {
+        setNotice(`Reset failed: ${exc.message}`);
+      }
     },
     exportSnapshot: async () => {
-      const payload = await postJson("/api/export-snapshot");
-      setState(payload.state);
-      setNotice(`Snapshot exported: ${payload.path}`);
+      try {
+        const payload = await postJson("/api/export-snapshot");
+        setState(payload.state);
+        setNotice(`Snapshot exported: ${payload.path}`);
+      } catch (exc: any) {
+        setNotice(`Export failed: ${exc.message}`);
+      }
     },
     applySpec: async (spec: AnyRecord) => {
       setNotice("");
@@ -118,8 +144,158 @@ function StatusPill({ status }: { status: string }) {
   return <span className={clsStatus(status)}>{titleCase(status)}</span>;
 }
 
-function LeftRail({ state, actions, notice }: { state: AnyRecord; actions: AnyRecord; notice: string }) {
+function aggregateStageStatus(stages: AnyRecord[], sourceIds: string[]): string {
+  const sourceStages = stages.filter((stage) => sourceIds.includes(stage.id));
+  if (!sourceStages.length) return "waiting";
+  const statuses = sourceStages.map((stage) => String(stage.status || "waiting"));
+  if (statuses.some((status) => status === "running")) return "running";
+  if (statuses.every((status) => status === "complete")) return "complete";
+  if (statuses.some((status) => status === "complete" || status === "partial")) return "partial";
+  if (statuses.some((status) => ["blocked", "error", "failed"].includes(status))) return "blocked";
+  return "waiting";
+}
+
+function metricFromDefinition(definition: MetricDefinition, state: AnyRecord): AnyRecord {
+  const backendMetric = definition.backendMetricKey ? state.metrics?.[definition.backendMetricKey] : undefined;
+  const display = metricDisplay(backendMetric);
+  if (backendMetric && display !== "Pending") {
+    return { ...backendMetric, display, explain: definition.description };
+  }
+  return {
+    display: definition.pendingLabel || "Estimate pending",
+    tone: "neutral",
+    explain: definition.description,
+  };
+}
+
+function sourceStatus(stages: AnyRecord[], sourceStageIds: string[]): string {
+  if (!sourceStageIds.length) return "waiting";
+  return aggregateStageStatus(stages, sourceStageIds);
+}
+
+function domainName(value: string): string {
+  return value.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function RoadmapIcon({ name }: { name: string }) {
+  const common = {
+    width: 18,
+    height: 18,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true
+  };
+  switch (name) {
+    case "file":
+      return (
+        <svg {...common}>
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+          <path d="M14 3v5h5" />
+          <path d="M8 13h8" />
+          <path d="M8 17h5" />
+        </svg>
+      );
+    case "chip":
+      return (
+        <svg {...common}>
+          <rect x="7" y="7" width="10" height="10" rx="2" />
+          <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3" />
+        </svg>
+      );
+    case "chart":
+      return (
+        <svg {...common}>
+          <path d="M4 19V5" />
+          <path d="M4 19h16" />
+          <path d="m7 15 3-4 3 2 4-7" />
+        </svg>
+      );
+    case "activity":
+      return (
+        <svg {...common}>
+          <path d="M3 12h4l2-6 4 12 2-6h6" />
+        </svg>
+      );
+    case "sliders":
+      return (
+        <svg {...common}>
+          <path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h12M20 18h0" />
+          <circle cx="16" cy="6" r="2" />
+          <circle cx="9" cy="12" r="2" />
+          <circle cx="18" cy="18" r="2" />
+        </svg>
+      );
+    case "board":
+      return (
+        <svg {...common}>
+          <rect x="4" y="4" width="16" height="16" rx="2" />
+          <path d="M8 8h3v3H8z" />
+          <path d="M15 8h1M15 12h1M8 16h8M11 9h3M11 10.5v4" />
+        </svg>
+      );
+    case "code":
+      return (
+        <svg {...common}>
+          <path d="m9 18-6-6 6-6" />
+          <path d="m15 6 6 6-6 6" />
+        </svg>
+      );
+    case "database":
+      return (
+        <svg {...common}>
+          <ellipse cx="12" cy="5" rx="7" ry="3" />
+          <path d="M5 5v6c0 1.7 3.1 3 7 3s7-1.3 7-3V5" />
+          <path d="M5 11v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" />
+        </svg>
+      );
+    case "report":
+      return (
+        <svg {...common}>
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+          <path d="M14 3v5h5" />
+          <path d="m9 15 2 2 4-5" />
+        </svg>
+      );
+    default:
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 8v4l3 2" />
+        </svg>
+      );
+  }
+}
+
+function statusDisplay(status: string): string {
+  if (status === "active") return "Active";
+  if (status === "complete") return "Done";
+  if (status === "running") return "Running";
+  if (status === "partial") return "Partial";
+  if (["blocked", "error", "failed"].includes(status)) return "Blocked";
+  return "";
+}
+
+function LeftRail({
+  state,
+  actions,
+  notice,
+  projectRequest,
+  onProjectRequestChange,
+  plan,
+}: {
+  state: AnyRecord;
+  actions: AnyRecord;
+  notice: string;
+  projectRequest: string;
+  onProjectRequestChange: (request: string) => void;
+  plan: WorkflowPlan;
+}) {
   const events = (state.progressEvents || []).slice(-8).reverse();
+  const selectedSample = DEMO_PROJECT_REQUESTS.find((sample) => sample.request === projectRequest)?.id || "custom";
   return (
     <aside className="leftRail">
       <div className="brandBlock">
@@ -132,7 +308,27 @@ function LeftRail({ state, actions, notice }: { state: AnyRecord; actions: AnyRe
 
       <div className="promptCard">
         <div className="label">Product Request</div>
-        <p>{state.prompt}</p>
+        <p>{projectRequest}</p>
+        <label className="requestSelector">
+          <span>Demo Request</span>
+          <select
+            value={selectedSample}
+            onChange={(event) => {
+              const next = DEMO_PROJECT_REQUESTS.find((sample) => sample.id === event.target.value);
+              if (next) onProjectRequestChange(next.request);
+            }}
+          >
+            {selectedSample === "custom" && <option value="custom">Current project request</option>}
+            {DEMO_PROJECT_REQUESTS.map((sample) => (
+              <option value={sample.id} key={sample.id}>
+                {sample.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <small>
+          Classified as {domainName(plan.classification.primaryDomain)} / {plan.classification.productType}
+        </small>
       </div>
 
       <div className="buttonGrid">
@@ -178,27 +374,25 @@ function LeftRail({ state, actions, notice }: { state: AnyRecord; actions: AnyRe
   );
 }
 
-function Hero({ state }: { state: AnyRecord }) {
-  const metrics = state.metrics || {};
+function Hero({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }) {
+  const heroMetrics = plan.metrics.slice(0, 4);
   return (
     <section className="hero">
       <div>
-        <div className="eyebrow">Investor Demo Mode</div>
-        <h1>Specification → Verified Hardware</h1>
-        <p>AI-generated hardware draft: specs, BOM, waveforms, control, risks, and package.</p>
+        <div className="eyebrow">AI-native modular EE platform</div>
+        <h1>Specification → EE Package</h1>
+        <p>{plan.selectedPacks.map((pack) => pack.name).join(" + ")} workflow selected from the project request.</p>
       </div>
       <div className="productVision">
         <img src="/pcb-closeup-home.jpg" alt="PCB electronics close-up" />
         <div className="productVisionCaption">
-          <span>Target Outcome</span>
-          <strong>Manufacturable charger PCB package</strong>
+          <strong>PCB Prototype All-in-One</strong>
         </div>
       </div>
       <div className="heroMetrics">
-        <MetricTile label="Efficiency" metric={metrics.efficiency} />
-        <MetricTile label="Loss" metric={metrics.totalLoss} />
-        <MetricTile label="Hot Spot" metric={metrics.maxTemp} />
-        <MetricTile label="Ripple" metric={metrics.voutRipple} />
+        {heroMetrics.map((metric) => (
+          <MetricTile label={metric.label} metric={metricFromDefinition(metric, state)} key={metric.id} />
+        ))}
       </div>
     </section>
   );
@@ -214,26 +408,475 @@ function MetricTile({ label, metric }: { label: string; metric: AnyRecord }) {
   );
 }
 
-function StageTimeline({ stages }: { stages: AnyRecord[] }) {
+function ProjectUnderstanding({ plan }: { plan: WorkflowPlan }) {
   return (
-    <section className="panel">
+    <section className="panel understandingPanel">
       <div className="panelHeader">
         <div>
-          <h2>System Map</h2>
-          <p>From request to hardware package.</p>
+          <h2>Project Understanding</h2>
+          <p>AutoEE classifies the request, selects domain packs, then builds the workflow from active modules.</p>
         </div>
       </div>
-      <div className="stageGrid">
-        {stages.map((stage) => (
-          <div className={`stageCard ${clsStatus(stage.status)}`} key={stage.id}>
-            <div className="stageTopline">
-              <span className="stageIndex">{stage.index}</span>
-              <StatusPill status={stage.status} />
+      <div className="understandingGrid">
+        <div className="understandingPrimary">
+          <span>Product Type</span>
+          <strong>{plan.classification.productType.replace(/_/g, " ")}</strong>
+          <small>{plan.classification.confidence} confidence / {plan.classification.source.replace(/_/g, " ")}</small>
+        </div>
+        <div className="domainPackList">
+          {plan.selectedPacks.map((pack) => (
+            <article className={pack.placeholder ? "placeholder" : ""} key={pack.id}>
+              <span>{pack.placeholder ? "Placeholder pack" : "Executable pack"}</span>
+              <strong>{pack.name}</strong>
+              <p>{pack.description}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+      <ul className="reasonList">
+        {plan.classification.reasons.map((reason) => <li key={reason}>{reason}</li>)}
+      </ul>
+      <div className="plannerNotice">{plan.capabilityNotice}</div>
+    </section>
+  );
+}
+
+function CapabilityNotice({ payload }: { payload: AnyRecord }) {
+  return (
+    <div className="capabilityNotice">
+      <strong>Demo data / Not connected</strong>
+      <span>{payload.notice || "This module is using fake data. The real external capability is not connected yet."}</span>
+      <small>
+        {payload.sourceType || "demo_data"} / {payload.realCapabilityStatus || "not_connected"}
+      </small>
+    </div>
+  );
+}
+
+function ExecutionPlanDetail({ data }: { data: AnyRecord }) {
+  const items = data.items || [];
+  if (!items.length) return <div className="empty">Run the demo to generate the execution plan.</div>;
+  return (
+    <div className="executionPlanGrid">
+      {items.map((item: AnyRecord) => (
+        <article className="executionPlanCard" key={item.step}>
+          <div>
+            <span>{item.step}</span>
+            <strong>{item.goal}</strong>
+          </div>
+          <p>Inputs: {(item.inputs || []).join(", ")}</p>
+          <p>Outputs: {(item.outputs || []).join(", ")}</p>
+          <small>{item.nextIntegration}</small>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function PartsCatalogDetail({ data }: { data: AnyRecord }) {
+  const items = data.items || [];
+  if (!items.length) return <div className="empty">Run Parts to populate the fake DigiKey/Mouser BOM table.</div>;
+  return (
+    <div className="bomTableWrap">
+      <div className="moduleMetricRow">
+        <div><span>Total demo BOM</span><strong>${Number(data.totalCostUsd || 0).toFixed(2)}</strong></div>
+        <div><span>Source</span><strong>Fake DigiKey + Mouser</strong></div>
+      </div>
+      <table className="bomTable">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Part</th>
+            <th>Key Parameters</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Links</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((part: AnyRecord) => (
+            <tr key={part.role}>
+              <td>{part.role}</td>
+              <td><strong>{part.mpn}</strong><span>{part.manufacturer}</span></td>
+              <td>{(part.keyParams || []).slice(0, 4).join("; ")}</td>
+              <td>{part.quantity}</td>
+              <td>${Number(part.lineTotalUsd || 0).toFixed(2)}</td>
+              <td>
+                <div className="linkList">
+                  {part.datasheetUrl && <a href={part.datasheetUrl}>Datasheet</a>}
+                  {part.supplierLinks?.digikey && <a href={part.supplierLinks.digikey}>DigiKey</a>}
+                  {part.supplierLinks?.mouser && <a href={part.supplierLinks.mouser}>Mouser</a>}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function AnalysisDetail({ data }: { data: AnyRecord }) {
+  if (!data.available) return <div className="empty">Run Analysis to calculate loss and thermal estimates.</div>;
+  return (
+    <div>
+      <div className="moduleMetricRow">
+        {(data.cards || []).map((card: AnyRecord) => (
+          <div key={card.label}><span>{card.label}</span><strong>{card.display}</strong></div>
+        ))}
+      </div>
+      <div className="detailTwoCol">
+        <section>
+          <h4>Loss Terms</h4>
+          <ul className="compactList">{(data.lossItems || []).slice(0, 8).map((item: AnyRecord) => <li key={item.label}>{item.label}: {item.display}</li>)}</ul>
+        </section>
+        <section>
+          <h4>Thermal Notes</h4>
+          <ul className="compactList">
+            <li>Max junction estimate: {data.thermal?.maxJunctionTempC ? `${data.thermal.maxJunctionTempC} C` : "-"}</li>
+            {(data.thermal?.warnings || []).map((item: string) => <li key={item}>{item}</li>)}
+          </ul>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function ControlPlanDetail({ data }: { data: AnyRecord }) {
+  if (!data.available) return <div className="empty">Run Control to generate the synthetic control plan.</div>;
+  return (
+    <div>
+      <div className="moduleMetricRow">
+        <div><span>Mode</span><strong>{data.controlMode}</strong></div>
+        <div><span>Compensator</span><strong>{data.compensatorType}</strong></div>
+        <div><span>Target fc</span><strong>{formatHz(data.targetCrossoverHz)}</strong></div>
+      </div>
+      <div className="detailTwoCol">
+        <section>
+          <h4>Parameters</h4>
+          <ul className="compactList">{(data.parameters || []).map((item: AnyRecord) => <li key={item.name}>{item.name}: {item.value} {item.unit}</li>)}</ul>
+        </section>
+        <section>
+          <h4>Validation</h4>
+          <ul className="compactList">{(data.validation || []).map((item: AnyRecord) => <li key={item.check}>{item.check}: {String(item.result ?? "-")}</li>)}</ul>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function PcbAutomationDetail({ data }: { data: AnyRecord }) {
+  const steps = data.automationSteps || [];
+  if (!steps.length) return <div className="empty">Run PCB to populate the fake KiCad/JLCPCB automation pipeline.</div>;
+  return (
+    <div className="pcbStepGrid">
+      {steps.map((step: AnyRecord) => (
+        <article className="pcbStepCard" key={step.step}>
+          <span>{step.status}</span>
+          <strong>{step.step}</strong>
+          <p>{step.output}</p>
+          <small>{step.notice}</small>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function GenericModuleDetail({ stage, plan }: { stage: WorkflowStep; plan: WorkflowPlan }) {
+  const linkedModules = [...plan.modules.required, ...plan.modules.recommended, ...plan.modules.optional].filter((moduleItem) =>
+    stage.moduleIds.includes(moduleItem.id),
+  );
+  return (
+    <div className="detailTwoCol">
+      <section>
+        <h4>Module Intent</h4>
+        <p className="detailText">{stage.description}</p>
+        <p className="detailText">This step is selected by the workflow planner for the current domain pack.</p>
+      </section>
+      <section>
+        <h4>Selected Modules</h4>
+        <ul className="compactList">
+          {linkedModules.length ? linkedModules.map((item) => <li key={item.id}>{item.name}: {item.reason}</li>) : <li>Planning placeholder. No executable module is connected yet.</li>}
+        </ul>
+      </section>
+    </div>
+  );
+}
+
+function SimulationDetail({ data }: { data: AnyRecord }) {
+  if (!data.available) return <div className="empty">Run Simulation to generate synthetic waveform metrics.</div>;
+  return (
+    <div className="moduleMetricRow">
+      <div><span>Ripple</span><strong>{data.metrics?.vout_ripple_mv_pp ?? "-"} mVpp</strong></div>
+      <div><span>Transient</span><strong>{data.metrics?.vout_transient_deviation_mv ?? "-"} mV</strong></div>
+      <div><span>Inductor Peak</span><strong>{data.metrics?.inductor_peak_a ?? "-"} A</strong></div>
+      <div><span>Source</span><strong>Synthetic</strong></div>
+    </div>
+  );
+}
+
+function OutputList({ items }: { items: AnyRecord[] }) {
+  if (!items?.length) return <div className="empty">Waiting for demo outputs.</div>;
+  return (
+    <ul className="outputList">
+      {items.map((item: AnyRecord) => (
+        <li key={`${item.label}-${item.path}`}>
+          <strong>{item.label || "Output"}</strong>
+          <span>{item.path || "-"}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function TestWorkflowDetail({ data, focusId }: { data: AnyRecord; focusId?: string }) {
+  const cards = data.cards || [];
+  const activeCard = cards.find((card: AnyRecord) => card.id === focusId) || cards[0];
+  if (!data.available) return <div className="empty">Run the 3-min demo to generate fake post-prototype Test results.</div>;
+
+  const codes = data.codes || {};
+  const tuning = data.tuning || {};
+  const logged = data.data || {};
+  const report = data.report || {};
+  const renderFocusedDetail = () => {
+    switch (activeCard?.id) {
+      case "embedded_coding_download":
+        return (
+          <div className="detailTwoCol">
+            <section>
+              <h4>Flash Log</h4>
+              <ul className="compactList">
+                {(codes.flashLog || []).map((item: AnyRecord) => (
+                  <li key={item.step}>{item.step}: {item.detail}</li>
+                ))}
+              </ul>
+            </section>
+            <section>
+              <h4>Generated Outputs</h4>
+              <OutputList items={codes.outputs || []} />
+            </section>
+          </div>
+        );
+      case "closed_loop_tuning":
+        return (
+          <div className="detailTwoCol">
+            <section>
+              <h4>Tuning Sweep</h4>
+              <ul className="compactList">
+                {(tuning.parameterSweep || []).map((item: AnyRecord) => (
+                  <li key={item.iteration}>
+                    Iteration {item.iteration}: settling {item.settlingMs} ms, overshoot {item.overshootPercent}%, phase margin {item.phaseMarginDeg} deg
+                  </li>
+                ))}
+              </ul>
+            </section>
+            <section>
+              <h4>Validation</h4>
+              <ul className="compactList">
+                {(tuning.validation || []).map((item: AnyRecord) => (
+                  <li key={item.check}>{item.check}: {item.result} ({item.status})</li>
+                ))}
+              </ul>
+            </section>
+          </div>
+        );
+      case "efficiency_logging":
+        return (
+          <div>
+            <div className="moduleMetricRow">
+              {(logged.summaryCards || []).map((card: AnyRecord) => (
+                <div key={card.label}><span>{card.label}</span><strong>{card.value}</strong></div>
+              ))}
             </div>
-            <h3>{stage.title}</h3>
+            <div className="bomTableWrap">
+              <table className="bomTable">
+                <thead>
+                  <tr>
+                    <th>Vin</th>
+                    <th>Load</th>
+                    <th>Vout</th>
+                    <th>Efficiency</th>
+                    <th>Hot Spot</th>
+                    <th>Ripple</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(logged.efficiencyPoints || []).map((point: AnyRecord) => (
+                    <tr key={`${point.vinV}-${point.loadA}`}>
+                      <td>{point.vinV} V</td>
+                      <td>{point.loadA} A</td>
+                      <td>{point.voutV} V</td>
+                      <td>{point.efficiencyPercent}%</td>
+                      <td>{point.hotSpotC} C</td>
+                      <td>{point.rippleMvpp} mVpp</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      case "test_report":
+        return (
+          <div className="detailTwoCol">
+            <section>
+              <h4>Report Sections</h4>
+              <ul className="compactList">
+                {(report.sections || []).map((item: AnyRecord) => (
+                  <li key={item.title}>{item.title}: {item.status}</li>
+                ))}
+              </ul>
+            </section>
+            <section>
+              <h4>Revision Actions</h4>
+              <ul className="compactList">
+                {(report.revisionActions || []).map((item: string) => <li key={item}>{item}</li>)}
+              </ul>
+            </section>
+          </div>
+        );
+      default:
+        return <div className="empty">Select a Test module to inspect its fake result.</div>;
+    }
+  };
+
+  return (
+    <div className="testWorkflowDetail">
+      <div className="pcbStepGrid">
+        {cards.map((card: AnyRecord) => (
+          <article className={`pcbStepCard ${card.id === activeCard?.id ? "selected" : ""}`} key={card.id}>
+            <span>{card.status}</span>
+            <strong>{card.title}</strong>
+            <p>{card.summary}</p>
+            <small>{card.outputPreview}</small>
+          </article>
+        ))}
+      </div>
+      <div className="testFocusPanel">
+        <div className="testFocusHeader">
+          <div>
+            <span>{activeCard?.label}</span>
+            <h4>{activeCard?.title}</h4>
+          </div>
+          <small>{activeCard?.sourceType} / {activeCard?.realCapabilityStatus}</small>
+        </div>
+        {renderFocusedDetail()}
+      </div>
+    </div>
+  );
+}
+
+function ModuleDetailPanel({ stage, state, plan }: { stage: WorkflowStep & AnyRecord; state: AnyRecord; plan: WorkflowPlan }) {
+  const testPayload = state.testWorkflow || {};
+  const detailMap: Record<string, { title: string; payload: AnyRecord; body: React.ReactNode }> = {
+    specifications: { title: "Execution Plan", payload: state.executionPlan || {}, body: <ExecutionPlanDetail data={state.executionPlan || {}} /> },
+    parts: { title: "BOM Search Results", payload: state.partsCatalog || {}, body: <PartsCatalogDetail data={state.partsCatalog || {}} /> },
+    analysis: { title: "Loss + Thermal Analysis", payload: state.analysisSummary || {}, body: <AnalysisDetail data={state.analysisSummary || {}} /> },
+    simulation: { title: "Simulation Evidence", payload: state.waveforms || {}, body: <SimulationDetail data={state.waveforms || {}} /> },
+    control: { title: "Control Plan", payload: state.controlPlan || {}, body: <ControlPlanDetail data={state.controlPlan || {}} /> },
+    pcb: { title: "PCB Automation Plan", payload: state.pcbAutomationPlan || {}, body: <PcbAutomationDetail data={state.pcbAutomationPlan || {}} /> },
+    embedded_coding_download: { title: "Post-Prototype Test Workflow", payload: testPayload, body: <TestWorkflowDetail data={testPayload} focusId="embedded_coding_download" /> },
+    closed_loop_tuning: { title: "Post-Prototype Test Workflow", payload: testPayload, body: <TestWorkflowDetail data={testPayload} focusId="closed_loop_tuning" /> },
+    efficiency_logging: { title: "Post-Prototype Test Workflow", payload: testPayload, body: <TestWorkflowDetail data={testPayload} focusId="efficiency_logging" /> },
+    test_report: { title: "Post-Prototype Test Workflow", payload: testPayload, body: <TestWorkflowDetail data={testPayload} focusId="test_report" /> },
+  };
+  const detail = detailMap[stage.id] || {
+    title: "Module Detail",
+    payload: { sourceType: "domain_pack_config", realCapabilityStatus: "planning_placeholder", notice: "This module is part of the selected domain pack. Real solver/integration work is not connected yet." },
+    body: <GenericModuleDetail stage={stage} plan={plan} />,
+  };
+  return (
+    <section className="moduleDetailPanel">
+      <div className="moduleDetailHeader">
+        <div>
+          <span>{stage.title}</span>
+          <h3>{detail.title}</h3>
+        </div>
+        <CapabilityNotice payload={detail.payload} />
+      </div>
+      {detail.body}
+    </section>
+  );
+}
+
+function StageTimeline({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }) {
+  const stages = state.stages || [];
+  const [activeStageId, setActiveStageId] = React.useState(plan.workflowSteps[0]?.id || "specifications");
+  React.useEffect(() => {
+    setActiveStageId(plan.workflowSteps[0]?.id || "specifications");
+  }, [plan.requestText]);
+  const plannedSections = plan.workflowSections.map((section) => ({
+    ...section,
+    steps: section.steps.map((stepItem, index) => ({
+      ...stepItem,
+      index: index + 1,
+      status: sourceStatus(stages, stepItem.sourceStageIds),
+    })),
+  }));
+  const allRoadmapStages = plannedSections.flatMap((section) => section.steps);
+  const hasRealStatus = allRoadmapStages.some((stage) => ["running", "complete", "partial", "blocked", "error", "failed"].includes(stage.status));
+  if (!hasRealStatus && allRoadmapStages[0]) {
+    allRoadmapStages[0].status = "active";
+  }
+  const completedCount = allRoadmapStages.filter((stage) => stage.status === "complete").length;
+  const activeStage = allRoadmapStages.find((stage) => stage.id === activeStageId) || allRoadmapStages[0];
+
+  const renderStageCard = (stage: AnyRecord) => (
+    <div
+      className={`roadmapCard state-${String(stage.status || "waiting").toLowerCase().replace(/_/g, "-")} ${stage.id === activeStage.id ? "selected" : ""}`}
+      key={stage.id}
+      role="button"
+      tabIndex={0}
+      onClick={() => setActiveStageId(stage.id)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setActiveStageId(stage.id);
+        }
+      }}
+    >
+      <div className="roadmapCardTop">
+        <span className="roadmapStepNumber">{stage.index}</span>
+        <span className="roadmapStatus" aria-label={`Status: ${stage.status}`}>
+          <span />
+          {statusDisplay(stage.status) && <em>{statusDisplay(stage.status)}</em>}
+        </span>
+      </div>
+      <div className="roadmapCardBody">
+        <span className="roadmapIcon">
+          <RoadmapIcon name={stage.icon} />
+        </span>
+        <h3>{stage.title}</h3>
+      </div>
+    </div>
+  );
+
+  return (
+    <section className="panel systemMapPanel">
+      <div className="panelHeader systemMapHeader">
+        <div>
+          <h2>System Map</h2>
+          <p>{plan.selectedPacks.map((pack) => pack.uiLabels.workflowSubtitle).join(" ")}</p>
+        </div>
+        <div className="roadmapSummary">
+          <span>{completedCount} / {allRoadmapStages.length} completed</span>
+          <strong>{hasRealStatus ? "Workflow Status" : "Planner Preview"}</strong>
+        </div>
+      </div>
+      <div className="systemMapGroups">
+        {plannedSections.map((section) => (
+          <div className="roadmapSection" key={`${section.label}-${section.contextLabel}`}>
+            <div className="roadmapSectionHeader">
+              <span>{section.label}</span>
+              <strong>{section.contextLabel}</strong>
+            </div>
+            <div className="roadmapTrack" style={{ "--step-count": section.steps.length } as React.CSSProperties}>
+              {section.steps.map(renderStageCard)}
+            </div>
           </div>
         ))}
       </div>
+      {activeStage && <ModuleDetailPanel stage={activeStage} state={state} plan={plan} />}
     </section>
   );
 }
@@ -321,7 +964,7 @@ function SpecNumberInput({
   );
 }
 
-function DesignPackage({ state, actions }: { state: AnyRecord; actions: AnyRecord }) {
+function ArtifactPackage({ state, actions, plan, showSpecEditor = false }: { state: AnyRecord; actions: AnyRecord; plan: WorkflowPlan; showSpecEditor?: boolean }) {
   const stages = state.stages || [];
   const spec = state.spec || state.rawState?.spec || {};
   const [draft, setDraft] = React.useState<AnyRecord>(() => toEditableSpec(spec));
@@ -333,7 +976,11 @@ function DesignPackage({ state, actions }: { state: AnyRecord; actions: AnyRecor
       setError("");
     }
   }, [JSON.stringify(spec), dirty]);
-  const ready = stages.length > 0 && stages.every((stage: AnyRecord) => stage.status === "complete");
+  const artifactItems = plan.artifacts.map((artifactItem) => ({
+    ...artifactItem,
+    status: sourceStatus(stages, artifactItem.sourceStageIds),
+  }));
+  const ready = artifactItems.length > 0 && artifactItems.every((item) => item.status === "complete");
   const updateDraft = (key: string, value: string) => {
     setDirty(true);
     setDraft((current: AnyRecord) => ({ ...current, [key]: value }));
@@ -363,38 +1010,85 @@ function DesignPackage({ state, actions }: { state: AnyRecord; actions: AnyRecor
     <section className="panel packagePanel">
       <div className="panelHeader">
         <div>
-          <h2>{ready ? "Design Package Ready" : "Design Package"}</h2>
-          <p>Edit specs, then rerun the agent.</p>
+          <h2>{ready ? "Generated EE Package Ready" : plan.selectedPacks[0]?.uiLabels.packageTitle || "Generated EE Package"}</h2>
+          <p>Artifacts are selected by the active domain pack. Placeholder packs show intended deliverables only.</p>
         </div>
       </div>
-      <div className="specEditor">
-        <label className="specName">
-          <span>Design Brief</span>
-          <input value={draft.name} onChange={(event) => updateDraft("name", event.target.value)} />
-        </label>
-        <div className="specFormGrid">
-          {SPEC_FIELDS.map((field) => (
-            <label className="specInputRow" key={field.key}>
-              <span>{field.label}</span>
-              <SpecNumberInput field={field} value={String(draft[field.key] ?? "")} onChange={(value) => updateDraft(field.key, value)} />
+      {showSpecEditor && (
+        <details className="specEditorDisclosure">
+          <summary>Power demo spec editor</summary>
+          <div className="specEditor">
+            <label className="specName">
+              <span>Design Brief</span>
+              <input value={draft.name} onChange={(event) => updateDraft("name", event.target.value)} />
             </label>
-          ))}
-        </div>
-        {error && <div className="formError">{error}</div>}
-        <button className="applySpecs" onClick={apply} disabled={state.running}>
-          Apply Specs
-        </button>
-      </div>
-      <div className="packageSubhead">Generated Package</div>
+            <div className="specFormGrid">
+              {SPEC_FIELDS.map((field) => (
+                <label className="specInputRow" key={field.key}>
+                  <span>{field.label}</span>
+                  <SpecNumberInput field={field} value={String(draft[field.key] ?? "")} onChange={(value) => updateDraft(field.key, value)} />
+                </label>
+              ))}
+            </div>
+            {error && <div className="formError">{error}</div>}
+            <button className="applySpecs" onClick={apply} disabled={state.running}>
+              Apply Specs
+            </button>
+          </div>
+        </details>
+      )}
+      <div className="packageSubhead">Artifact Package</div>
       <div className="packageList">
-        {stages.map((stage: AnyRecord) => (
-          <div className="packageItem" key={stage.id}>
-            <StatusDot status={stage.status} />
+        {artifactItems.map((artifactItem: ArtifactDefinition & { status: string }) => (
+          <div className="packageItem" key={artifactItem.id}>
+            <StatusDot status={artifactItem.status} />
             <div>
-              <strong>{stage.generatedArtifact}</strong>
-              <span>{stage.evidenceLevel}</span>
+              <strong>{artifactItem.label}</strong>
+              <span>{artifactItem.statusLabel}</span>
+              <small>{artifactItem.description}</small>
             </div>
           </div>
+        ))}
+        {!artifactItems.length && (
+          <div className="empty">Select a project request to preview generated artifacts.</div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ModuleSelectionPanel({ plan }: { plan: WorkflowPlan }) {
+  const groups: Array<[string, CapabilityModule[]]> = [
+    ["Required", plan.modules.required],
+    ["Recommended", plan.modules.recommended],
+    ["Optional", plan.modules.optional],
+  ];
+  return (
+    <section className="panel moduleSelectionPanel">
+      <div className="panelHeader">
+        <div>
+          <h2>Active Engineering Modules</h2>
+          <p>Modules are selected from the classified domain pack. Optional modules are shown for future expansion.</p>
+        </div>
+      </div>
+      <div className="moduleSelectionGrid">
+        {groups.map(([label, modules]) => (
+          <section className="moduleGroup" key={label}>
+            <h3>{label}</h3>
+            <div className="moduleCardList">
+              {modules.map((moduleItem) => (
+                <article className={`moduleSelectCard ${moduleItem.statusCategory}`} key={moduleItem.id}>
+                  <div>
+                    <span className="roadmapIcon"><RoadmapIcon name={moduleItem.icon} /></span>
+                    <strong>{moduleItem.name}</strong>
+                  </div>
+                  <p>{moduleItem.reason}</p>
+                  <small>{domainName(moduleItem.domain)} / {moduleItem.appearsInWorkflow ? "active workflow" : "supporting"}</small>
+                </article>
+              ))}
+              {!modules.length && <div className="empty">No modules in this group.</div>}
+            </div>
+          </section>
         ))}
       </div>
     </section>
@@ -405,22 +1099,26 @@ function StatusDot({ status }: { status: string }) {
   return <span className={`statusDot ${String(status || "waiting")}`} />;
 }
 
-function EnergyStory({ state }: { state: AnyRecord }) {
+function DynamicMetricsPanel({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }) {
   return (
     <section className="panel">
       <div className="panelHeader">
         <div>
-          <h2>Energy Story</h2>
-          <p>Power, heat, and stability at a glance.</p>
+          <h2>Dynamic Metrics</h2>
+          <p>Metrics come from the selected domain pack, not from a global power-only dashboard.</p>
         </div>
       </div>
       <div className="energyGrid">
-        {(state.energy?.cards || []).map((card: AnyRecord) => (
-          <div className={`energyCard tone-${card.tone || "neutral"}`} key={card.label}>
-            <span>{card.label}</span>
-            <strong>{card.display}</strong>
+        {plan.metrics.map((metric) => {
+          const metricValue = metricFromDefinition(metric, state);
+          return (
+          <div className={`energyCard tone-${metricValue.tone || "neutral"}`} key={metric.id}>
+            <span>{metric.label}</span>
+            <strong>{metricValue.display}</strong>
+            <p>{metric.description}</p>
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
@@ -454,7 +1152,7 @@ function EvidenceRail({ state }: { state: AnyRecord }) {
           </div>
           <div>
             <strong>{missing.length}</strong>
-            <span>Missing data</span>
+            <span>Missing evidence</span>
           </div>
         </div>
         <ul className="compactList">
@@ -903,17 +1601,95 @@ function DesignRationale({ data }: { data: AnyRecord }) {
   );
 }
 
+const HUMAN_LABELS: Record<string, string> = {
+  input_voltage_min_v: "minimum input voltage",
+  input_voltage_nominal_v: "nominal input voltage",
+  input_voltage_max_v: "maximum input voltage",
+  output_voltage_v: "output voltage",
+  output_current_a: "output current",
+  target_efficiency_percent: "target efficiency",
+  ambient_temp_c: "ambient temperature",
+  high_side_mosfet: "high-side MOSFET",
+  low_side_mosfet: "low-side MOSFET",
+  inductor: "inductor",
+  input_capacitor: "input capacitor",
+  output_capacitor: "output capacitor",
+  hs_mosfet_conduction: "high-side MOSFET conduction-loss estimate",
+  ls_mosfet_conduction: "low-side MOSFET conduction-loss estimate",
+  hs_switching_overlap: "high-side MOSFET switching-loss estimate",
+  inductor_dcr: "inductor copper-loss estimate",
+  inductor_core_placeholder: "inductor core-loss estimate",
+  output_cap_esr: "output capacitor ESR-loss estimate",
+  input_cap_rms_esr: "input capacitor RMS-loss estimate"
+};
+
+const MISSING_EVIDENCE_MESSAGES: Record<string, string> = {
+  thermal_result: "Thermal result is missing, so component temperature risk has not been checked.",
+  "open_loop_sim.simulation_result": "Open-loop simulation result is missing, so waveform behavior has not been reviewed.",
+  "simulation/waveforms/open_loop_waveforms.csv": "Exported waveform data file is missing, so simulation traces cannot be independently reviewed.",
+  "closed_loop_control.control_result": "Closed-loop control result is missing, so stability and compensation have not been reviewed.",
+  "pcb/schematic": "Schematic file is missing.",
+  "pcb/layout": "PCB layout file is missing.",
+  "pcb/drc_reports": "PCB design-rule check report is missing.",
+  "pcb/erc_reports": "Schematic electrical-rule check report is missing.",
+  "pcb/manufacturing/gerber": "Gerber manufacturing files are missing.",
+  "pcb/manufacturing/drill": "PCB drill files are missing.",
+  "pcb/manufacturing/cpl": "Component placement file is missing.",
+  "firmware/generated": "Generated firmware source is missing.",
+  "firmware/build": "Compiled firmware build is missing."
+};
+
+function humanLabel(value: string): string {
+  return HUMAN_LABELS[value] || value.replace(/_/g, " ");
+}
+
+function humanizeRiskItem(item: string): string {
+  const text = String(item);
+  const mockPart = text.match(/^(.+) is sourced from mock catalog\.$/);
+  if (mockPart) {
+    return `The ${humanLabel(mockPart[1])} currently comes from a mock catalog and must be replaced with a verified supplier or datasheet-backed part.`;
+  }
+  if (text === "Blocked: risky hardware action requires --approve or HARDWARE_AGENT_APPROVAL=YES.") {
+    return "Real hardware actions are blocked until a human explicitly approves manufacturing, firmware flashing, or lab execution.";
+  }
+  return text;
+}
+
+function humanizeMissingEvidence(item: string): string {
+  const text = String(item);
+  if (MISSING_EVIDENCE_MESSAGES[text]) return MISSING_EVIDENCE_MESSAGES[text];
+  if (text.startsWith("spec.")) {
+    return `The ${humanLabel(text.split(".")[1])} is not defined in the design specification.`;
+  }
+  if (text.startsWith("selected_bom.") && text.endsWith(".datasheet_url")) {
+    const part = text.split(".")[1];
+    return `The ${humanLabel(part)} datasheet link is missing, so the selected part cannot be verified.`;
+  }
+  if (text.startsWith("selected_bom.")) {
+    const part = text.split(".")[1];
+    return `The ${humanLabel(part)} has not been selected in the bill of materials.`;
+  }
+  if (text.startsWith("loss_breakdown.items_w.")) {
+    const parts = text.split(".");
+    const lossKey = parts[parts.length - 1] || text;
+    return `The ${humanLabel(lossKey)} is missing from the loss model.`;
+  }
+  return text.replace(/_/g, " ").replace(/\//g, " / ").replace(/\./g, " - ");
+}
+
 function RiskSummary({ data }: { data: AnyRecord }) {
+  const risks = (data.risks || []).map((item: string) => humanizeRiskItem(item));
+  const missingEvidence = (data.missingData || []).map((item: string) => humanizeMissingEvidence(item));
   return (
     <div className="riskSummary">
       <div className="riskGrid">
         <section>
           <h3>Risks</h3>
-          <ul className="compactList">{(data.risks || []).map((item: string) => <li key={item}>{item}</li>)}</ul>
+          <ul className="compactList">{risks.map((item: string, index: number) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
         </section>
         <section>
-          <h3>Missing Data</h3>
-          <ul className="compactList">{(data.missingData || []).map((item: string) => <li key={item}>{item}</li>)}</ul>
+          <h3>Missing Evidence</h3>
+          <ul className="compactList">{missingEvidence.map((item: string, index: number) => <li key={`${item}-${index}`}>{item}</li>)}</ul>
         </section>
         <section>
           <h3>Next Actions</h3>
@@ -927,9 +1703,28 @@ function RiskSummary({ data }: { data: AnyRecord }) {
 function App() {
   const { state, actions, notice } = useAutoEEState();
   const [mode, setMode] = React.useState("investor");
+  const [projectRequest, setProjectRequest] = React.useState("");
+  const activeProjectRequest = projectRequest || state.prompt || EMPTY_STATE.prompt;
+  const plan = React.useMemo(() => planWorkflow(activeProjectRequest), [activeProjectRequest]);
+  React.useEffect(() => {
+    if (!projectRequest && state.prompt) setProjectRequest(state.prompt);
+  }, [projectRequest, state.prompt]);
+  React.useEffect(() => {
+    const failures = validateWorkflowPlannerSamples();
+    if (failures.length) {
+      console.warn("Workflow planner sample validation failed:", failures);
+    }
+  }, []);
   return (
     <div className="appShell">
-      <LeftRail state={state} actions={actions} notice={notice} />
+      <LeftRail
+        state={state}
+        actions={actions}
+        notice={notice}
+        projectRequest={activeProjectRequest}
+        onProjectRequestChange={setProjectRequest}
+        plan={plan}
+      />
       <main className="main">
         <div className="modeTabs">
           <button className={mode === "investor" ? "active" : ""} onClick={() => setMode("investor")}>
@@ -941,22 +1736,27 @@ function App() {
         </div>
         {mode === "investor" ? (
           <>
-            <Hero state={state} />
+            <Hero state={state} plan={plan} />
             <div className="mainGrid">
               <div className="centerStack">
-                <StageTimeline stages={state.stages || []} />
-                <EnergyStory state={state} />
-                <EngineeringTabs state={state} />
+                <ProjectUnderstanding plan={plan} />
+                <StageTimeline state={state} plan={plan} />
+                <ModuleSelectionPanel plan={plan} />
+                <DynamicMetricsPanel state={state} plan={plan} />
               </div>
               <div className="rightStack">
-                <DesignPackage state={state} actions={actions} />
+                <ArtifactPackage state={state} actions={actions} plan={plan} />
                 <EvidenceRail state={state} />
               </div>
             </div>
           </>
         ) : (
           <>
-            <Hero state={state} />
+            <Hero state={state} plan={plan} />
+            <div className="engineeringLayout">
+              <ProjectUnderstanding plan={plan} />
+              <ArtifactPackage state={state} actions={actions} plan={plan} showSpecEditor />
+            </div>
             <EngineeringTabs state={state} />
           </>
         )}

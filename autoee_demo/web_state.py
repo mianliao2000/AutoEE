@@ -49,6 +49,78 @@ def safe_list(value: Any) -> List[Any]:
     return value if isinstance(value, list) else []
 
 
+HUMAN_LABELS = {
+    "input_voltage_min_v": "minimum input voltage",
+    "input_voltage_nominal_v": "nominal input voltage",
+    "input_voltage_max_v": "maximum input voltage",
+    "output_voltage_v": "output voltage",
+    "output_current_a": "output current",
+    "target_efficiency_percent": "target efficiency",
+    "ambient_temp_c": "ambient temperature",
+    "high_side_mosfet": "high-side MOSFET",
+    "low_side_mosfet": "low-side MOSFET",
+    "inductor": "inductor",
+    "input_capacitor": "input capacitor",
+    "output_capacitor": "output capacitor",
+    "hs_mosfet_conduction": "high-side MOSFET conduction-loss estimate",
+    "ls_mosfet_conduction": "low-side MOSFET conduction-loss estimate",
+    "hs_switching_overlap": "high-side MOSFET switching-loss estimate",
+    "inductor_dcr": "inductor copper-loss estimate",
+    "inductor_core_placeholder": "inductor core-loss estimate",
+    "output_cap_esr": "output capacitor ESR-loss estimate",
+    "input_cap_rms_esr": "input capacitor RMS-loss estimate",
+}
+
+
+MISSING_DATA_MESSAGES = {
+    "thermal_result": "Thermal result is missing, so component temperature risk has not been checked.",
+    "open_loop_sim.simulation_result": "Open-loop simulation result is missing, so waveform behavior has not been reviewed.",
+    "simulation/waveforms/open_loop_waveforms.csv": "Exported waveform data file is missing, so simulation traces cannot be independently reviewed.",
+    "closed_loop_control.control_result": "Closed-loop control result is missing, so stability and compensation have not been reviewed.",
+    "pcb/schematic": "Schematic file is missing.",
+    "pcb/layout": "PCB layout file is missing.",
+    "pcb/drc_reports": "PCB design-rule check report is missing.",
+    "pcb/erc_reports": "Schematic electrical-rule check report is missing.",
+    "pcb/manufacturing/gerber": "Gerber manufacturing files are missing.",
+    "pcb/manufacturing/drill": "PCB drill files are missing.",
+    "pcb/manufacturing/cpl": "Component placement file is missing.",
+    "firmware/generated": "Generated firmware source is missing.",
+    "firmware/build": "Compiled firmware build is missing.",
+}
+
+
+def _human_label(value: str) -> str:
+    return HUMAN_LABELS.get(value, value.replace("_", " "))
+
+
+def humanize_missing_data(item: Any) -> str:
+    text = str(item)
+    if text in MISSING_DATA_MESSAGES:
+        return MISSING_DATA_MESSAGES[text]
+    if text.startswith("spec."):
+        return f"The {_human_label(text.split('.', 1)[1])} is not defined in the design specification."
+    if text.startswith("selected_bom.") and text.endswith(".datasheet_url"):
+        part = text.split(".")[1]
+        return f"The {_human_label(part)} datasheet link is missing, so the selected part cannot be verified."
+    if text.startswith("selected_bom."):
+        part = text.split(".", 1)[1]
+        return f"The {_human_label(part)} has not been selected in the bill of materials."
+    if text.startswith("loss_breakdown.items_w."):
+        loss_key = text.rsplit(".", 1)[1]
+        return f"The {_human_label(loss_key)} is missing from the loss model."
+    return text.replace("_", " ").replace("/", " / ").replace(".", " - ")
+
+
+def humanize_risk(item: Any) -> str:
+    text = str(item)
+    if text.endswith(" is sourced from mock catalog."):
+        part = text.replace(" is sourced from mock catalog.", "")
+        return f"The {_human_label(part)} currently comes from a mock catalog and must be replaced with a verified supplier or datasheet-backed part."
+    if text == "Blocked: risky hardware action requires --approve or HARDWARE_AGENT_APPROVAL=YES.":
+        return "Real hardware actions are blocked until a human explicitly approves manufacturing, firmware flashing, or lab execution."
+    return text
+
+
 def _float_or_none(value: Any) -> Optional[float]:
     try:
         return float(value)
@@ -150,6 +222,38 @@ DEMO_STAGES = [
         generated_artifact="Reviewable design package draft",
         evidence_level="needs signoff",
     ),
+    DemoStage(
+        id="embedded_coding_download",
+        title="Codes",
+        plain_english="Build demo firmware, flash the returned prototype, and record firmware identity and bring-up logs.",
+        module_ids=["embedded_coding_download"],
+        generated_artifact="Firmware image and flash transcript",
+        evidence_level="fake lab workflow",
+    ),
+    DemoStage(
+        id="closed_loop_tuning",
+        title="Tuning",
+        plain_english="Run a fake bench tuning sweep that turns the analytical control seed into selected register settings.",
+        module_ids=["closed_loop_tuning"],
+        generated_artifact="Closed-loop tuning sweep",
+        evidence_level="fake lab workflow",
+    ),
+    DemoStage(
+        id="efficiency_logging",
+        title="Data",
+        plain_english="Log fake efficiency, ripple, thermal, and instrument metadata across the operating points.",
+        module_ids=["efficiency_logging"],
+        generated_artifact="Efficiency and thermal data log",
+        evidence_level="fake lab workflow",
+    ),
+    DemoStage(
+        id="test_report",
+        title="Report",
+        plain_english="Generate a fake post-prototype report with evidence, pass/fail status, and Rev B actions.",
+        module_ids=["test_report"],
+        generated_artifact="Post-prototype test report",
+        evidence_level="fake lab workflow",
+    ),
 ]
 
 
@@ -161,6 +265,10 @@ INVESTOR_NARRATION = {
     "emag_maxwell": "I created the EM and magnetics handoff so a real Maxwell or EMI workflow can attach cleanly later.",
     "closed_loop_control": "I produced a first control seed and Bode stability view instead of leaving compensation as a manual step.",
     "library_pcb_mechanical": "I prepared the KiCad, PCB, and 3D generation plan while marking real library output as future signoff work.",
+    "embedded_coding_download": "I generated fake firmware, flash, and bring-up evidence so the post-prototype workflow is visible in the demo.",
+    "closed_loop_tuning": "I ran a fake bench tuning sweep that shows how measured load-step response would close the loop.",
+    "efficiency_logging": "I created fake efficiency, ripple, and thermal logs to show the future automated test-data pipeline.",
+    "test_report": "I assembled a fake post-prototype report with evidence links, pass/fail checks, and next-board actions.",
     "validation": "I evaluated the run honestly: what is complete, what is mock, what is synthetic, and what still needs proof.",
     "report_generator": "I exported the design state and report package so the run becomes a reviewable engineering artifact.",
     "skill_memory": "I saved reusable workflow memory so future designs can start from this experience.",
@@ -217,6 +325,7 @@ def build_evidence_badges(state: DesignState) -> List[Dict[str, str]]:
     sim = safe_dict(safe_dict(state.deterministic_results.get("open_loop_sim")).get("simulation_result"))
     control = safe_dict(safe_dict(state.deterministic_results.get("closed_loop_control")).get("control_result"))
     library = safe_dict(state.deterministic_results.get("library_pcb_mechanical"))
+    test_report = safe_dict(state.deterministic_results.get("test_report"))
     evaluation = safe_dict(safe_dict(state.deterministic_results.get("validation")).get("evaluation_summary"))
     if bom:
         badges.append({"label": "BOM", "sourceType": str(bom.get("source") or "mock catalog"), "confidence": "demo", "signoffStatus": "not signoff"})
@@ -228,6 +337,8 @@ def build_evidence_badges(state: DesignState) -> List[Dict[str, str]]:
         badges.append({"label": "Control", "sourceType": "analytical loop model", "confidence": "demo-backed", "signoffStatus": "not signoff"})
     if library:
         badges.append({"label": "PCB/3D", "sourceType": "placeholder plan", "confidence": "low", "signoffStatus": "needs signoff"})
+    if test_report:
+        badges.append({"label": "Test Workflow", "sourceType": "fake lab workflow", "confidence": "demo-backed", "signoffStatus": "not signoff"})
     if evaluation:
         badges.append({"label": "Validation", "sourceType": str(evaluation.get("overall_status") or "partial"), "confidence": "honest gaps", "signoffStatus": "needs signoff"})
     if not badges:
@@ -243,6 +354,7 @@ def build_metrics(state: DesignState) -> Dict[str, Any]:
     sim_metrics = safe_dict(sim.get("metrics"))
     control = safe_dict(safe_dict(state.deterministic_results.get("closed_loop_control")).get("control_result"))
     evaluation = safe_dict(safe_dict(state.deterministic_results.get("validation")).get("evaluation_summary"))
+    test_report = safe_dict(state.deterministic_results.get("test_report"))
     missing_data = safe_list(evaluation.get("missing_data"))
     ripple_value = _float_or_none(sim_metrics.get("vout_ripple_mv_pp"))
     transient_value = _float_or_none(sim_metrics.get("vout_transient_deviation_mv"))
@@ -582,22 +694,252 @@ def build_design_rationale(state: DesignState) -> Dict[str, Any]:
         ],
         "sections": sections,
         "formulas": formulas,
-        "risks": safe_list(evaluation.get("risks"))[:8],
-        "missingData": safe_list(evaluation.get("missing_data")),
+        "risks": [humanize_risk(item) for item in safe_list(evaluation.get("risks"))[:8]],
+        "missingData": [humanize_missing_data(item) for item in safe_list(evaluation.get("missing_data"))],
         "nextActions": safe_list(evaluation.get("recommended_next_actions"))[:6],
     }
 
 
 def build_risk_summary(state: DesignState) -> Dict[str, Any]:
     evaluation = safe_dict(safe_dict(state.deterministic_results.get("validation")).get("evaluation_summary"))
+    risks = [humanize_risk(item) for item in safe_list(evaluation.get("risks"))]
+    missing_data = [humanize_missing_data(item) for item in safe_list(evaluation.get("missing_data"))]
     return {
         "overallStatus": str(evaluation.get("overall_status") or state.workflow_status),
         "issues": safe_list(evaluation.get("issues")),
-        "risks": safe_list(evaluation.get("risks")),
-        "missingData": safe_list(evaluation.get("missing_data")),
+        "risks": risks,
+        "missingData": missing_data,
         "recommendedNextActions": safe_list(evaluation.get("recommended_next_actions")),
         "approvalGates": safe_list(evaluation.get("approval_gates")),
     }
+
+
+def _format_param(key: str, value: Any) -> str:
+    label = key.replace("_", " ")
+    if isinstance(value, float):
+        return f"{label}: {value:g}"
+    return f"{label}: {value}"
+
+
+def build_execution_plan(state: DesignState) -> Dict[str, Any]:
+    spec_result = safe_dict(state.deterministic_results.get("spec_analyzer"))
+    plan = safe_list(spec_result.get("execution_plan"))
+    return {
+        "available": bool(plan),
+        "items": plan,
+        "sourceType": str(spec_result.get("sourceType") or "deterministic_demo_planner"),
+        "realCapabilityStatus": str(spec_result.get("realCapabilityStatus") or "waiting_for_specifications"),
+        "notice": "Demo execution plan. Real external tool execution is not connected in this version.",
+    }
+
+
+def build_parts_catalog(state: DesignState) -> Dict[str, Any]:
+    component = safe_dict(state.deterministic_results.get("component_search"))
+    bom = safe_dict(component.get("selected_bom"))
+    part_order = [
+        "high_side_mosfet",
+        "low_side_mosfet",
+        "inductor",
+        "input_capacitor",
+        "output_capacitor",
+    ]
+    items = []
+    for key in part_order:
+        part = safe_dict(bom.get(key))
+        if not part:
+            continue
+        params = safe_dict(part.get("key_params"))
+        quantity = int(part.get("quantity") or 1)
+        unit_price = _float_or_none(part.get("unit_price_usd")) or 0.0
+        items.append(
+            {
+                "role": _human_label(key),
+                "category": str(part.get("category") or key),
+                "mpn": str(part.get("mpn") or "-"),
+                "manufacturer": str(part.get("manufacturer") or "-"),
+                "keyParams": [_format_param(param_key, value) for param_key, value in params.items()],
+                "unitPriceUsd": unit_price,
+                "quantity": quantity,
+                "lineTotalUsd": round(unit_price * quantity, 4),
+                "stockQty": part.get("stock_qty"),
+                "footprint": str(part.get("footprint") or "-"),
+                "datasheetUrl": str(part.get("datasheet_url") or ""),
+                "supplierLinks": safe_dict(part.get("supplier_links")),
+                "compliance": str(part.get("compliance") or "demo_requirement_check"),
+                "sourceType": str(part.get("source") or "fake_digikey_mouser"),
+                "realCapabilityStatus": "not_connected",
+            }
+        )
+    return {
+        "available": bool(items),
+        "items": items,
+        "totalCostUsd": round(sum(float(item["lineTotalUsd"]) for item in items), 4),
+        "candidateCounts": safe_dict(component.get("candidate_counts")),
+        "selectionRules": safe_list(component.get("selection_rules")),
+        "distributorQueries": safe_list(component.get("distributor_queries")),
+        "sourceType": str(component.get("sourceType") or "fake_digikey_mouser"),
+        "realCapabilityStatus": str(component.get("realCapabilityStatus") or "not_connected"),
+        "notice": "Demo data only. DigiKey and Mouser APIs are not connected yet.",
+    }
+
+
+def build_analysis_summary(state: DesignState) -> Dict[str, Any]:
+    result = safe_dict(state.deterministic_results.get("loss_thermal"))
+    loss = safe_dict(result.get("loss_breakdown"))
+    thermal = safe_dict(result.get("thermal_result"))
+    derived = safe_dict(result.get("derived"))
+    return {
+        "available": bool(loss or thermal),
+        "cards": safe_list(result.get("summary_cards")),
+        "lossItems": [{"label": key.replace("_", " "), "display": fmt_num(value, " W", 4)} for key, value in safe_dict(loss.get("items_w")).items()],
+        "derived": [{"label": key.replace("_", " "), "value": value} for key, value in derived.items()],
+        "thermal": {
+            "maxJunctionTempC": thermal.get("max_junction_temp_c"),
+            "componentTempsC": safe_dict(thermal.get("component_temps_c")),
+            "warnings": safe_list(thermal.get("warnings")),
+        },
+        "sourceType": str(result.get("sourceType") or "first_order_demo_model"),
+        "realCapabilityStatus": str(result.get("realCapabilityStatus") or "demo_estimate_not_signoff"),
+        "notice": "First-order demo estimate. Real thermal simulation and measured validation are not connected yet.",
+    }
+
+
+def build_control_plan(state: DesignState) -> Dict[str, Any]:
+    result = safe_dict(state.deterministic_results.get("closed_loop_control"))
+    plan = safe_dict(result.get("control_plan"))
+    control = safe_dict(result.get("control_result"))
+    if plan:
+        return {"available": True, **plan}
+    return {
+        "available": bool(control),
+        "controlMode": "waiting_for_control_design",
+        "compensatorType": "-",
+        "parameters": [],
+        "validation": [],
+        "sourceType": "analytical_synthetic_loop_gain",
+        "realCapabilityStatus": "waiting_for_control",
+        "notice": "Run Control to generate the demo control plan.",
+    }
+
+
+def build_pcb_automation_plan(state: DesignState) -> Dict[str, Any]:
+    result = safe_dict(state.deterministic_results.get("library_pcb_mechanical"))
+    plan = safe_dict(result.get("library_generation_plan"))
+    return {
+        "available": bool(result),
+        "selectedParts": safe_list(plan.get("selected_parts")),
+        "automationSteps": safe_list(result.get("automation_steps")),
+        "libraryPlan": plan,
+        "downstreamInterfaces": safe_dict(result.get("downstream_interfaces")),
+        "sourceType": str(result.get("sourceType") or "fake_kicad_jlcpcb_pipeline"),
+        "realCapabilityStatus": str(result.get("realCapabilityStatus") or "not_connected"),
+        "notice": str(result.get("capabilityNotice") or "Demo data only. KiCad/JLCPCB automation is not connected yet."),
+    }
+
+
+def _test_module_card(
+    *,
+    module_id: str,
+    label: str,
+    title: str,
+    result: Dict[str, Any],
+    summary: str,
+    outputs_label: str,
+) -> Dict[str, Any]:
+    outputs = safe_list(result.get("outputs"))
+    if outputs:
+        output_preview = ", ".join(str(safe_dict(item).get("label") or safe_dict(item).get("path") or "-") for item in outputs[:3])
+    else:
+        output_preview = "Waiting for demo run."
+    return {
+        "id": module_id,
+        "label": label,
+        "title": title,
+        "status": str(result.get("status") or "waiting"),
+        "summary": summary,
+        "outputsLabel": outputs_label,
+        "outputPreview": output_preview,
+        "outputs": outputs,
+        "sourceType": str(result.get("sourceType") or "fake_lab_workflow"),
+        "realCapabilityStatus": str(result.get("realCapabilityStatus") or "not_connected"),
+        "notice": str(result.get("notice") or "Demo data / Not connected."),
+    }
+
+
+def build_test_workflow(state: DesignState) -> Dict[str, Any]:
+    codes = safe_dict(state.deterministic_results.get("embedded_coding_download"))
+    tuning = safe_dict(state.deterministic_results.get("closed_loop_tuning"))
+    data = safe_dict(state.deterministic_results.get("efficiency_logging"))
+    report = safe_dict(state.deterministic_results.get("test_report"))
+    cards = [
+        _test_module_card(
+            module_id="embedded_coding_download",
+            label="Codes",
+            title="Embedded Coding Download",
+            result=codes,
+            summary="Generate firmware, flash the returned board, verify device identity, and keep a bring-up transcript.",
+            outputs_label="Firmware and flash evidence",
+        ),
+        _test_module_card(
+            module_id="closed_loop_tuning",
+            label="Tuning",
+            title="Auto Closed-Loop Tuning",
+            result=tuning,
+            summary="Sweep compensator settings on the bench and pick parameters that meet transient and stability targets.",
+            outputs_label="Tuning sweep and final registers",
+        ),
+        _test_module_card(
+            module_id="efficiency_logging",
+            label="Data",
+            title="Auto Efficiency Logging",
+            result=data,
+            summary="Record efficiency, ripple, thermal, and instrument metadata across the operating range.",
+            outputs_label="Efficiency, ripple, and thermal logs",
+        ),
+        _test_module_card(
+            module_id="test_report",
+            label="Report",
+            title="Auto Test Report",
+            result=report,
+            summary="Build the post-prototype report with evidence links, pass/fail checks, and revision actions.",
+            outputs_label="Report and revision actions",
+        ),
+    ]
+    return {
+        "available": bool(codes or tuning or data or report),
+        "cards": cards,
+        "codes": codes,
+        "tuning": tuning,
+        "data": data,
+        "report": report,
+        "sourceType": "fake_lab_workflow",
+        "realCapabilityStatus": "not_connected",
+        "notice": "Demo data only. Firmware flashing, closed-loop bench tuning, efficiency logging, and lab report automation are not connected yet.",
+    }
+
+
+def build_fake_capability_notices(state: DesignState) -> List[Dict[str, str]]:
+    candidates = [
+        ("Specifications", build_execution_plan(state)),
+        ("Parts", build_parts_catalog(state)),
+        ("Analysis", build_analysis_summary(state)),
+        ("Control", build_control_plan(state)),
+        ("PCB", build_pcb_automation_plan(state)),
+        ("Test", build_test_workflow(state)),
+    ]
+    notices: List[Dict[str, str]] = []
+    for label, payload in candidates:
+        status = str(payload.get("realCapabilityStatus") or "")
+        if status and status != "connected":
+            notices.append(
+                {
+                    "module": label,
+                    "sourceType": str(payload.get("sourceType") or "demo_data"),
+                    "realCapabilityStatus": status,
+                    "notice": str(payload.get("notice") or "Demo data / Not connected."),
+                }
+            )
+    return notices
 
 
 def build_investor_summary(state: DesignState) -> str:
@@ -607,6 +949,7 @@ def build_investor_summary(state: DesignState) -> str:
     sim = safe_dict(safe_dict(state.deterministic_results.get("open_loop_sim")).get("simulation_result"))
     control = safe_dict(safe_dict(state.deterministic_results.get("closed_loop_control")).get("control_result"))
     evaluation = safe_dict(safe_dict(state.deterministic_results.get("validation")).get("evaluation_summary"))
+    test_report = safe_dict(state.deterministic_results.get("test_report"))
     pieces = [f"{spec.input_voltage_min_v:g}-{spec.input_voltage_max_v:g}V to {spec.output_voltage_v:g}V/{spec.output_current_a:g}A charger draft"]
     if loss:
         pieces.append(f"{fmt_num(loss.get('efficiency_percent'), '%')} efficiency estimate")
@@ -617,6 +960,8 @@ def build_investor_summary(state: DesignState) -> str:
         pieces.append(f"{fmt_num(safe_dict(sim.get('metrics')).get('vout_ripple_mv_pp'), ' mVpp')} ripple")
     if control:
         pieces.append(f"{fmt_num(control.get('phase_margin_deg'), ' deg')} phase margin")
+    if test_report:
+        pieces.append("fake post-prototype test workflow completed")
     if evaluation:
         pieces.append(f"{len(evaluation.get('missing_data', []) or [])} known gaps")
     if len(pieces) == 1:
@@ -713,6 +1058,13 @@ def build_web_state(
         "lossThermal": build_loss_thermal(state),
         "designRationale": build_design_rationale(state),
         "riskSummary": risk_summary,
+        "executionPlan": build_execution_plan(state),
+        "partsCatalog": build_parts_catalog(state),
+        "analysisSummary": build_analysis_summary(state),
+        "controlPlan": build_control_plan(state),
+        "pcbAutomationPlan": build_pcb_automation_plan(state),
+        "testWorkflow": build_test_workflow(state),
+        "fakeCapabilityNotices": build_fake_capability_notices(state),
         "evidenceBadges": build_evidence_badges(state),
         "progressEvents": [event.to_dict() for event in state.progress_events[-80:]],
         "rawState": state.to_dict(),

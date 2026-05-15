@@ -26,11 +26,40 @@ class WorkflowModuleTests(unittest.TestCase):
             "emag_maxwell",
             "closed_loop_control",
             "library_pcb_mechanical",
+            "embedded_coding_download",
+            "closed_loop_tuning",
+            "efficiency_logging",
+            "test_report",
             "validation",
             "report_generator",
             "skill_memory",
         ]:
             self.assertIn(module_id, state.deterministic_results)
+        self.assertIn("execution_plan", state.deterministic_results["spec_analyzer"])
+        bom = state.deterministic_results["component_search"]["selected_bom"]
+        high_side = bom["high_side_mosfet"]
+        self.assertIn("supplier_links", high_side)
+        self.assertIn("digikey", high_side["supplier_links"])
+        self.assertIn("mouser", high_side["supplier_links"])
+        self.assertIn("unit_price_usd", high_side)
+        self.assertIn("stock_qty", high_side)
+        self.assertIn("key_params", high_side)
+        pcb_steps = state.deterministic_results["library_pcb_mechanical"]["automation_steps"]
+        step_names = {step["step"] for step in pcb_steps}
+        for expected in ["Schematic Generation", "Placement", "Routing", "Gerber Export", "JLCPCB Handoff"]:
+            self.assertIn(expected, step_names)
+        firmware = state.deterministic_results["embedded_coding_download"]
+        self.assertEqual(firmware["realCapabilityStatus"], "not_connected")
+        self.assertIn("flashLog", firmware)
+        tuning = state.deterministic_results["closed_loop_tuning"]
+        self.assertIn("parameterSweep", tuning)
+        self.assertIn("selectedParameters", tuning)
+        logged = state.deterministic_results["efficiency_logging"]
+        self.assertGreaterEqual(len(logged["efficiencyPoints"]), 4)
+        self.assertIn("summaryCards", logged)
+        test_report = state.deterministic_results["test_report"]
+        self.assertIn("reportSummary", test_report)
+        self.assertIn("revisionActions", test_report)
 
     def test_default_buck_specs_are_market_demo_values(self):
         spec = ProjectSpec()

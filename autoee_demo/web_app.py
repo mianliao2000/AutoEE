@@ -38,7 +38,7 @@ class WebDemoSession:
 
     def __init__(
         self,
-        min_module_seconds: float = 2.0,
+        min_module_seconds: float = 0.5,
         output_root: Optional[Path] = None,
     ):
         self.lock = threading.RLock()

@@ -17,7 +17,7 @@
 - Added `Run 3-Min Demo`, `Reset Demo`, and Markdown investor snapshot export.
 - Switched to a white/light theme and reduced Investor Demo plus Engineering Console typography.
 - Split Loss + Thermal into a clear efficiency-curve panel, separate loss-stack panel, non-overlapping pie charts, and more readable thermal color-scale notes.
-- Added a 2-second minimum visual runtime per module for the Investor Demo so fake/fast modules do not instantly jump to complete.
+- Set the Investor Demo visual runtime to 0.5 seconds per module so fake/fast modules remain visible without slowing down the demo.
 - Added Engineering Console `Design Rationale` tab as a concise quick-check document with architecture decisions, component rationale, formulas, current results, and review gaps.
 
 ## Verification

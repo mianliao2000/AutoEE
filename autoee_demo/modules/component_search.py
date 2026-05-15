@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import quote
 from typing import Optional
 
 from autoee_demo.core.state import BomSelection, DesignState, PartCandidate
@@ -9,7 +10,15 @@ from autoee_demo.model_backend import ModelManager
 from .base import AutoEESkill, SkillRunResult, require_result
 
 
-def _part(category, mpn, manufacturer, params, price, stock, footprint):
+def _supplier_links(mpn: str) -> dict:
+    encoded = quote(mpn)
+    return {
+        "digikey": f"https://www.digikey.com/en/products/result?keywords={encoded}",
+        "mouser": f"https://www.mouser.com/c/?q={encoded}",
+    }
+
+
+def _part(category, mpn, manufacturer, params, price, stock, footprint, quantity=1):
     return PartCandidate(
         category=category,
         mpn=mpn,
@@ -18,7 +27,11 @@ def _part(category, mpn, manufacturer, params, price, stock, footprint):
         unit_price_usd=price,
         stock_qty=stock,
         footprint=footprint,
-        source="mock_digikey_catalog",
+        datasheet_url=f"https://example.com/datasheets/{quote(mpn)}.pdf",
+        source="fake_digikey_mouser",
+        quantity=quantity,
+        supplier_links=_supplier_links(mpn),
+        compliance="meets_demo_requirements",
     )
 
 
@@ -47,6 +60,7 @@ class ComponentSearchBackend(AutoEESkill):
                     0.58,
                     45000,
                     "PowerPAK_SO8_5x6",
+                    quantity=1,
                 ),
                 _part(
                     "mosfet",
@@ -56,6 +70,7 @@ class ComponentSearchBackend(AutoEESkill):
                     0.74,
                     26000,
                     "PowerPAK_SO8_5x6",
+                    quantity=1,
                 ),
             ],
             "inductors": [
@@ -67,6 +82,7 @@ class ComponentSearchBackend(AutoEESkill):
                     0.82,
                     18000,
                     "Inductor_7x7mm",
+                    quantity=1,
                 ),
                 _part(
                     "inductor",
@@ -76,6 +92,7 @@ class ComponentSearchBackend(AutoEESkill):
                     0.91,
                     12000,
                     "Inductor_7x7mm",
+                    quantity=1,
                 ),
             ],
             "capacitors": [
@@ -87,6 +104,7 @@ class ComponentSearchBackend(AutoEESkill):
                     0.19,
                     90000,
                     "C_1210_3225Metric",
+                    quantity=2,
                 ),
                 _part(
                     "input_capacitor",
@@ -96,6 +114,7 @@ class ComponentSearchBackend(AutoEESkill):
                     0.31,
                     65000,
                     "C_1210_3225Metric",
+                    quantity=2,
                 ),
             ],
         }
@@ -117,16 +136,21 @@ class ComponentSearchBackend(AutoEESkill):
                 title=self.title,
                 summary=summary,
                 data={
-                    "backend": "mock_digikey",
+                    "backend": "fake_digikey_mouser",
                     "selected_bom": selected.to_dict(),
                     "candidate_counts": {key: len(value) for key, value in candidates.items()},
+                    "distributor_queries": [
+                        {"distributor": "DigiKey", "status": "demo_data_not_connected", "query": "60V MOSFET low Rds(on) QFN 5x6"},
+                        {"distributor": "Mouser", "status": "demo_data_not_connected", "query": "shielded 10uH inductor 7A"},
+                    ],
                     "selection_rules": [
                         "Voltage rating >= 1.25 x Vin(max)",
                         "Inductor saturation current > Iout + ripple/2",
                         "X7R ceramic caps with voltage derating and low ESR",
                     ],
+                    "sourceType": "fake_digikey_mouser",
+                    "realCapabilityStatus": "not_connected",
                 },
-                source="mock_catalog",
+                source="fake_catalog",
             ),
         )
-

@@ -28,6 +28,10 @@ class WebBackendTests(unittest.TestCase):
         self.assertEqual(payload["spec"]["input_voltage_min_v"], 9.0)
         self.assertIn("stages", payload)
         self.assertIn("designRationale", payload)
+        self.assertIn("executionPlan", payload)
+        self.assertIn("partsCatalog", payload)
+        self.assertIn("pcbAutomationPlan", payload)
+        self.assertIn("testWorkflow", payload)
         self.assertGreaterEqual(len(payload["stages"]), 6)
 
     def test_update_spec_clears_old_results(self):
@@ -77,6 +81,25 @@ class WebBackendTests(unittest.TestCase):
         self.assertIn("synthetic", payload["waveforms"]["sourceBadge"])
         self.assertTrue(payload["waveforms"]["controlBode"]["available"])
         self.assertIn("phase_margin_deg", payload["waveforms"]["controlBode"]["metrics"])
+        self.assertTrue(payload["executionPlan"]["items"])
+        self.assertTrue(payload["partsCatalog"]["items"])
+        first_part = payload["partsCatalog"]["items"][0]
+        self.assertIn("digikey", first_part["supplierLinks"])
+        self.assertIn("mouser", first_part["supplierLinks"])
+        pcb_steps = {step["step"] for step in payload["pcbAutomationPlan"]["automationSteps"]}
+        self.assertIn("Gerber Export", pcb_steps)
+        self.assertIn("JLCPCB Handoff", pcb_steps)
+        self.assertTrue(payload["testWorkflow"]["available"])
+        self.assertGreaterEqual(len(payload["testWorkflow"]["cards"]), 4)
+        self.assertIn("flashLog", payload["testWorkflow"]["codes"])
+        self.assertGreaterEqual(len(payload["testWorkflow"]["data"]["efficiencyPoints"]), 4)
+        self.assertIn("revisionActions", payload["testWorkflow"]["report"])
+        test_stage_status = {stage["id"]: stage["status"] for stage in payload["stages"]}
+        self.assertEqual(test_stage_status["embedded_coding_download"], "complete")
+        self.assertEqual(test_stage_status["closed_loop_tuning"], "complete")
+        self.assertEqual(test_stage_status["efficiency_logging"], "complete")
+        self.assertEqual(test_stage_status["test_report"], "complete")
+        self.assertTrue(payload["fakeCapabilityNotices"])
         badge_text = " ".join(f"{badge['sourceType']} {badge['signoffStatus']}" for badge in payload["evidenceBadges"])
         self.assertIn("not signoff", badge_text)
         self.assertIn("mock", badge_text)

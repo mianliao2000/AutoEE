@@ -46,7 +46,7 @@ def wait_for_server(host: str, port: int, timeout_s: float = 10.0) -> None:
 
 def start_server(host: str, port: int) -> Tuple[uvicorn.Server, threading.Thread]:
     ensure_stdio()
-    session = WebDemoSession(min_module_seconds=2.0)
+    session = WebDemoSession(min_module_seconds=0.5)
     app = create_app(session)
     config = uvicorn.Config(app, host=host, port=port, log_level="warning", access_log=False, log_config=None)
     server = uvicorn.Server(config)

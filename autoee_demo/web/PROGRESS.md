@@ -8,16 +8,17 @@
 - Added FastAPI runtime in `autoee_demo/web_app.py` with state, run-demo, stop, reset, export-snapshot, and Server-Sent Events endpoints.
 - Added `autoee_demo/web_launcher.py` as the PyInstaller/web desktop entrypoint.
 - Added `autoee_demo/web_state.py` to derive investor narrative, metrics, evidence badges, waveforms, loss/thermal data, design rationale, risk summary, and snapshot Markdown from `DesignState`.
-- Added Vite + React + TypeScript frontend under `web/` with Investor Demo, Workflow timeline, Energy Story, Waveform overview, Loss/Thermal, Design Rationale, Risk Summary, and compact developer JSON.
+- Added Vite + React + TypeScript frontend under `web/` with Investor Demo, modular domain-pack workflow planning, Project Understanding, Selected Workflow, Active Engineering Modules, Dynamic Metrics, Generated EE Package, Waveform overview, Loss/Thermal, Design Rationale, Risk Summary, and compact developer JSON.
+- Standardized all domain-pack roadmaps to the same two-section layout: Design before PCB prototype fabrication and Test after the prototype returns.
 - Added packaging assets: `packaging/autoee_web.spec`, `scripts/build_web_release.ps1`, and `README_START_HERE.txt`.
 - Generated portable release folder at `release/AutoEE-Investor-Demo/AutoEE.exe`.
 
 ## Verification
 - `npm --prefix web run build` passes.
-- `python -m unittest discover -s tests` passes with 26 tests.
+- `python -m unittest discover -s tests` passes with 28 tests.
 - `python -m autoee_demo.web_launcher --smoke` passes.
 - `python -m compileall autoee_demo evals tests tools` passes.
-- `release/AutoEE-Investor-Demo/AutoEE.exe --smoke` finds bundled static assets and initializes 7 demo stages.
+- Web smoke tests initialize the full 11-stage power electronics demo, including the fake post-prototype Test workflow.
 - Release folder was scanned for accidental API key pattern; no secrets were found.
 
 ## Risks And Notes

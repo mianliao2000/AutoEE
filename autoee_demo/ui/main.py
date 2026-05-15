@@ -2263,7 +2263,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "assistant",
             "I will run the 3-minute investor demo: product requirement, specs, parts, loss/thermal, waveforms, control, validation, and design package.",
         )
-        self.start_worker("run", INVESTOR_DEMO_PROMPT, [skill.module_id for skill in self.agent.skills], min_module_seconds=2.0)
+        self.start_worker("run", INVESTOR_DEMO_PROMPT, [skill.module_id for skill in self.agent.skills], min_module_seconds=0.5)
 
     def on_run_all_clicked(self) -> None:
         self._append_chat("user", "Run the full AutoEE Buck charger workflow.")

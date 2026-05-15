@@ -208,12 +208,32 @@ class ControlTunerBackend(AutoEESkill):
             ],
         )
         summary = f"Computed PID/Type-3 seed at fc={result.crossover_hz:.0f}Hz and PM={result.phase_margin_deg:.0f}deg."
+        control_plan = {
+            "controlMode": "voltage_mode_synchronous_buck",
+            "compensatorType": "Type-3 / PID seed",
+            "targetCrossoverHz": round(wc / (2.0 * math.pi), 2),
+            "phaseMarginTargetDeg": 60.0,
+            "parameters": [
+                {"name": "Kp", "value": result.kp, "unit": "", "purpose": "Proportional gain for transient response."},
+                {"name": "Ki", "value": result.ki, "unit": "", "purpose": "Integrator gain for zero steady-state error."},
+                {"name": "Kd", "value": result.kd, "unit": "", "purpose": "Damping term for phase boost."},
+                {"name": "Kf", "value": result.kf, "unit": "rad/s", "purpose": "Derivative pole / filter frequency."},
+            ],
+            "validation": [
+                {"check": "Bode crossover", "result": bode_metrics.get("crossover_hz"), "status": "demo_estimate_not_signoff"},
+                {"check": "Phase margin", "result": bode_metrics.get("phase_margin_deg"), "status": "demo_estimate_not_signoff"},
+                {"check": "Load-step settling", "result": metrics["estimated_settling_ms"], "status": "demo_estimate_not_signoff"},
+            ],
+            "sourceType": "analytical_synthetic_loop_gain",
+            "realCapabilityStatus": "demo_estimate_not_signoff",
+            "notice": "Simulation-backed auto-tuning and bench closed-loop tuning are not connected yet.",
+        }
         return self.complete(
             state,
             SkillRunResult(
                 self.module_id,
                 self.title,
                 summary,
-                {"control_result": result.to_dict(), "bode_plot": bode_plot},
+                {"control_result": result.to_dict(), "bode_plot": bode_plot, "control_plan": control_plan},
             ),
         )
