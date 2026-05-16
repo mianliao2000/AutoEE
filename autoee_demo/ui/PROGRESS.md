@@ -14,7 +14,7 @@
 - Replaced the old loss/thermal panel with an output-current loss sweep, Vin efficiency curves, peak-efficiency and full-power loss pie charts, and color-coded temperature cards.
 - Added Investor Demo Mode as the default right-side workspace tab, with Engineering Console preserved as the second tab.
 - Added VC-facing hero strip, AI hardware skill system map, design package checklist, energy story, evidence badges, and founder narration panel.
-- Added `Run 3-Min Demo`, `Reset Demo`, and Markdown investor snapshot export.
+- Added `Run Demo`, `Reset Demo`, and Markdown investor snapshot export.
 - Switched to a white/light theme and reduced Investor Demo plus Engineering Console typography.
 - Split Loss + Thermal into a clear efficiency-curve panel, separate loss-stack panel, non-overlapping pie charts, and more readable thermal color-scale notes.
 - Set the Investor Demo visual runtime to 0.5 seconds per module so fake/fast modules remain visible without slowing down the demo.

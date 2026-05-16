@@ -111,6 +111,8 @@ const DESIGN_PHASE = "Design";
 const TEST_PHASE = "Test";
 const BEFORE_PROTOTYPE = "Before PCB Prototype Fabrication";
 const AFTER_PROTOTYPE = "After PCB Prototype Returns";
+const DEMO_DESIGN_STAGE_IDS = ["understand_specs", "select_parts", "loss_thermal", "waveforms", "control", "package"];
+const DEMO_TEST_STAGE_IDS = ["embedded_coding_download", "closed_loop_tuning", "efficiency_logging", "test_report"];
 
 const powerWorkflow: WorkflowStep[] = [
   {
@@ -224,7 +226,7 @@ const packs: DomainPack[] = [
     uiLabels: {
       workflowTitle: "Selected Workflow",
       workflowSubtitle: "Power electronics pack: design before fabrication, then test after the prototype returns.",
-      packageTitle: "Generated EE Package",
+      packageTitle: "Generated Hardware Package",
     },
     workflowSteps: powerWorkflow,
     capabilities: [
@@ -312,7 +314,7 @@ const packs: DomainPack[] = [
   ], [
     ["bom_cost", "BOM Cost"], ["layer_count", "Layer Count"], ["drc_risk", "DRC Risk"], ["assembly_risk", "Assembly Risk"], ["connector_count", "Connector Count"],
   ], [
-    "Requirement Summary", "Component Inventory", "Connector / I/O Map", "Layout Constraint Set", "Assembly Risk Review", "Generated EE Package",
+    "Requirement Summary", "Component Inventory", "Connector / I/O Map", "Layout Constraint Set", "Assembly Risk Review", "Generated Hardware Package",
   ]),
 ];
 
@@ -394,8 +396,16 @@ function step(
   description: string,
   icon: string,
   moduleIds: string[],
+  sourceStageIds: string[] = [],
 ): WorkflowStep {
-  return { id, title, phase, contextLabel, description, icon, moduleIds, sourceStageIds: [] };
+  return { id, title, phase, contextLabel, description, icon, moduleIds, sourceStageIds };
+}
+
+function mapPlaceholderWorkflowToDemoStages(workflowSteps: WorkflowStep[]): WorkflowStep[] {
+  return workflowSteps.map((workflowStep) => {
+    if (workflowStep.sourceStageIds.length) return workflowStep;
+    return { ...workflowStep, sourceStageIds: [workflowStep.id] };
+  });
 }
 
 function placeholderPack(
@@ -407,6 +417,7 @@ function placeholderPack(
   metricRows: Array<[string, string]>,
   artifactLabels: string[],
 ): DomainPack {
+  const mappedWorkflowSteps = mapPlaceholderWorkflowToDemoStages(workflowSteps);
   const capabilities = Array.from(new Set(workflowSteps.flatMap((workflowStep) => workflowStep.moduleIds))).map((moduleId, index) => {
     const workflowStep = workflowSteps.find((item) => item.moduleIds.includes(moduleId));
     const category: ModuleStatusCategory = index < 3 ? "required" : index < 5 ? "recommended" : "optional";
@@ -432,9 +443,9 @@ function placeholderPack(
     uiLabels: {
       workflowTitle: "Selected Workflow",
       workflowSubtitle: `${name} pack is selected from request keywords. Placeholder modules show intended workflow coverage only.`,
-      packageTitle: "Generated EE Package",
+      packageTitle: "Generated Hardware Package",
     },
-    workflowSteps,
+    workflowSteps: mappedWorkflowSteps,
     capabilities,
     metrics: metricRows.map(([metricId, label]) =>
       metric(metricId, label, `${label} placeholder for the ${name} domain pack.`, id, undefined, "Estimate pending"),
@@ -445,7 +456,7 @@ function placeholderPack(
         label,
         `${label} placeholder artifact for the ${name} workflow.`,
         id,
-        [workflowSteps[Math.min(index, workflowSteps.length - 1)]?.id || ""],
+        mappedWorkflowSteps[Math.min(index, mappedWorkflowSteps.length - 1)]?.sourceStageIds || [],
         "placeholder / not connected",
       ),
     ),
@@ -471,7 +482,7 @@ function inferProductType(request: string, domains: ProjectDomain[]): string {
   if (domains.includes("analog_sensor") && request.includes("thermocouple")) return "thermocouple_measurement_front_end";
   if (domains.includes("high_speed_digital") && request.includes("fpga")) return "fpga_high_speed_io_board";
   if (domains.includes("embedded_mcu")) return "embedded_controller_board";
-  return "general_ee_pcb";
+  return "general_hardware_pcb";
 }
 
 function mergeModules(packsToMerge: DomainPack[]): ModuleSelectionResult {
@@ -583,6 +594,12 @@ export function validateWorkflowPlannerSamples(): string[] {
     if (!plan.workflowSteps.length) failures.push(`${sample.id} produced no workflow steps`);
     if (!plan.metrics.length) failures.push(`${sample.id} produced no metrics`);
     if (!plan.artifacts.length) failures.push(`${sample.id} produced no artifacts`);
+    if (plan.workflowSteps.some((workflowStep) => !workflowStep.sourceStageIds.length)) {
+      failures.push(`${sample.id} produced workflow steps without demo status source mapping`);
+    }
+    if (plan.artifacts.some((artifactItem) => !artifactItem.sourceStageIds.length)) {
+      failures.push(`${sample.id} produced artifacts without demo status source mapping`);
+    }
     const sectionLabels = plan.workflowSections.map((section) => section.label);
     const unexpectedSections = sectionLabels.filter((label) => label !== DESIGN_PHASE && label !== TEST_PHASE);
     if (unexpectedSections.length) {

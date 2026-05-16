@@ -49,6 +49,14 @@ class WebDemoSession:
         self.stop_requested = False
         self.started_at: Optional[float] = None
         self.presentation_status: Dict[str, str] = {}
+        self.active_demo_context: Dict[str, Any] = {
+            "requestId": "power_buck",
+            "domain": "power_electronics",
+            "productType": "dc_dc_buck_converter",
+            "demoMode": "power_backend",
+            "workflowSteps": [],
+        }
+        self.active_demo_stage_status: Dict[str, str] = {}
         self.agent = self._new_agent()
 
     @staticmethod
@@ -62,12 +70,34 @@ class WebDemoSession:
 
     def state_payload(self) -> Dict[str, Any]:
         with self.lock:
-            return build_web_state(
+            payload = build_web_state(
                 self.agent.state,
                 presentation_status=dict(self.presentation_status),
                 running=self.running,
                 started_at=self.started_at,
             )
+            context = dict(self.active_demo_context)
+            demo_stages = []
+            for item in context.get("workflowSteps") or []:
+                if not isinstance(item, dict):
+                    continue
+                stage_id = str(item.get("id") or "")
+                if not stage_id:
+                    continue
+                demo_stages.append({
+                    "id": stage_id,
+                    "title": str(item.get("title") or stage_id),
+                    "phase": str(item.get("phase") or ""),
+                    "status": self.active_demo_stage_status.get(stage_id, "waiting"),
+                })
+            payload.update({
+                "activeDemoRequestId": context.get("requestId", "power_buck"),
+                "activeDemoDomain": context.get("domain", "power_electronics"),
+                "activeDemoProductType": context.get("productType", "dc_dc_buck_converter"),
+                "demoMode": context.get("demoMode", "power_backend"),
+                "activeDemoStages": demo_stages,
+            })
+            return payload
 
     def reset(self) -> Dict[str, Any]:
         with self.lock:
@@ -75,6 +105,7 @@ class WebDemoSession:
             self.agent = self._new_agent()
             self.agent.state = DesignState(spec=spec)
             self.presentation_status.clear()
+            self.active_demo_stage_status.clear()
             self.running = False
             self.stop_requested = False
             self.started_at = None
@@ -93,6 +124,7 @@ class WebDemoSession:
             self.agent = self._new_agent()
             self.agent.state = DesignState(spec=spec)
             self.presentation_status.clear()
+            self.active_demo_stage_status.clear()
             self.stop_requested = False
             self.started_at = None
             self.agent.state.workflow_status = "edited"
@@ -130,21 +162,105 @@ class WebDemoSession:
             self._bump()
         return self.state_payload()
 
-    def run_demo(self) -> bool:
+    @staticmethod
+    def _is_power_demo(context: Dict[str, Any]) -> bool:
+        return context.get("requestId") == "power_buck" or context.get("domain") == "power_electronics"
+
+    @staticmethod
+    def _normalize_demo_context(context: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+        raw = context if isinstance(context, dict) else {}
+        request_id = str(raw.get("requestId") or "power_buck")
+        domain = str(raw.get("domain") or "power_electronics")
+        product_type = str(raw.get("productType") or "dc_dc_buck_converter")
+        request_text = str(raw.get("requestText") or "")
+        workflow_steps = raw.get("workflowSteps") if isinstance(raw.get("workflowSteps"), list) else []
+        normalized_steps = []
+        for item in workflow_steps:
+            if not isinstance(item, dict) or not item.get("id"):
+                continue
+            normalized_steps.append({
+                "id": str(item.get("id")),
+                "title": str(item.get("title") or item.get("id")),
+                "phase": str(item.get("phase") or ""),
+            })
+        demo_mode = "power_backend" if request_id == "power_buck" or domain == "power_electronics" else "profile_fake"
+        return {
+            "requestId": request_id,
+            "requestText": request_text,
+            "domain": domain,
+            "productType": product_type,
+            "demoMode": demo_mode,
+            "workflowSteps": normalized_steps,
+        }
+
+    def run_demo(self, context: Optional[Dict[str, Any]] = None) -> bool:
+        demo_context = self._normalize_demo_context(context)
         with self.lock:
             if self.running:
                 return False
+            spec = self.agent.state.spec
+            self.agent = self._new_agent()
+            self.agent.state = DesignState(spec=spec)
             self.running = True
             self.stop_requested = False
             self.started_at = time.monotonic()
             self.presentation_status.clear()
+            self.active_demo_context = demo_context
+            self.active_demo_stage_status = {
+                str(item["id"]): "waiting"
+                for item in demo_context.get("workflowSteps", [])
+                if item.get("id")
+            }
             self.agent.stop_requested = False
             self.agent.state.workflow_status = "running"
-            self.agent.state.record_event("agent", "running", "Web investor demo started.")
+            self.agent.state.record_event("ui", "reset", "Run Demo reset previous results before starting.")
+            self.agent.state.record_event("agent", "running", f"{demo_context['requestId']} demo started.")
             self._bump()
-        worker = threading.Thread(target=self._run_demo_thread, name="AutoEEWebDemoRunner", daemon=True)
+        target = self._run_demo_thread if self._is_power_demo(demo_context) else self._run_profile_demo_thread
+        worker = threading.Thread(target=target, name="AutoEEWebDemoRunner", daemon=True)
         worker.start()
         return True
+
+    def _run_profile_demo_thread(self) -> None:
+        try:
+            with self.lock:
+                steps = list(self.active_demo_context.get("workflowSteps") or [])
+            for step in steps:
+                stage_id = str(step.get("id") or "")
+                if not stage_id:
+                    continue
+                with self.lock:
+                    if self.stop_requested:
+                        break
+                    self.active_demo_stage_status[stage_id] = "running"
+                    self.agent.state.record_event(stage_id, "running", f"{step.get('title', stage_id)} demo module is running.")
+                    self._bump()
+
+                start = time.monotonic()
+                while time.monotonic() - start < self.min_module_seconds:
+                    with self.lock:
+                        if self.stop_requested:
+                            break
+                    time.sleep(0.05)
+
+                with self.lock:
+                    if self.stop_requested:
+                        break
+                    self.active_demo_stage_status[stage_id] = "complete"
+                    self.agent.state.record_event(stage_id, "complete", f"{step.get('title', stage_id)} fake module completed.")
+                    self._bump()
+
+            with self.lock:
+                if self.stop_requested:
+                    self.agent.state.workflow_status = "stopped"
+                    self.agent.state.record_event("agent", "stopped", "Profile demo stopped by user.")
+                else:
+                    self.agent.state.workflow_status = "complete"
+                    self.agent.state.record_event("agent", "complete", f"{self.active_demo_context.get('requestId')} profile demo completed.")
+        finally:
+            with self.lock:
+                self.running = False
+                self._bump()
 
     def _run_demo_thread(self) -> None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -185,10 +301,10 @@ class WebDemoSession:
             with self.lock:
                 if self.stop_requested:
                     self.agent.state.workflow_status = "stopped"
-                    self.agent.state.record_event("agent", "stopped", "Web investor demo stopped by user.")
+                    self.agent.state.record_event("agent", "stopped", "Web Home Page demo stopped by user.")
                 elif self.agent.state.workflow_status != "error":
                     self.agent.state.workflow_status = "complete"
-                    self.agent.state.record_event("agent", "complete", "Web investor demo completed.")
+                    self.agent.state.record_event("agent", "complete", "Web Home Page demo completed.")
         finally:
             with self.lock:
                 self.running = False
@@ -198,7 +314,7 @@ class WebDemoSession:
     def export_snapshot(self) -> Dict[str, Any]:
         snapshot_dir = self.output_root.parent / "investor_snapshots"
         snapshot_dir.mkdir(parents=True, exist_ok=True)
-        path = snapshot_dir / f"autoee_investor_snapshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        path = snapshot_dir / f"AutoEE_investor_snapshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         with self.lock:
             text = build_investor_snapshot_markdown(self.agent.state)
         path.write_text(text, encoding="utf-8")
@@ -217,8 +333,8 @@ def create_app(session: Optional[WebDemoSession] = None) -> FastAPI:
         return JSONResponse(app.state.session.state_payload())
 
     @app.post("/api/run-demo")
-    def run_demo() -> JSONResponse:
-        started = app.state.session.run_demo()
+    def run_demo(payload: Optional[Dict[str, Any]] = None) -> JSONResponse:
+        started = app.state.session.run_demo(payload)
         return JSONResponse({"ok": True, "started": started, "state": app.state.session.state_payload()})
 
     @app.post("/api/stop")

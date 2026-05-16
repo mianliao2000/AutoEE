@@ -700,7 +700,7 @@ class InvestorDemoPanel(QtWidgets.QWidget):
         action_row = QtWidgets.QHBoxLayout()
         self.prompt_label = QtWidgets.QLabel(INVESTOR_DEMO_PROMPT)
         self.prompt_label.setObjectName("DemoPrompt")
-        self.btn_run_demo = QtWidgets.QPushButton("Run 3-Min Demo")
+        self.btn_run_demo = QtWidgets.QPushButton("Run Demo")
         self.btn_run_demo.setObjectName("PrimaryButton")
         self.btn_reset_demo = QtWidgets.QPushButton("Reset Demo")
         self.btn_export_snapshot = QtWidgets.QPushButton("Export Investor Snapshot")
@@ -1637,7 +1637,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._apply_dark_theme()
         self._append_chat(
             "assistant",
-            "I am AutoEE Agent. For a VC demo, click Run 3-Min Demo and I will turn one product request into a reviewable hardware design package.",
+            "I am AutoEE Agent. For a VC demo, click Run Demo and I will turn one product request into a reviewable hardware design package.",
         )
         self.render_state()
 
@@ -1698,7 +1698,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_send = QtWidgets.QPushButton("Send")
         self.btn_send.setObjectName("PrimaryButton")
         self.btn_send.clicked.connect(self.on_send_message)
-        self.btn_run_all = QtWidgets.QPushButton("Run 3-Min Demo")
+        self.btn_run_all = QtWidgets.QPushButton("Run Demo")
         self.btn_run_all.clicked.connect(self.on_run_investor_demo)
         self.btn_stop = QtWidgets.QPushButton("Stop")
         self.btn_stop.clicked.connect(self.on_stop_clicked)
@@ -2257,11 +2257,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def on_run_investor_demo(self) -> None:
         self.workspace_tabs.setCurrentWidget(self.investor_demo)
+        current_spec = self.agent.state.spec
+        self.agent.state = DesignState(spec=current_spec)
         self._demo_started_at = time.monotonic()
         self._append_chat("user", INVESTOR_DEMO_PROMPT)
         self._append_chat(
             "assistant",
-            "I will run the 3-minute investor demo: product requirement, specs, parts, loss/thermal, waveforms, control, validation, and design package.",
+            "I reset the previous demo results and will run the demo: product requirement, specs, parts, loss/thermal, waveforms, control, validation, and design package.",
         )
         self.start_worker("run", INVESTOR_DEMO_PROMPT, [skill.module_id for skill in self.agent.skills], min_module_seconds=0.5)
 
@@ -2291,7 +2293,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.chat_view.clear()
         self._append_chat(
             "assistant",
-            "Investor demo reset. Start from the default product request, then run the 3-minute demo to build the design package live.",
+            "Investor demo reset. Start from the default product request, then run the demo to build the design package live.",
         )
         self.run_progress.setRange(0, len(self.agent.skills))
         self.run_progress.setValue(0)

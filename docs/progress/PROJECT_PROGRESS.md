@@ -46,7 +46,7 @@
 - Added a control/Bode regression test for GUI plot data.
 - Added tests for spec YAML round-trip, evaluation statuses, safety gates, CLI evaluation output, validation skill integration, and report evaluation content.
 - Added waveform schema and GUI Design Console widget tests.
-- Added Investor Demo GUI tests covering default tab selection, Run 3-Min Demo control presence, Design Package view, Markdown snapshot export, and reset behavior.
+- Added Investor Demo GUI tests covering default tab selection, Run Demo control presence, Design Package view, Markdown snapshot export, and reset behavior.
 - Added Design Rationale GUI test coverage for formula checkpoints and synthetic/source honesty text.
 - Added web backend tests for state, full offline demo run, reset, spec editing/result invalidation, invalid spec rejection, export snapshot, and evidence honesty labels.
 - GUI checks cover CLI smoke, offscreen `MainWindow` construction, and offscreen populated workflow render.

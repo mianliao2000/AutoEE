@@ -31,7 +31,7 @@ class EvaluationSummary:
     risks: List[str] = field(default_factory=list)
     recommended_next_actions: List[str] = field(default_factory=list)
     issues: List[EvaluationIssue] = field(default_factory=list)
-    source: str = "autoee_evaluator_v1"
+    source: str = "AutoEE_evaluator_v1"
 
     def to_dict(self) -> Dict[str, Any]:
         return {

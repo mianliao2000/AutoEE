@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "autoee-demo"
+name = "AutoEE-demo"
 version = "0.1.0"
 description = "AutoEE Buck workflow demo with pluggable model backends."
 requires-python = ">=3.10"

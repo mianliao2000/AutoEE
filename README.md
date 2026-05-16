@@ -6,7 +6,7 @@ After every implementation, UI, workflow, or content change, update this README 
 
 # Current Technical Architecture Snapshot
 
-AutoEE is now structured as an AI-native modular EE design platform. Power electronics remains the first executable domain pack and still powers the buck charger demo, but the frontend architecture no longer assumes every project is a power converter.
+AutoEE is now structured as an AI-native modular hardware design platform. Power electronics remains the first executable domain pack and still powers the buck charger demo, but the frontend architecture no longer assumes every project is a power converter.
 
 Current web architecture:
 
@@ -41,12 +41,32 @@ Current web architecture:
   - High-Speed Digital
   - General PCB
 - Placeholder packs are planning previews only. They show the intended workflow, module selection, metrics, and artifact package, but they do not run real solvers or external integrations yet.
-- The investor-facing web UI now renders from the workflow planner:
-  - Project Understanding
-  - Selected Workflow / System Map
-  - Active Engineering Modules
-  - Dynamic Metrics
-  - Generated EE Package
+- Placeholder packs now use their own workflow step IDs for Run Demo progress instead of borrowing the power-electronics stage IDs. This keeps active/completed cards tied to the current request and prevents RF, analog, high-speed, or general PCB demos from looking like the buck charger run.
+- Each preset request now has its own demo circuit profile instead of reusing the 15W USB-C buck package everywhere:
+  - Power Electronics -> 9-36 V to 5 V / 3 A synchronous buck converter
+  - RF / Embedded -> 2.4 GHz coin-cell BLE temperature sensor node
+  - Analog / Sensor -> low-noise thermocouple measurement front-end with ADC output
+  - High-Speed Digital -> FPGA board with DDR memory and USB 3.0 interface
+  - General PCB -> small controller board with connectors, LEDs, and programming header
+- Non-power profiles generate request-specific fake metrics, circuit blocks, module outputs, artifact names, and Engineering Console detail tabs. These are isolated modular presentation outputs only; the real RF, analog, embedded, high-speed, schematic, layout, and manufacturing adapters are still not connected.
+- The Home Page web UI is now a cinematic, product-led launch page for non-technical audiences. It uses Tesla.com-style design principles without copying Tesla branding or trade dress, avoids generic SaaS card grids, and focuses on one premium narrative: requirement -> AutoEE -> reviewable hardware package:
+  - hero: `AutoEE` and `Specs -> Hardware`
+  - subtitle: `AI-Powered Autonomous Hardware Design`
+  - full-bleed dark hardware hero with the PCB visual as the cinematic background
+  - the hero preview uses a large `Example Engineering Console.png` product screenshot that is hidden by default and toggled with the `Show Concept` CTA
+  - desktop-first single-line typography for short hero, package, and platform statements where the viewport allows it
+  - responsive hero composition keeps desktop text sizing stable while the console screenshot scales first, preventing text/image overlap across monitor sizes
+  - the hero places the left copy within the first third of the display, with capped responsive type, a small left inset, and a comfortable breathing gap so the concept screenshot can still occupy most remaining width
+  - platform expansion title: `Power first. General hardware next.`
+  - minimal platform expansion section: a compact one-line Power -> Communication -> Sensing -> Embedded -> High-Speed -> Mechanical path under the platform title
+  - black, white, and neutral styling with very limited accent use, keeping Engineering Console visually separate
+- The web app opens to Engineering Console by default. Engineering Console is the technical cockpit and keeps the detailed planner output, selected workflow roadmap, active modules, validation metrics, artifact package, spec editor, evidence badges, waveform tabs, loss/thermal views, design rationale, risk summary, developer state, and collapsible logs.
+- Engineering Console uses a compact project header instead of the marketing hero, with project name, domain, product type, run status, and workflow/export actions.
+- Engineering Console uses a neutral EDA-style workspace: project navigation on the left, workflow/review content in the center, artifacts and validation in the right inspector, smaller radii, thin dividers, and semantic status colors.
+- Engineering Console keeps Project Understanding and System Map in the same left-column stack, while Generated Hardware Package and evidence panels live in the right sidebar. This keeps the workflow summary compact without blank vertical gaps.
+- Engineering Console side panels are collapsible: the left project/files rail can shrink to a compact navigation strip, and the right agent/artifact inspector can shrink to a compact Agent rail with running/done status.
+- Engineering Console notices and logs wrap long export paths inside their panels so snapshot messages do not overlap the workspace.
+- Engineering Console supports a Day/Night segmented theme switch in the project header; the selected theme is persisted in localStorage and does not affect the Home Page.
 - All domain-pack roadmaps use the same two-section System Map layout:
   - Design / Before PCB Prototype Fabrication
   - Test / After PCB Prototype Returns
@@ -56,6 +76,8 @@ Current web architecture:
 
 Demo request examples available in the web UI:
 
+- Power Electronics is selected by default because it is the current runnable backend demo.
+- DIY Request: editable free-text project request that drives the same deterministic classifier and workflow planner without being treated as a preset demo.
 - Power Electronics: `Design a vehicle/industrial 9-36 V to 5 V/3 A USB-C buck charger.`
 - RF / Embedded: `Design a 2.4 GHz BLE wireless temperature sensor node powered by a coin cell.`
 - Analog / Sensor: `Design a low-noise thermocouple measurement front-end with ADC output.`
@@ -64,8 +86,10 @@ Demo request examples available in the web UI:
 
 Current executable boundary:
 
-- Running the 3-minute demo still executes the power-electronics buck charger workflow.
-- Non-power domain packs are not connected to backend execution yet.
+- Running the demo still executes the power-electronics buck charger workflow.
+- `Run Demo` always resets previous demo results first, preserves the current spec, clears System Map cards back to the initial white waiting state, then starts only the currently selected request's demo so active/complete states never carry over from an older request.
+- Power Electronics runs the existing local backend skill chain. Non-power domain packs run isolated fake profile demos that advance only their own workflow steps and never populate buck-converter deterministic results.
+- On the Home Page, `Run Demo` switches into Engineering Console and starts the Power Electronics demo so the cinematic page remains a high-level entry point while the technical run appears in the cockpit.
 - All fake distributor, fake KiCad/JLCPCB, fake firmware flashing, fake lab tuning, fake efficiency logging, and fake report outputs remain clearly labeled as demo data / not connected / not signoff.
 
 ---

@@ -80,8 +80,8 @@ class LibraryPcbMechanicalSkill(AutoEESkill):
             {
                 "step": "Schematic Generation",
                 "status": "demo_data",
-                "output": "autoee_usb_c_buck.kicad_sch",
-                "artifactPath": "fake://kicad/project/autoee_usb_c_buck.kicad_sch",
+                "output": "AutoEE_usb_c_buck.kicad_sch",
+                "artifactPath": "fake://kicad/project/AutoEE_usb_c_buck.kicad_sch",
                 "notice": "Not connected to real KiCad schematic automation yet.",
             },
             {
@@ -108,8 +108,8 @@ class LibraryPcbMechanicalSkill(AutoEESkill):
             {
                 "step": "Gerber Export",
                 "status": "demo_data",
-                "output": "manufacturing/gerbers/autoee_usb_c_buck.zip",
-                "artifactPath": "fake://manufacturing/gerbers/autoee_usb_c_buck.zip",
+                "output": "manufacturing/gerbers/AutoEE_usb_c_buck.zip",
+                "artifactPath": "fake://manufacturing/gerbers/AutoEE_usb_c_buck.zip",
                 "notice": "No real Gerber files are created in this demo.",
             },
             {

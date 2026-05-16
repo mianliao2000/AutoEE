@@ -26,6 +26,279 @@ const EMPTY_STATE: AnyRecord = {
   progressEvents: [],
   rawState: {}
 };
+const DIY_REQUEST_FALLBACK = "Design a custom hardware project.";
+const DEFAULT_PROJECT_REQUEST = DEMO_PROJECT_REQUESTS[0]?.request || EMPTY_STATE.prompt;
+
+interface DemoCircuitProfile {
+  id: string;
+  projectName: string;
+  circuitName: string;
+  shortSummary: string;
+  packageSummary: string;
+  fakeNotice: string;
+  detailTabs: string[];
+  metrics: Record<string, AnyRecord>;
+  circuitBlocks: string[];
+  moduleResults: Record<string, { title: string; outputs: string[]; artifacts: string[]; status: string }>;
+}
+
+const DEMO_CIRCUIT_PROFILES: Record<string, DemoCircuitProfile> = {
+  power_buck: {
+    id: "power_buck",
+    projectName: "USB-C Buck Charger",
+    circuitName: "9-36 V to 5 V / 3 A synchronous buck converter",
+    shortSummary: "Automotive input buck charger with power-stage, control, PCB, and post-prototype test flow.",
+    packageSummary: "Power stage BOM, loss/thermal estimate, ripple/transient preview, control seed, PCB layout rules, and review report.",
+    fakeNotice: "Executable power demo with mock distributors and synthetic/not-signoff evidence.",
+    detailTabs: ["Waveforms", "Loss/Thermal", "Design Rationale", "Risk Summary", "Developer State"],
+    metrics: {},
+    circuitBlocks: ["Input protection", "Synchronous buck stage", "Inductor and output filter", "USB-C 5 V rail", "Control feedback", "Power-layout constraints"],
+    moduleResults: {},
+  },
+  rf_embedded_sensor: {
+    id: "rf_embedded_sensor",
+    projectName: "BLE Temperature Sensor Node",
+    circuitName: "2.4 GHz coin-cell wireless temperature sensor node",
+    shortSummary: "BLE SoC, low-power sensor front-end, chip antenna, matching network, coin-cell power tree, and manufacturing test hooks.",
+    packageSummary: "Frequency plan, RF SoC shortlist, link budget, antenna/matching notes, firmware architecture, low-power budget, and compliance checklist.",
+    fakeNotice: "Planning preview only. RF, antenna, firmware, and compliance adapters are not connected yet.",
+    detailTabs: ["Link Budget / RF Plan", "Firmware & Power Budget", "Risk Summary", "Developer State"],
+    metrics: {
+      link_margin: { display: "14.8 dB", tone: "pass", target: "> 10 dB" },
+      range: { display: "32 m indoor", tone: "neutral", target: "20 m" },
+      tx_power: { display: "0 dBm", tone: "neutral" },
+      rx_sensitivity: { display: "-96 dBm", tone: "pass" },
+      antenna_risk: { display: "Medium", tone: "warn" },
+      battery_life: { display: "14 mo est.", tone: "pass" },
+      sleep_current: { display: "2.1 uA", tone: "pass" },
+      io_usage: { display: "11 / 24 pins", tone: "neutral" },
+      firmware_risk: { display: "Medium", tone: "warn" },
+      bom_cost: { display: "$8.40", tone: "neutral" },
+    },
+    circuitBlocks: ["Coin-cell holder", "BLE SoC", "Temperature sensor", "32 MHz crystal", "Matching network", "Chip antenna", "SWD header", "Test pads"],
+    moduleResults: {
+      rf_requirements: {
+        title: "RF requirement plan",
+        outputs: ["2.4 GHz BLE peripheral", "Indoor range target: 20-30 m", "Coin-cell energy budget", "FCC/CE pre-scan checklist"],
+        artifacts: ["frequency_plan.md", "wireless_requirements.json"],
+        status: "Demo data / Not connected",
+      },
+      rf_ic_selection: {
+        title: "RF SoC shortlist",
+        outputs: ["Nordic nRF52-class BLE SoC", "Integrated DC/DC option", "SWD programming header", "I2C sensor interface"],
+        artifacts: ["rf_soc_shortlist.csv", "pin_resource_map.json"],
+        status: "Fake supplier shortlist",
+      },
+      link_budget: {
+        title: "Link budget estimate",
+        outputs: ["TX power: 0 dBm", "RX sensitivity: -96 dBm", "Estimated indoor link margin: 14.8 dB", "Antenna placement risk: medium"],
+        artifacts: ["link_budget_demo.xlsx"],
+        status: "First-order estimate",
+      },
+      antenna_matching: {
+        title: "Antenna and matching plan",
+        outputs: ["Chip antenna with keep-out", "Pi matching network reserved", "50 ohm feedline target", "Ground clearance rule"],
+        artifacts: ["antenna_matching_notes.md"],
+        status: "Placeholder RF plan",
+      },
+      rf_layout: {
+        title: "RF layout constraints",
+        outputs: ["Antenna edge placement", "Via fence around RF path", "No copper under antenna keep-out", "Short feedline route"],
+        artifacts: ["rf_layout_rules.md"],
+        status: "Layout rule draft",
+      },
+      wireless_compliance: {
+        title: "Wireless compliance review",
+        outputs: ["BLE advertising test", "Conducted power check", "Pre-scan radiated emissions", "Labeling and region notes"],
+        artifacts: ["wireless_compliance_checklist.md"],
+        status: "Review checklist",
+      },
+      mcu_selection: {
+        title: "MCU resource plan",
+        outputs: ["BLE SoC selected as MCU", "I2C sensor bus", "ADC battery monitor", "SWD debug path"],
+        artifacts: ["mcu_resource_plan.json"],
+        status: "Planning preview",
+      },
+      firmware_architecture: {
+        title: "Firmware architecture",
+        outputs: ["Sleep-first scheduler", "BLE advertising state machine", "Sensor sampling task", "Battery telemetry packet"],
+        artifacts: ["firmware_architecture.md"],
+        status: "Planning preview",
+      },
+      embedded_power_budget: {
+        title: "Low-power budget",
+        outputs: ["Sleep current: 2.1 uA", "Advertising burst: 6.8 mA", "Average current: 15 uA", "Battery estimate: 14 months"],
+        artifacts: ["power_budget_demo.csv"],
+        status: "Demo estimate",
+      },
+      manufacturing_test: {
+        title: "Manufacturing test plan",
+        outputs: ["SWD programming", "Current profile check", "BLE RSSI smoke test", "Sensor calibration point"],
+        artifacts: ["manufacturing_test_plan.md"],
+        status: "Test preview",
+      },
+    },
+  },
+  analog_sensor: {
+    id: "analog_sensor",
+    projectName: "Thermocouple Measurement Front-End",
+    circuitName: "Low-noise thermocouple amplifier with ADC output",
+    shortSummary: "Sensor protection, instrumentation amplifier, cold-junction measurement, low-pass filter, precision reference, and ADC interface.",
+    packageSummary: "Signal-chain plan, sensor/protection selection, op-amp and ADC shortlist, noise budget, calibration plan, and analog layout rules.",
+    fakeNotice: "Planning preview only. Noise simulation, calibration fixtures, and analog validation are not connected yet.",
+    detailTabs: ["Signal Chain", "Noise Budget", "Calibration Plan", "Risk Summary", "Developer State"],
+    metrics: {
+      noise: { display: "1.8 uVrms", tone: "pass", target: "< 2.5 uVrms" },
+      bandwidth: { display: "12 Hz", tone: "neutral" },
+      resolution: { display: "0.08 C", tone: "pass" },
+      accuracy: { display: "+/-0.6 C", tone: "warn" },
+      drift_risk: { display: "Medium", tone: "warn" },
+    },
+    circuitBlocks: ["Thermocouple input", "ESD/filter network", "Instrumentation amplifier", "Cold-junction sensor", "Precision reference", "24-bit ADC", "SPI/I2C output"],
+    moduleResults: {
+      signal_chain: {
+        title: "Signal-chain draft",
+        outputs: ["Type-K thermocouple input", "Gain stage before ADC", "Cold-junction compensation sensor", "Anti-alias low-pass filter"],
+        artifacts: ["signal_chain_block_diagram.md"],
+        status: "Planning preview",
+      },
+      sensor_selection: {
+        title: "Sensor and protection",
+        outputs: ["Thermocouple terminal block", "Low-leakage ESD clamp", "RC input filter", "Open-sensor detection path"],
+        artifacts: ["sensor_input_notes.md"],
+        status: "Demo data / Not connected",
+      },
+      op_amp_adc: {
+        title: "Amplifier and ADC shortlist",
+        outputs: ["Zero-drift instrumentation amplifier", "24-bit delta-sigma ADC", "2.5 V precision reference", "Low-noise LDO"],
+        artifacts: ["analog_bom_shortlist.csv"],
+        status: "Fake supplier shortlist",
+      },
+      noise_budget: {
+        title: "Noise budget",
+        outputs: ["Input noise estimate: 1.8 uVrms", "Effective resolution: 0.08 C", "Bandwidth: 12 Hz", "Dominant risk: offset drift"],
+        artifacts: ["noise_budget_demo.xlsx"],
+        status: "First-order estimate",
+      },
+      analog_layout: {
+        title: "Analog layout constraints",
+        outputs: ["Guard sensitive input nodes", "Split noisy digital return path", "Kelvin reference routing", "Thermal symmetry around CJC sensor"],
+        artifacts: ["analog_layout_rules.md"],
+        status: "Layout rule draft",
+      },
+      calibration: {
+        title: "Calibration plan",
+        outputs: ["Two-point temperature calibration", "Cold-junction offset trim", "Open-sensor fault test", "Production coefficient storage"],
+        artifacts: ["calibration_plan.md"],
+        status: "Test preview",
+      },
+    },
+  },
+  high_speed: {
+    id: "high_speed",
+    projectName: "FPGA DDR / USB 3.0 Board",
+    circuitName: "FPGA board with DDR memory and USB 3.0 interface",
+    shortSummary: "FPGA fabric, DDR memory topology, USB 3.0 PHY, multi-rail power tree, controlled impedance stackup, and timing constraints.",
+    packageSummary: "FPGA/DDR plan, memory topology, SI/PI risk review, stackup recommendation, impedance rules, and timing checklist.",
+    fakeNotice: "Planning preview only. SI/PI solvers, FPGA tools, and layout engines are not connected yet.",
+    detailTabs: ["SI / PI", "Stackup & Timing", "Risk Summary", "Developer State"],
+    metrics: {
+      eye_margin: { display: "22% UI", tone: "warn", target: "> 20% UI" },
+      pdn_risk: { display: "Medium", tone: "warn" },
+      layer_count: { display: "8 layers", tone: "neutral" },
+      interface_speed: { display: "5 Gbps", tone: "neutral" },
+      timing_risk: { display: "Medium", tone: "warn" },
+    },
+    circuitBlocks: ["FPGA", "DDR memory", "USB 3.0 PHY", "Clock tree", "PMIC rails", "8-layer stackup", "JTAG/debug", "High-speed connectors"],
+    moduleResults: {
+      processor_fpga: {
+        title: "FPGA selection envelope",
+        outputs: ["Mid-range FPGA class", "DDR-capable bank assignment", "USB 3.0 PHY interface", "JTAG and configuration memory"],
+        artifacts: ["fpga_selection_envelope.md"],
+        status: "Planning preview",
+      },
+      memory_interface: {
+        title: "DDR topology",
+        outputs: ["Point-to-point DDR interface", "Fly-by control/address plan", "Length-match groups", "Termination strategy"],
+        artifacts: ["ddr_topology_plan.md"],
+        status: "Placeholder SI plan",
+      },
+      signal_integrity: {
+        title: "Signal integrity plan",
+        outputs: ["USB 3.0 differential pair: 90 ohm", "DDR byte-lane matching", "Clock isolation", "Eye margin estimate: 22% UI"],
+        artifacts: ["si_constraints.csv"],
+        status: "First-order estimate",
+      },
+      power_integrity: {
+        title: "Power integrity plan",
+        outputs: ["Core rail transient target", "DDR VTT/VREF handling", "Decoupling placement classes", "PDN risk: medium"],
+        artifacts: ["pdn_review_plan.md"],
+        status: "Placeholder PI plan",
+      },
+      stackup: {
+        title: "Stackup recommendation",
+        outputs: ["8-layer stackup", "Adjacent solid reference planes", "Controlled impedance routing layers", "Return via rules"],
+        artifacts: ["stackup_recommendation.md"],
+        status: "Layout rule draft",
+      },
+      timing_constraints: {
+        title: "Timing constraint checklist",
+        outputs: ["DDR timing groups", "USB reference clock constraints", "CDC review", "Board delay export placeholder"],
+        artifacts: ["timing_constraints_notes.md"],
+        status: "Review checklist",
+      },
+    },
+  },
+  general_pcb: {
+    id: "general_pcb",
+    projectName: "Small Controller Board",
+    circuitName: "General controller PCB with connectors, LEDs, and programming header",
+    shortSummary: "MCU control board with regulated input, connector map, status LEDs, protection, programming header, and assembly/test notes.",
+    packageSummary: "Requirement summary, component inventory, connector/I/O map, layout constraints, assembly risk review, and generated hardware package draft.",
+    fakeNotice: "Planning preview only. Real schematic capture, layout, and assembly quoting are not connected yet.",
+    detailTabs: ["Board Plan", "Component / I/O Map", "Assembly Review", "Risk Summary", "Developer State"],
+    metrics: {
+      bom_cost: { display: "$12.80", tone: "neutral" },
+      layer_count: { display: "2 layers", tone: "pass" },
+      drc_risk: { display: "Low", tone: "pass" },
+      assembly_risk: { display: "Medium", tone: "warn" },
+      connector_count: { display: "6", tone: "neutral" },
+    },
+    circuitBlocks: ["MCU", "5 V input", "3.3 V regulator", "I/O connectors", "Status LEDs", "Programming header", "ESD protection", "Test points"],
+    moduleResults: {
+      requirements: {
+        title: "Board requirements",
+        outputs: ["Small controller board", "Connectors and LEDs", "Programming header", "Low-cost assembly target"],
+        artifacts: ["requirements_summary.md"],
+        status: "Planning preview",
+      },
+      component_inventory: {
+        title: "Component inventory",
+        outputs: ["MCU", "3.3 V regulator", "Connector set", "LED indicators", "Protection passives"],
+        artifacts: ["component_inventory.csv"],
+        status: "Fake catalog data",
+      },
+      connector_io: {
+        title: "Connector and I/O map",
+        outputs: ["6 connector groups", "GPIO allocation", "Programming header pinout", "LED and button assignments"],
+        artifacts: ["connector_io_map.json"],
+        status: "Planning preview",
+      },
+      layout_constraints: {
+        title: "Layout constraint set",
+        outputs: ["2-layer board target", "Connector edge placement", "Test point access", "Assembly keep-outs"],
+        artifacts: ["layout_constraints.md"],
+        status: "Layout rule draft",
+      },
+      assembly_review: {
+        title: "Assembly review",
+        outputs: ["Through-hole connector risk", "LED polarity checks", "Programming jig access", "BOM availability review"],
+        artifacts: ["assembly_review.md"],
+        status: "Review checklist",
+      },
+    },
+  },
+};
 
 const GROUP_COLORS: Record<string, string> = {
   MOSFET: "#7c8cff",
@@ -94,10 +367,27 @@ function useAutoEEState() {
   }, []);
 
   const actions = {
-    runDemo: async () => {
+    runDemo: async (context?: AnyRecord) => {
       setNotice("");
+      setState((current: AnyRecord) => ({
+        ...current,
+        running: true,
+        workflowStatus: "running",
+        stages: (current.stages || []).map((stage: AnyRecord) => ({ ...stage, status: "waiting" })),
+        activeDemoRequestId: context?.requestId ?? current.activeDemoRequestId,
+        activeDemoDomain: context?.domain ?? current.activeDemoDomain,
+        activeDemoProductType: context?.productType ?? current.activeDemoProductType,
+        demoMode: context && context.domain !== "power_electronics" ? "profile_fake" : "power_backend",
+        activeDemoStages: (context?.workflowSteps || []).map((step: AnyRecord) => ({
+          id: step.id,
+          title: step.title,
+          phase: step.phase,
+          status: "waiting",
+        })),
+        currentStage: null,
+      }));
       try {
-        const payload = await postJson("/api/run-demo");
+        const payload = await postJson("/api/run-demo", context);
         setState(payload.state);
       } catch (exc: any) {
         setNotice(`Run demo failed: ${exc.message}`);
@@ -144,7 +434,51 @@ function StatusPill({ status }: { status: string }) {
   return <span className={clsStatus(status)}>{titleCase(status)}</span>;
 }
 
-function aggregateStageStatus(stages: AnyRecord[], sourceIds: string[]): string {
+function demoProfileForPlan(plan: WorkflowPlan): DemoCircuitProfile {
+  const sampleId = selectedSampleId(plan.requestText);
+  if (DEMO_CIRCUIT_PROFILES[sampleId]) return DEMO_CIRCUIT_PROFILES[sampleId];
+  const primary = plan.classification.primaryDomain;
+  if (primary === "rf_communication" || plan.classification.domains.includes("rf_communication")) return DEMO_CIRCUIT_PROFILES.rf_embedded_sensor;
+  if (primary === "analog_sensor") return DEMO_CIRCUIT_PROFILES.analog_sensor;
+  if (primary === "high_speed_digital") return DEMO_CIRCUIT_PROFILES.high_speed;
+  if (primary === "general_pcb" || primary === "embedded_mcu") return DEMO_CIRCUIT_PROFILES.general_pcb;
+  return DEMO_CIRCUIT_PROFILES.power_buck;
+}
+
+function validateDemoCircuitProfiles(): string[] {
+  const failures: string[] = [];
+  for (const sample of DEMO_PROJECT_REQUESTS) {
+    const plan = planWorkflow(sample.request);
+    const profile = demoProfileForPlan(plan);
+    if (!profile) failures.push(`${sample.id} has no demo circuit profile`);
+    if (!profile.detailTabs.length) failures.push(`${sample.id} has no domain detail tabs`);
+    if (profile.id !== "power_buck" && profile.detailTabs.some((tab) => ["Waveforms", "Loss/Thermal"].includes(tab))) {
+      failures.push(`${sample.id} exposes power-only tabs in a non-power profile`);
+    }
+  }
+  return failures;
+}
+
+function demoRunPayload(plan: WorkflowPlan): AnyRecord {
+  const profile = demoProfileForPlan(plan);
+  return {
+    requestId: profile.id,
+    requestText: plan.requestText,
+    domain: plan.classification.primaryDomain,
+    productType: plan.classification.productType,
+    workflowSteps: plan.workflowSteps.map((step) => ({
+      id: step.id,
+      title: step.title,
+      phase: step.phase,
+    })),
+  };
+}
+
+function combinedStagePayloads(state: AnyRecord): AnyRecord[] {
+  return [...(state.stages || []), ...(state.activeDemoStages || [])];
+}
+
+function aggregateStageStatus(stages: AnyRecord[], sourceIds: readonly string[]): string {
   const sourceStages = stages.filter((stage) => sourceIds.includes(stage.id));
   if (!sourceStages.length) return "waiting";
   const statuses = sourceStages.map((stage) => String(stage.status || "waiting"));
@@ -155,7 +489,11 @@ function aggregateStageStatus(stages: AnyRecord[], sourceIds: string[]): string 
   return "waiting";
 }
 
-function metricFromDefinition(definition: MetricDefinition, state: AnyRecord): AnyRecord {
+function metricFromDefinition(definition: MetricDefinition, state: AnyRecord, plan?: WorkflowPlan): AnyRecord {
+  const profileMetric = plan ? demoProfileForPlan(plan).metrics[definition.id] : undefined;
+  if (profileMetric) {
+    return { ...profileMetric, explain: definition.description };
+  }
   const backendMetric = definition.backendMetricKey ? state.metrics?.[definition.backendMetricKey] : undefined;
   const display = metricDisplay(backendMetric);
   if (backendMetric && display !== "Pending") {
@@ -168,7 +506,7 @@ function metricFromDefinition(definition: MetricDefinition, state: AnyRecord): A
   };
 }
 
-function sourceStatus(stages: AnyRecord[], sourceStageIds: string[]): string {
+function sourceStatus(stages: AnyRecord[], sourceStageIds: readonly string[]): string {
   if (!sourceStageIds.length) return "waiting";
   return aggregateStageStatus(stages, sourceStageIds);
 }
@@ -295,7 +633,9 @@ function LeftRail({
   plan: WorkflowPlan;
 }) {
   const events = (state.progressEvents || []).slice(-8).reverse();
-  const selectedSample = DEMO_PROJECT_REQUESTS.find((sample) => sample.request === projectRequest)?.id || "custom";
+  const matchedSample = DEMO_PROJECT_REQUESTS.find((sample) => sample.request === projectRequest);
+  const selectedSample = matchedSample ? matchedSample.id : "diy";
+  const isDiyRequest = selectedSample === "diy";
   return (
     <aside className="leftRail">
       <div className="brandBlock">
@@ -308,17 +648,31 @@ function LeftRail({
 
       <div className="promptCard">
         <div className="label">Product Request</div>
-        <p>{projectRequest}</p>
+        {isDiyRequest ? (
+          <textarea
+            className="diyRequestInput"
+            value={projectRequest}
+            placeholder="Describe your hardware project request..."
+            rows={4}
+            onChange={(event) => onProjectRequestChange(event.target.value)}
+          />
+        ) : (
+          <p>{projectRequest}</p>
+        )}
         <label className="requestSelector">
           <span>Demo Request</span>
           <select
             value={selectedSample}
             onChange={(event) => {
+              if (event.target.value === "diy") {
+                onProjectRequestChange("");
+                return;
+              }
               const next = DEMO_PROJECT_REQUESTS.find((sample) => sample.id === event.target.value);
               if (next) onProjectRequestChange(next.request);
             }}
           >
-            {selectedSample === "custom" && <option value="custom">Current project request</option>}
+            <option value="diy">DIY Request</option>
             {DEMO_PROJECT_REQUESTS.map((sample) => (
               <option value={sample.id} key={sample.id}>
                 {sample.label}
@@ -332,8 +686,8 @@ function LeftRail({
       </div>
 
       <div className="buttonGrid">
-        <button className="primary" onClick={actions.runDemo} disabled={state.running}>
-          {state.running ? "Running..." : "Run 3-Min Demo"}
+        <button className="primary" onClick={() => actions.runDemo(demoRunPayload(plan))} disabled={state.running}>
+          {state.running ? "Running..." : "Run Demo"}
         </button>
         <button onClick={actions.stop} disabled={!state.running}>
           Stop
@@ -379,8 +733,8 @@ function Hero({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }) {
   return (
     <section className="hero">
       <div>
-        <div className="eyebrow">AI-native modular EE platform</div>
-        <h1>Specification → EE Package</h1>
+        <div className="eyebrow">AI-native modular hardware platform</div>
+        <h1>Specification → Hardware Package</h1>
         <p>{plan.selectedPacks.map((pack) => pack.name).join(" + ")} workflow selected from the project request.</p>
       </div>
       <div className="productVision">
@@ -391,7 +745,7 @@ function Hero({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }) {
       </div>
       <div className="heroMetrics">
         {heroMetrics.map((metric) => (
-          <MetricTile label={metric.label} metric={metricFromDefinition(metric, state)} key={metric.id} />
+          <MetricTile label={metric.label} metric={metricFromDefinition(metric, state, plan)} key={metric.id} />
         ))}
       </div>
     </section>
@@ -409,12 +763,13 @@ function MetricTile({ label, metric }: { label: string; metric: AnyRecord }) {
 }
 
 function ProjectUnderstanding({ plan }: { plan: WorkflowPlan }) {
+  const profile = demoProfileForPlan(plan);
   return (
     <section className="panel understandingPanel">
       <div className="panelHeader">
         <div>
           <h2>Project Understanding</h2>
-          <p>AutoEE classifies the request, selects domain packs, then builds the workflow from active modules.</p>
+          <p>Domain classification and workflow scope for the current design.</p>
         </div>
       </div>
       <div className="understandingGrid">
@@ -437,6 +792,17 @@ function ProjectUnderstanding({ plan }: { plan: WorkflowPlan }) {
         {plan.classification.reasons.map((reason) => <li key={reason}>{reason}</li>)}
       </ul>
       <div className="plannerNotice">{plan.capabilityNotice}</div>
+      <div className="circuitDraftPanel">
+        <div>
+          <span>Generated Circuit Draft</span>
+          <strong>{profile.circuitName}</strong>
+          <p>{profile.shortSummary}</p>
+          <small>{profile.fakeNotice}</small>
+        </div>
+        <ul>
+          {profile.circuitBlocks.map((block) => <li key={block}>{block}</li>)}
+        </ul>
+      </div>
     </section>
   );
 }
@@ -583,9 +949,31 @@ function PcbAutomationDetail({ data }: { data: AnyRecord }) {
 }
 
 function GenericModuleDetail({ stage, plan }: { stage: WorkflowStep; plan: WorkflowPlan }) {
+  const profile = demoProfileForPlan(plan);
+  const profileResult = profile.moduleResults[stage.id];
   const linkedModules = [...plan.modules.required, ...plan.modules.recommended, ...plan.modules.optional].filter((moduleItem) =>
     stage.moduleIds.includes(moduleItem.id),
   );
+  if (profileResult) {
+    return (
+      <div className="detailTwoCol">
+        <section>
+          <h4>{profileResult.title}</h4>
+          <p className="detailText">{stage.description}</p>
+          <ul className="compactList">
+            {profileResult.outputs.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </section>
+        <section>
+          <h4>Generated Fake Artifacts</h4>
+          <ul className="compactList">
+            {profileResult.artifacts.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+          <p className="detailText">{profileResult.status}</p>
+        </section>
+      </div>
+    );
+  }
   return (
     <div className="detailTwoCol">
       <section>
@@ -632,7 +1020,7 @@ function OutputList({ items }: { items: AnyRecord[] }) {
 function TestWorkflowDetail({ data, focusId }: { data: AnyRecord; focusId?: string }) {
   const cards = data.cards || [];
   const activeCard = cards.find((card: AnyRecord) => card.id === focusId) || cards[0];
-  if (!data.available) return <div className="empty">Run the 3-min demo to generate fake post-prototype Test results.</div>;
+  if (!data.available) return <div className="empty">Run the demo to generate fake post-prototype Test results.</div>;
 
   const codes = data.codes || {};
   const tuning = data.tuning || {};
@@ -768,6 +1156,7 @@ function TestWorkflowDetail({ data, focusId }: { data: AnyRecord; focusId?: stri
 
 function ModuleDetailPanel({ stage, state, plan }: { stage: WorkflowStep & AnyRecord; state: AnyRecord; plan: WorkflowPlan }) {
   const testPayload = state.testWorkflow || {};
+  const profile = demoProfileForPlan(plan);
   const detailMap: Record<string, { title: string; payload: AnyRecord; body: React.ReactNode }> = {
     specifications: { title: "Execution Plan", payload: state.executionPlan || {}, body: <ExecutionPlanDetail data={state.executionPlan || {}} /> },
     parts: { title: "BOM Search Results", payload: state.partsCatalog || {}, body: <PartsCatalogDetail data={state.partsCatalog || {}} /> },
@@ -781,8 +1170,8 @@ function ModuleDetailPanel({ stage, state, plan }: { stage: WorkflowStep & AnyRe
     test_report: { title: "Post-Prototype Test Workflow", payload: testPayload, body: <TestWorkflowDetail data={testPayload} focusId="test_report" /> },
   };
   const detail = detailMap[stage.id] || {
-    title: "Module Detail",
-    payload: { sourceType: "domain_pack_config", realCapabilityStatus: "planning_placeholder", notice: "This module is part of the selected domain pack. Real solver/integration work is not connected yet." },
+    title: `${profile.projectName} Module`,
+    payload: { sourceType: profile.id, realCapabilityStatus: "planning_placeholder", notice: profile.fakeNotice },
     body: <GenericModuleDetail stage={stage} plan={plan} />,
   };
   return (
@@ -800,10 +1189,10 @@ function ModuleDetailPanel({ stage, state, plan }: { stage: WorkflowStep & AnyRe
 }
 
 function StageTimeline({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }) {
-  const stages = state.stages || [];
-  const [activeStageId, setActiveStageId] = React.useState(plan.workflowSteps[0]?.id || "specifications");
+  const stages = combinedStagePayloads(state);
+  const [activeStageId, setActiveStageId] = React.useState<string | null>(null);
   React.useEffect(() => {
-    setActiveStageId(plan.workflowSteps[0]?.id || "specifications");
+    setActiveStageId(null);
   }, [plan.requestText]);
   const plannedSections = plan.workflowSections.map((section) => ({
     ...section,
@@ -815,15 +1204,12 @@ function StageTimeline({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }
   }));
   const allRoadmapStages = plannedSections.flatMap((section) => section.steps);
   const hasRealStatus = allRoadmapStages.some((stage) => ["running", "complete", "partial", "blocked", "error", "failed"].includes(stage.status));
-  if (!hasRealStatus && allRoadmapStages[0]) {
-    allRoadmapStages[0].status = "active";
-  }
   const completedCount = allRoadmapStages.filter((stage) => stage.status === "complete").length;
   const activeStage = allRoadmapStages.find((stage) => stage.id === activeStageId) || allRoadmapStages[0];
 
   const renderStageCard = (stage: AnyRecord) => (
     <div
-      className={`roadmapCard state-${String(stage.status || "waiting").toLowerCase().replace(/_/g, "-")} ${stage.id === activeStage.id ? "selected" : ""}`}
+      className={`roadmapCard state-${String(stage.status || "waiting").toLowerCase().replace(/_/g, "-")} ${stage.id === activeStageId ? "selected" : ""}`}
       key={stage.id}
       role="button"
       tabIndex={0}
@@ -855,7 +1241,7 @@ function StageTimeline({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }
     <section className="panel systemMapPanel">
       <div className="panelHeader systemMapHeader">
         <div>
-          <h2>System Map</h2>
+          <h2>Workflow Modules</h2>
           <p>{plan.selectedPacks.map((pack) => pack.uiLabels.workflowSubtitle).join(" ")}</p>
         </div>
         <div className="roadmapSummary">
@@ -965,8 +1351,10 @@ function SpecNumberInput({
 }
 
 function ArtifactPackage({ state, actions, plan, showSpecEditor = false }: { state: AnyRecord; actions: AnyRecord; plan: WorkflowPlan; showSpecEditor?: boolean }) {
-  const stages = state.stages || [];
+  const stages = combinedStagePayloads(state);
   const spec = state.spec || state.rawState?.spec || {};
+  const profile = demoProfileForPlan(plan);
+  const canEditPowerSpec = showSpecEditor && plan.classification.primaryDomain === "power_electronics";
   const [draft, setDraft] = React.useState<AnyRecord>(() => toEditableSpec(spec));
   const [error, setError] = React.useState("");
   const [dirty, setDirty] = React.useState(false);
@@ -1010,13 +1398,13 @@ function ArtifactPackage({ state, actions, plan, showSpecEditor = false }: { sta
     <section className="panel packagePanel">
       <div className="panelHeader">
         <div>
-          <h2>{ready ? "Generated EE Package Ready" : plan.selectedPacks[0]?.uiLabels.packageTitle || "Generated EE Package"}</h2>
-          <p>Artifacts are selected by the active domain pack. Placeholder packs show intended deliverables only.</p>
+          <h2>{showSpecEditor ? "Artifacts" : ready ? "Generated Hardware Package Ready" : plan.selectedPacks[0]?.uiLabels.packageTitle || "Generated Hardware Package"}</h2>
+          <p>{showSpecEditor ? profile.packageSummary : "Artifacts are selected by the active domain pack. Placeholder packs show intended deliverables only."}</p>
         </div>
       </div>
-      {showSpecEditor && (
+      {canEditPowerSpec && (
         <details className="specEditorDisclosure">
-          <summary>Power demo spec editor</summary>
+          <summary>Edit specs</summary>
           <div className="specEditor">
             <label className="specName">
               <span>Design Brief</span>
@@ -1044,7 +1432,7 @@ function ArtifactPackage({ state, actions, plan, showSpecEditor = false }: { sta
             <StatusDot status={artifactItem.status} />
             <div>
               <strong>{artifactItem.label}</strong>
-              <span>{artifactItem.statusLabel}</span>
+              <span>{compactStatusLabel(artifactItem.status)}</span>
               <small>{artifactItem.description}</small>
             </div>
           </div>
@@ -1067,8 +1455,8 @@ function ModuleSelectionPanel({ plan }: { plan: WorkflowPlan }) {
     <section className="panel moduleSelectionPanel">
       <div className="panelHeader">
         <div>
-          <h2>Active Engineering Modules</h2>
-          <p>Modules are selected from the classified domain pack. Optional modules are shown for future expansion.</p>
+          <h2>Engineering Modules</h2>
+          <p>Required, recommended, and optional modules for this project.</p>
         </div>
       </div>
       <div className="moduleSelectionGrid">
@@ -1099,18 +1487,26 @@ function StatusDot({ status }: { status: string }) {
   return <span className={`statusDot ${String(status || "waiting")}`} />;
 }
 
+function compactStatusLabel(status: string): string {
+  if (status === "complete") return "Done";
+  if (status === "running" || status === "active") return "Active";
+  if (status === "partial") return "Partial";
+  if (["blocked", "error", "failed"].includes(status)) return "Blocked";
+  return "Pending";
+}
+
 function DynamicMetricsPanel({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }) {
   return (
     <section className="panel">
       <div className="panelHeader">
         <div>
-          <h2>Dynamic Metrics</h2>
-          <p>Metrics come from the selected domain pack, not from a global power-only dashboard.</p>
+          <h2>Validation Metrics</h2>
+          <p>Domain-specific checks generated from the selected workflow.</p>
         </div>
       </div>
       <div className="energyGrid">
         {plan.metrics.map((metric) => {
-          const metricValue = metricFromDefinition(metric, state);
+          const metricValue = metricFromDefinition(metric, state, plan);
           return (
           <div className={`energyCard tone-${metricValue.tone || "neutral"}`} key={metric.id}>
             <span>{metric.label}</span>
@@ -1165,15 +1561,103 @@ function EvidenceRail({ state }: { state: AnyRecord }) {
   );
 }
 
-function EngineeringTabs({ state }: { state: AnyRecord }) {
-  const [tab, setTab] = React.useState("waveforms");
-  const tabs = [
-    ["waveforms", "Waveforms"],
-    ["loss", "Loss/Thermal"],
-    ["rationale", "Design Rationale"],
-    ["risk", "Risk Summary"],
-    ["json", "Developer State"]
-  ];
+function ProfileModuleSummary({ profile, moduleIds }: { profile: DemoCircuitProfile; moduleIds: string[] }) {
+  const modules = moduleIds.map((id) => profile.moduleResults[id]).filter(Boolean);
+  return (
+    <div className="profileModuleGrid">
+      {modules.map((moduleItem) => (
+        <article className="profileModuleCard" key={moduleItem.title}>
+          <span>{moduleItem.status}</span>
+          <h3>{moduleItem.title}</h3>
+          <ul className="compactList">
+            {moduleItem.outputs.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+          <small>{moduleItem.artifacts.join(", ")}</small>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function ProfileMetricPanel({ profile, metricIds }: { profile: DemoCircuitProfile; metricIds: string[] }) {
+  return (
+    <div className="moduleMetricRow">
+      {metricIds.map((id) => {
+        const metric = profile.metrics[id] || { display: "Pending", tone: "neutral" };
+        return (
+          <div className={`tone-${metric.tone || "neutral"}`} key={id}>
+            <span>{id.replace(/_/g, " ")}</span>
+            <strong>{metric.display}</strong>
+            {metric.target && <small>Target {metric.target}</small>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function DomainDetailPanel({ profile, title, summary, metricIds, moduleIds }: { profile: DemoCircuitProfile; title: string; summary: string; metricIds: string[]; moduleIds: string[] }) {
+  return (
+    <div className="domainDetailPanel">
+      <div className="domainDetailHeader">
+        <div>
+          <span>{profile.circuitName}</span>
+          <h3>{title}</h3>
+          <p>{summary}</p>
+        </div>
+        <small>Demo data / Not connected</small>
+      </div>
+      <ProfileMetricPanel profile={profile} metricIds={metricIds} />
+      <ProfileModuleSummary profile={profile} moduleIds={moduleIds} />
+    </div>
+  );
+}
+
+function EngineeringTabs({ state, plan }: { state: AnyRecord; plan: WorkflowPlan }) {
+  const profile = demoProfileForPlan(plan);
+  const isPower = plan.classification.primaryDomain === "power_electronics";
+  const domain = plan.classification.primaryDomain;
+  const tabs = isPower
+    ? [
+        ["waveforms", "Waveforms"],
+        ["loss", "Loss/Thermal"],
+        ["rationale", "Design Rationale"],
+        ["risk", "Risk Summary"],
+        ["json", "Developer State"],
+      ]
+    : domain === "rf_communication" || plan.classification.domains.includes("rf_communication")
+      ? [
+          ["rf", "Link Budget / RF Plan"],
+          ["firmware", "Firmware & Power Budget"],
+          ["risk", "Risk Summary"],
+          ["json", "Developer State"],
+        ]
+      : domain === "analog_sensor"
+        ? [
+            ["signal", "Signal Chain"],
+            ["noise", "Noise Budget"],
+            ["calibration", "Calibration Plan"],
+            ["risk", "Risk Summary"],
+            ["json", "Developer State"],
+          ]
+        : domain === "high_speed_digital"
+          ? [
+              ["si_pi", "SI / PI"],
+              ["stackup", "Stackup & Timing"],
+              ["risk", "Risk Summary"],
+              ["json", "Developer State"],
+            ]
+          : [
+              ["board", "Board Plan"],
+              ["io", "Component / I/O Map"],
+              ["assembly", "Assembly Review"],
+              ["risk", "Risk Summary"],
+              ["json", "Developer State"],
+            ];
+  const [tab, setTab] = React.useState(tabs[0][0]);
+  React.useEffect(() => {
+    setTab(tabs[0][0]);
+  }, [profile.id]);
   return (
     <section className="engineering panel">
       <div className="tabBar">
@@ -1186,6 +1670,16 @@ function EngineeringTabs({ state }: { state: AnyRecord }) {
       {tab === "waveforms" && <WaveformOverview data={state.waveforms} />}
       {tab === "loss" && <LossThermal data={state.lossThermal} />}
       {tab === "rationale" && <DesignRationale data={state.designRationale} />}
+      {tab === "rf" && <DomainDetailPanel profile={profile} title="RF Link Budget And Antenna Plan" summary="Wireless range, RF SoC choice, antenna matching, and RF layout constraints for the BLE sensor node." metricIds={["link_margin", "range", "tx_power", "rx_sensitivity", "antenna_risk"]} moduleIds={["rf_requirements", "rf_ic_selection", "link_budget", "antenna_matching", "rf_layout"]} />}
+      {tab === "firmware" && <DomainDetailPanel profile={profile} title="Firmware And Coin-Cell Power Budget" summary="Embedded firmware tasks, low-power modes, programming flow, and manufacturing test coverage." metricIds={["battery_life", "sleep_current", "io_usage", "firmware_risk", "bom_cost"]} moduleIds={["mcu_selection", "firmware_architecture", "embedded_power_budget", "manufacturing_test"]} />}
+      {tab === "signal" && <DomainDetailPanel profile={profile} title="Analog Signal Chain" summary="Thermocouple input protection, amplifier, cold-junction compensation, reference, ADC, and digital output plan." metricIds={["bandwidth", "resolution", "accuracy"]} moduleIds={["signal_chain", "sensor_selection", "op_amp_adc", "analog_layout"]} />}
+      {tab === "noise" && <DomainDetailPanel profile={profile} title="Noise Budget And Accuracy Estimate" summary="Input-referred noise, effective temperature resolution, bandwidth, and drift risk for the measurement front-end." metricIds={["noise", "bandwidth", "resolution", "accuracy", "drift_risk"]} moduleIds={["noise_budget"]} />}
+      {tab === "calibration" && <DomainDetailPanel profile={profile} title="Calibration Plan" summary="Two-point calibration, cold-junction trim, open-sensor fault test, and production coefficient storage." metricIds={["accuracy", "drift_risk"]} moduleIds={["calibration"]} />}
+      {tab === "si_pi" && <DomainDetailPanel profile={profile} title="Signal And Power Integrity Plan" summary="USB 3.0, DDR, power tree, decoupling, and early SI/PI risk estimates for the FPGA board." metricIds={["eye_margin", "pdn_risk", "interface_speed", "timing_risk"]} moduleIds={["processor_fpga", "memory_interface", "signal_integrity", "power_integrity"]} />}
+      {tab === "stackup" && <DomainDetailPanel profile={profile} title="Stackup And Timing Constraints" summary="Layer count, controlled impedance rules, reference planes, return vias, and timing constraint notes." metricIds={["layer_count", "interface_speed", "timing_risk"]} moduleIds={["stackup", "timing_constraints"]} />}
+      {tab === "board" && <DomainDetailPanel profile={profile} title="General Controller Board Plan" summary="Board requirements, MCU/regulator structure, connector map, LEDs, programming header, and test-point strategy." metricIds={["bom_cost", "layer_count", "connector_count"]} moduleIds={["requirements", "component_inventory", "layout_constraints"]} />}
+      {tab === "io" && <DomainDetailPanel profile={profile} title="Component And I/O Map" summary="Connector groups, GPIO allocation, LED/button assignments, protection passives, and programming access." metricIds={["connector_count", "bom_cost"]} moduleIds={["component_inventory", "connector_io"]} />}
+      {tab === "assembly" && <DomainDetailPanel profile={profile} title="Assembly Review" summary="Assembly risk, connector placement, polarity checks, test access, and production notes." metricIds={["assembly_risk", "drc_risk", "layer_count"]} moduleIds={["assembly_review", "layout_constraints"]} />}
       {tab === "risk" && <RiskSummary data={state.riskSummary} />}
       {tab === "json" && <pre className="jsonBlock">{JSON.stringify(state.rawState, null, 2)}</pre>}
     </section>
@@ -1700,66 +2194,656 @@ function RiskSummary({ data }: { data: AnyRecord }) {
   );
 }
 
+function selectedSampleId(projectRequest: string): string {
+  return DEMO_PROJECT_REQUESTS.find((sample) => sample.request === projectRequest)?.id || "diy";
+}
+
+function localStorageBoolean(key: string, fallback: boolean): boolean {
+  if (typeof window === "undefined") return fallback;
+  const value = window.localStorage.getItem(key);
+  return value === null ? fallback : value === "true";
+}
+
+function useStoredBoolean(key: string, fallback: boolean): [boolean, (value: boolean) => void] {
+  const [value, setValue] = React.useState(() => localStorageBoolean(key, fallback));
+  const update = React.useCallback((next: boolean) => {
+    setValue(next);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(key, String(next));
+    }
+  }, [key]);
+  return [value, update];
+}
+
+function EngineeringSidebar({
+  state,
+  actions,
+  notice,
+  projectRequest,
+  onProjectRequestChange,
+  plan,
+  collapsed,
+  onToggle,
+}: {
+  state: AnyRecord;
+  actions: AnyRecord;
+  notice: string;
+  projectRequest: string;
+  onProjectRequestChange: (request: string) => void;
+  plan: WorkflowPlan;
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
+  const selectedSample = selectedSampleId(projectRequest);
+  const events = (state.progressEvents || []).slice(-12).reverse();
+  const navItems = ["Project", "Specs", "Modules", "Artifacts", "Validation", "Logs", "Settings"];
+  if (collapsed) {
+    return (
+      <aside className="engineeringSidebar collapsed" aria-label="Collapsed engineering navigation">
+        <button className="panelToggle" onClick={onToggle} title="Expand files panel" aria-label="Expand files panel">›</button>
+        <div className="brandMark compactOnly">AE</div>
+        <nav className="collapsedNav" aria-label="Compact engineering navigation">
+          {navItems.map((item, index) => (
+            <button className={index === 0 ? "active" : ""} key={item} title={item}>
+              {item.slice(0, 1)}
+            </button>
+          ))}
+        </nav>
+        <button className="collapsedRun" onClick={() => actions.runDemo(demoRunPayload(plan))} disabled={state.running} title="Run Demo">
+          {state.running ? "…" : "▶"}
+        </button>
+      </aside>
+    );
+  }
+
+  return (
+    <aside className="engineeringSidebar">
+      <button className="panelToggle sideToggle" onClick={onToggle} title="Collapse files panel" aria-label="Collapse files panel">‹</button>
+      <div className="brandBlock compactBrand">
+        <div className="brandMark">AE</div>
+        <div>
+          <div className="brandTitle">AutoEE</div>
+          <div className="brandSubtitle">Engineering Console</div>
+        </div>
+      </div>
+
+      <label className="requestSelector compactSelector">
+        <span>Project Request</span>
+        <select
+          value={selectedSample}
+          onChange={(event) => {
+            if (event.target.value === "diy") {
+              onProjectRequestChange("");
+              return;
+            }
+            const next = DEMO_PROJECT_REQUESTS.find((sample) => sample.id === event.target.value);
+            if (next) onProjectRequestChange(next.request);
+          }}
+        >
+          <option value="diy">DIY Request</option>
+          {DEMO_PROJECT_REQUESTS.map((sample) => (
+            <option value={sample.id} key={sample.id}>
+              {sample.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      {selectedSample === "diy" && (
+        <textarea
+          className="diyRequestInput compactInput"
+          value={projectRequest === DIY_REQUEST_FALLBACK ? "" : projectRequest}
+          placeholder="Describe the hardware project..."
+          rows={4}
+          onChange={(event) => onProjectRequestChange(event.target.value)}
+        />
+      )}
+
+      <nav className="engineeringNav" aria-label="Engineering console navigation">
+        {navItems.map((item, index) => (
+          <button className={index === 0 ? "active" : ""} key={item}>
+            {item}
+          </button>
+        ))}
+      </nav>
+
+      <div className="engineeringRunBox">
+        <button className="primary" onClick={() => actions.runDemo(demoRunPayload(plan))} disabled={state.running}>
+          {state.running ? "Running..." : "Run Demo"}
+        </button>
+        <button onClick={actions.stop} disabled={!state.running}>Stop</button>
+        <button onClick={actions.reset}>Reset</button>
+      </div>
+      {notice && <div className="notice compactNotice">{notice}</div>}
+
+      <details className="logsDisclosure">
+        <summary>Logs</summary>
+        <div className="eventList compactLogs">
+          {events.length ? events.map((event: AnyRecord, index: number) => (
+            <div className="eventItem" key={`${event.timestamp}-${index}`}>
+              <span>{event.module_id}</span>
+              <strong>{event.status}</strong>
+              <p>{event.message}</p>
+            </div>
+          )) : <div className="empty">No workflow events.</div>}
+        </div>
+      </details>
+
+      <div className="sidebarMeta">
+        <span>{domainName(plan.classification.primaryDomain)}</span>
+        <strong>{plan.classification.productType.replace(/_/g, " ")}</strong>
+      </div>
+    </aside>
+  );
+}
+
+function EngineeringProjectHeader({
+  state,
+  actions,
+  plan,
+  onOpenInvestor,
+  darkTheme,
+  onSetDarkTheme,
+}: {
+  state: AnyRecord;
+  actions: AnyRecord;
+  plan: WorkflowPlan;
+  onOpenInvestor: () => void;
+  darkTheme: boolean;
+  onSetDarkTheme: (enabled: boolean) => void;
+}) {
+  const spec = state.spec || state.rawState?.spec || {};
+  const profile = demoProfileForPlan(plan);
+  const statusStages = state.demoMode === "profile_fake" ? (state.activeDemoStages || []) : (state.stages || []);
+  const completed = statusStages.filter((stage: AnyRecord) => stage.status === "complete").length;
+  const total = statusStages.length || plan.workflowSteps.length;
+  const status = state.workflowStatus === "complete" ? "Needs Review" : state.running ? "Running" : "Ready";
+  const projectName = plan.classification.primaryDomain === "power_electronics"
+    ? String(spec.name || profile.projectName).replace(/^AutoEE\s+/i, "").replace(/\s+Demo$/i, "")
+    : profile.projectName;
+  return (
+    <header className="projectHeader">
+      <div>
+        <span className="projectKicker">Project</span>
+        <h1>{projectName}</h1>
+        <div className="projectMeta">
+          <span>{domainName(plan.classification.primaryDomain)}</span>
+          <span>{profile.circuitName}</span>
+          <span>{completed} / {total} modules complete</span>
+        </div>
+      </div>
+      <div className="projectStatusBlock">
+        <span className={`projectStatus ${status.toLowerCase().replace(/\s+/g, "-")}`}>{status}</span>
+        <div className="projectActions">
+          <button className="primary" onClick={() => actions.runDemo(demoRunPayload(plan))} disabled={state.running}>{state.running ? "Running..." : "Run Demo"}</button>
+          <button disabled>Run Module</button>
+          <button onClick={actions.exportSnapshot}>Export Package</button>
+          <div className="themeSwitch" aria-label="Engineering Console theme">
+            <button className={!darkTheme ? "active" : ""} onClick={() => onSetDarkTheme(false)}>Day</button>
+            <button className={darkTheme ? "active" : ""} onClick={() => onSetDarkTheme(true)}>Night</button>
+          </div>
+          <button onClick={onOpenInvestor}>Home Page</button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+const INVESTOR_FLOW = [
+  {
+    title: "Understand",
+    caption: "Read specs",
+    sourceStageIds: ["understand_specs"],
+    icon: "file",
+  },
+  {
+    title: "Plan",
+    caption: "Choose modules",
+    sourceStageIds: ["select_parts"],
+    icon: "chip",
+  },
+  {
+    title: "Generate",
+    caption: "Create artifacts",
+    sourceStageIds: ["loss_thermal", "waveforms", "control", "package"],
+    icon: "board",
+  },
+  {
+    title: "Review",
+    caption: "Surface risks",
+    sourceStageIds: ["test_report", "package"],
+    icon: "report",
+  },
+];
+
+const INVESTOR_PACKAGE_CARDS = [
+  ["BOM", "Supplier-aware part list", "chip", ["select_parts"]],
+  ["Schematic Draft", "Reviewable circuit intent", "file", ["package"]],
+  ["Layout Rules", "PCB constraints and guardrails", "board", ["package"]],
+  ["Simulation Preview", "Behavior before bench time", "activity", ["waveforms"]],
+  ["Risk Report", "What still needs proof", "report", ["package"]],
+  ["Engineer Review Checklist", "Ready for human signoff", "report", ["test_report", "package"]],
+] as const;
+
+const HERO_PACKAGE_CHIPS = [
+  ["BOM", "chip"],
+  ["Schematic", "file"],
+  ["Layout", "board"],
+  ["Simulation", "activity"],
+  ["Risk", "report"],
+  ["Checklist", "report"],
+] as const;
+
+const PLATFORM_DOMAINS = [
+  ["Power", "First wedge", "activity"],
+  ["Communication", "Wireless", "chart"],
+  ["Sensing", "Signals", "sliders"],
+  ["Embedded", "Firmware", "code"],
+  ["High-Speed", "Systems", "board"],
+  ["Mechanical", "Physical design", "board"],
+] as const;
+
+function InvestorStoryPage({
+  state,
+  actions,
+  plan,
+  onOpenEngineering,
+}: {
+  state: AnyRecord;
+  actions: AnyRecord;
+  plan: WorkflowPlan;
+  onOpenEngineering: () => void;
+}) {
+  return (
+    <div className="investorStory">
+      <section className="storyHero">
+        <div className="storyHeroCopy">
+          <span className="storyEyebrow">AI-Native Hardware Platform</span>
+          <h1>Specs → Hardware</h1>
+          <p>AI-Powered Autonomous Hardware Design</p>
+          <div className="storyActions">
+            <button className="storyPrimary" onClick={() => actions.runDemo()} disabled={state.running}>
+              {state.running ? "Running..." : "Run Demo"}
+            </button>
+            <button className="storySecondary" onClick={onOpenEngineering}>
+              Engineering Console
+            </button>
+          </div>
+        </div>
+        <div className="storyHeroVisual">
+          <img src="/pcb-closeup-home.jpg" alt="PCB electronics close-up" />
+          <div className="packageGlowCard">
+            <span>Ready to Review</span>
+            <strong>Hardware Design Package</strong>
+            <div className="heroArtifactList">
+              {HERO_PACKAGE_CHIPS.map(([title, icon]) => (
+                <small key={title}>
+                  <RoadmapIcon name={icon} />
+                  {title}
+                </small>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="storySection transformSection">
+        <div className="storySectionHeader">
+          <span>How It Works</span>
+          <h2>Spec → Package</h2>
+        </div>
+        <div className="transformationFlow">
+          <article className="transformCard">
+            <span className="transformIcon"><RoadmapIcon name="file" /></span>
+            <h3>Spec</h3>
+            <p>Product request</p>
+          </article>
+          <div className="flowArrow" aria-hidden="true">→</div>
+          <article className="transformCard agentCard">
+            <span className="transformIcon"><RoadmapIcon name="activity" /></span>
+            <h3>Agent</h3>
+            <p>Plans workflow</p>
+          </article>
+          <div className="flowArrow" aria-hidden="true">→</div>
+          <article className="transformCard">
+            <span className="transformIcon"><RoadmapIcon name="report" /></span>
+            <h3>Package</h3>
+            <p>Ready to review</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="storySection">
+        <div className="storySectionHeader">
+          <span>AI Workflow</span>
+          <h2>Simple 4-Step Flow</h2>
+        </div>
+        <div className="simpleWorkflow">
+          {INVESTOR_FLOW.map((item, index) => {
+            const status = sourceStatus(combinedStagePayloads(state), item.sourceStageIds);
+            return (
+              <article className={`simpleStep status-${status}`} key={item.title}>
+                <div>
+                  <span>{index + 1}</span>
+                  <StatusDot status={status} />
+                </div>
+                <RoadmapIcon name={item.icon} />
+                <h3>{item.title}</h3>
+                <p>{item.caption}</p>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="storySection">
+        <div className="storySectionHeader">
+          <span>Preview</span>
+          <h2>Review Kit</h2>
+        </div>
+        <div className="storyPackageGrid">
+          {INVESTOR_PACKAGE_CARDS.map(([title, caption, icon, sourceStageIds]) => {
+            const status = sourceStatus(combinedStagePayloads(state), sourceStageIds);
+            return (
+              <article className={`storyPackageCard status-${status}`} key={title}>
+                <span><RoadmapIcon name={icon} /></span>
+                <h3>{title}</h3>
+                <p>{caption}</p>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="storySection platformSection">
+        <div className="storySectionHeader">
+          <span>Platform Expansion</span>
+          <h2>Start with power. Extend the workflow across hardware.</h2>
+        </div>
+        <div className="platformRail">
+          {PLATFORM_DOMAINS.map(([title, caption, icon], index) => (
+            <React.Fragment key={title}>
+              <article className={index === 0 ? "current" : ""}>
+                <b>{index + 1}</b>
+                <span><RoadmapIcon name={icon} /></span>
+                <strong>{title}</strong>
+                {index === 0 ? <em>{caption}</em> : <small>{caption}</small>}
+              </article>
+              {index < PLATFORM_DOMAINS.length - 1 && <i aria-hidden="true">↓</i>}
+            </React.Fragment>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function InvestorPosterPage({
+  state,
+  actions,
+  onOpenEngineering,
+}: {
+  state: AnyRecord;
+  actions: AnyRecord;
+  onOpenEngineering: () => void;
+}) {
+  const processItems = ["Spec", "Understand", "Plan", "Generate", "Review", "Package"];
+  const domains = ["Power", "Communication", "Sensing", "Embedded", "High-Speed", "Mechanical"];
+  return (
+    <div className="investorPoster">
+      <section className="posterStage">
+        <div className="posterCopy">
+          <span>AI-Native Hardware Platform</span>
+          <h1>Specs → Hardware</h1>
+          <p>AI-Powered Autonomous Hardware Design</p>
+          <div className="storyActions">
+            <button className="storyPrimary" onClick={() => actions.runDemo()} disabled={state.running}>
+              {state.running ? "Running..." : "Run Demo"}
+            </button>
+            <button className="storySecondary" onClick={onOpenEngineering}>
+              Engineering Console
+            </button>
+          </div>
+        </div>
+
+        <div className="posterPackage">
+          <div className="packageBackdrop" />
+          <section>
+            <span>Reviewable output</span>
+            <h2>Hardware Design Package</h2>
+            <p>BOM &middot; Schematic &middot; Layout &middot; Simulation &middot; Risk &middot; Checklist</p>
+            <div className="packageArtifactLine">
+              {HERO_PACKAGE_CHIPS.map(([title]) => <strong key={title}>{title}</strong>)}
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <div className="posterProcessRail" aria-label="Requirement to design package process">
+        {processItems.map((item, index) => (
+          <React.Fragment key={item}>
+            <span className={index === 0 || index === processItems.length - 1 ? "edge" : ""}>{item}</span>
+            {index < processItems.length - 1 && <i aria-hidden="true">→</i>}
+          </React.Fragment>
+        ))}
+      </div>
+
+      <section className="posterPlatformBand">
+        <p>Power first. Expand across hardware.</p>
+        <div>
+          {domains.map((item, index) => (
+            <React.Fragment key={item}>
+              <span className={index === 0 ? "first" : ""}>{item}{index === 0 && <em>First wedge</em>}</span>
+              {index < domains.length - 1 && <i aria-hidden="true">→</i>}
+            </React.Fragment>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function InvestorLandingPage({
+  state,
+  onRunDemo,
+}: {
+  state: AnyRecord;
+  onRunDemo: () => void;
+}) {
+  const domains = ["Power", "Communication", "Sensing", "Embedded", "High-Speed", "Mechanical"];
+  const [showConsolePreview, setShowConsolePreview] = React.useState(false);
+
+  return (
+    <div className="investorLanding">
+      <section className={`landingHero ${showConsolePreview ? "console-visible" : "console-hidden"}`}>
+        <div className="landingHeroMedia" aria-hidden="true" />
+        <div className="landingHeroShade" aria-hidden="true" />
+        <div className="landingHeroCopy">
+          <span>AI-Native Hardware Platform</span>
+          <h1>
+            <strong>AutoEE</strong>
+            <em>Specs &rarr; Hardware</em>
+          </h1>
+          <p>AI-Powered Autonomous Hardware Design</p>
+          <div className="landingActions">
+            <button className="storyPrimary" onClick={onRunDemo} disabled={state.running}>
+              {state.running ? "Running..." : "Run Demo"}
+            </button>
+            <button
+              className="storySecondary"
+              onClick={() => setShowConsolePreview((visible) => !visible)}
+              aria-expanded={showConsolePreview}
+            >
+              Show Concept
+            </button>
+          </div>
+        </div>
+
+        {showConsolePreview && (
+          <figure className="landingConsolePreview">
+            <img src="/Example%20Engineering%20Console.png" alt="Example Engineering Console preview" />
+          </figure>
+        )}
+      </section>
+
+      <section className="landingPlatform">
+        <div>
+          <h2>Power first. General hardware next.</h2>
+          <div className="landingDomainStack" aria-label="AutoEE hardware domain expansion path">
+            {domains.map((item, index) => (
+              <React.Fragment key={item}>
+                <span>{item}</span>
+                {index < domains.length - 1 && <i aria-hidden="true">&rarr;</i>}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function AgentStatusRail({ state }: { state: AnyRecord }) {
+  const complete = state.workflowStatus === "complete";
+  const running = Boolean(state.running);
+  const statusText = running ? "Running" : complete ? "Done" : "Ready";
+  return (
+    <div className={`agentStatusRail ${running ? "running" : complete ? "done" : "ready"}`}>
+      <span aria-hidden="true" />
+      <strong>{statusText}</strong>
+    </div>
+  );
+}
+
+function EngineeringRightPanel({
+  state,
+  actions,
+  plan,
+  collapsed,
+  onToggle,
+}: {
+  state: AnyRecord;
+  actions: AnyRecord;
+  plan: WorkflowPlan;
+  collapsed: boolean;
+  onToggle: () => void;
+}) {
+  if (collapsed) {
+    return (
+      <aside className="copilotRail" aria-label="Collapsed agent panel">
+        <button className="panelToggle" onClick={onToggle} title="Expand agent panel" aria-label="Expand agent panel">‹</button>
+        <span className="copilotRailLabel">Agent</span>
+        <AgentStatusRail state={state} />
+        <button className="copilotRailAction" onClick={actions.exportSnapshot} title="Export package">⇩</button>
+      </aside>
+    );
+  }
+
+  return (
+    <aside className="rightStack agentPanel">
+      <button className="panelToggle sideToggle rightSideToggle" onClick={onToggle} title="Collapse agent panel" aria-label="Collapse agent panel">›</button>
+      <AgentStatusRail state={state} />
+      <ArtifactPackage state={state} actions={actions} plan={plan} showSpecEditor />
+      <EvidenceRail state={state} />
+    </aside>
+  );
+}
+
 function App() {
   const { state, actions, notice } = useAutoEEState();
-  const [mode, setMode] = React.useState("investor");
-  const [projectRequest, setProjectRequest] = React.useState("");
-  const activeProjectRequest = projectRequest || state.prompt || EMPTY_STATE.prompt;
+  const [mode, setMode] = React.useState("engineering");
+  const [leftPanelOpen, setLeftPanelOpen] = useStoredBoolean("autoee.engineering.leftPanelOpen", true);
+  const [rightPanelOpen, setRightPanelOpen] = useStoredBoolean("autoee.engineering.rightPanelOpen", true);
+  const [darkEngineeringTheme, setDarkEngineeringTheme] = useStoredBoolean("autoee.engineering.darkTheme", false);
+  const [projectRequest, setProjectRequest] = React.useState(DEFAULT_PROJECT_REQUEST);
+  const initializedProjectRequest = React.useRef(false);
+  const activeProjectRequest = projectRequest.trim() || DIY_REQUEST_FALLBACK;
   const plan = React.useMemo(() => planWorkflow(activeProjectRequest), [activeProjectRequest]);
+  const runPowerInvestorDemo = React.useCallback(() => {
+    const powerRequest = DEMO_PROJECT_REQUESTS[0]?.request || DEFAULT_PROJECT_REQUEST;
+    const powerPlan = planWorkflow(powerRequest);
+    setProjectRequest(powerRequest);
+    setMode("engineering");
+    void actions.runDemo(demoRunPayload(powerPlan));
+  }, [actions]);
   React.useEffect(() => {
-    if (!projectRequest && state.prompt) setProjectRequest(state.prompt);
+    if (!initializedProjectRequest.current && state.prompt) {
+      initializedProjectRequest.current = true;
+      if (projectRequest !== DEFAULT_PROJECT_REQUEST) {
+        setProjectRequest(state.prompt);
+      }
+    }
   }, [projectRequest, state.prompt]);
   React.useEffect(() => {
-    const failures = validateWorkflowPlannerSamples();
+    const failures = [...validateWorkflowPlannerSamples(), ...validateDemoCircuitProfiles()];
     if (failures.length) {
       console.warn("Workflow planner sample validation failed:", failures);
     }
   }, []);
+  if (mode === "investor") {
+    return (
+      <div className="appShell storyShell">
+        <main className="main storyMain">
+          <div className="storyTopbar">
+            <div className="brandBlock">
+              <div className="brandMark">AE</div>
+              <div>
+                <div className="brandTitle">AutoEE</div>
+                <div className="brandSubtitle">AI Hardware Agent</div>
+              </div>
+            </div>
+            <div className="modeTabs">
+              <button className="active" onClick={() => setMode("investor")}>
+                Home Page
+              </button>
+              <button onClick={() => setMode("engineering")}>
+                Engineering Console
+              </button>
+            </div>
+          </div>
+          {notice && <div className="notice storyNotice">{notice}</div>}
+          <InvestorLandingPage state={state} onRunDemo={runPowerInvestorDemo} />
+        </main>
+      </div>
+    );
+  }
+
   return (
-    <div className="appShell">
-      <LeftRail
+    <div className={`appShell engineeringShell ${leftPanelOpen ? "left-open" : "left-collapsed"} ${darkEngineeringTheme ? "theme-dark" : "theme-light"}`}>
+      <EngineeringSidebar
         state={state}
         actions={actions}
         notice={notice}
         projectRequest={activeProjectRequest}
         onProjectRequestChange={setProjectRequest}
         plan={plan}
+        collapsed={!leftPanelOpen}
+        onToggle={() => setLeftPanelOpen(!leftPanelOpen)}
       />
-      <main className="main">
-        <div className="modeTabs">
-          <button className={mode === "investor" ? "active" : ""} onClick={() => setMode("investor")}>
-            Investor Demo
-          </button>
-          <button className={mode === "engineering" ? "active" : ""} onClick={() => setMode("engineering")}>
-            Engineering Console
-          </button>
+      <main className="main engineeringMain">
+        <EngineeringProjectHeader
+          state={state}
+          actions={actions}
+          plan={plan}
+          onOpenInvestor={() => setMode("investor")}
+          darkTheme={darkEngineeringTheme}
+          onSetDarkTheme={setDarkEngineeringTheme}
+        />
+        <div className={`mainGrid engineeringGrid ${rightPanelOpen ? "right-open" : "right-collapsed"}`}>
+          <div className="centerStack">
+            <ProjectUnderstanding plan={plan} />
+            <StageTimeline state={state} plan={plan} />
+            <ModuleSelectionPanel plan={plan} />
+            <DynamicMetricsPanel state={state} plan={plan} />
+            <EngineeringTabs state={state} plan={plan} />
+          </div>
+          <EngineeringRightPanel
+            state={state}
+            actions={actions}
+            plan={plan}
+            collapsed={!rightPanelOpen}
+            onToggle={() => setRightPanelOpen(!rightPanelOpen)}
+          />
         </div>
-        {mode === "investor" ? (
-          <>
-            <Hero state={state} plan={plan} />
-            <div className="mainGrid">
-              <div className="centerStack">
-                <ProjectUnderstanding plan={plan} />
-                <StageTimeline state={state} plan={plan} />
-                <ModuleSelectionPanel plan={plan} />
-                <DynamicMetricsPanel state={state} plan={plan} />
-              </div>
-              <div className="rightStack">
-                <ArtifactPackage state={state} actions={actions} plan={plan} />
-                <EvidenceRail state={state} />
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <Hero state={state} plan={plan} />
-            <div className="engineeringLayout">
-              <ProjectUnderstanding plan={plan} />
-              <ArtifactPackage state={state} actions={actions} plan={plan} showSpecEditor />
-            </div>
-            <EngineeringTabs state={state} />
-          </>
-        )}
       </main>
     </div>
   );

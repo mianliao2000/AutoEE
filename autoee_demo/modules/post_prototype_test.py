@@ -35,7 +35,7 @@ class EmbeddedCodingDownloadSkill(AutoEESkill):
     ) -> SkillRunResult:
         require_result(state, "library_pcb_mechanical")
         spec = state.spec
-        firmware_artifact = "firmware/build/autoee_usb_c_buck_fw_v0.3.0_demo.hex"
+        firmware_artifact = "firmware/build/AutoEE_usb_c_buck_fw_v0.3.0_demo.hex"
         data = {
             **_base_payload(
                 "fake_firmware_flash",
@@ -48,7 +48,7 @@ class EmbeddedCodingDownloadSkill(AutoEESkill):
             "programmer": "SWD/J-Link demo adapter",
             "deviceIdentity": {
                 "mcu": "STM32G431CBU6",
-                "boardId": "AUTOEE-BUCK-REV-A-FAKE",
+                "boardId": "AutoEE-BUCK-REV-A-FAKE",
                 "serial": "DEMO-LAB-0007",
             },
             "configuration": {
@@ -326,7 +326,7 @@ class AutoTestReportSkill(AutoEESkill):
         coding = require_result(state, "embedded_coding_download")
         tuning = require_result(state, "closed_loop_tuning")
         logging = require_result(state, "efficiency_logging")
-        report_path = "reports/post_prototype/autoee_revA_test_report_demo.pdf"
+        report_path = "reports/post_prototype/AutoEE_revA_test_report_demo.pdf"
         sections = [
             {
                 "title": "Firmware bring-up",

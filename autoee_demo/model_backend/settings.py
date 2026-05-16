@@ -10,7 +10,7 @@ from .types import ProviderConfig
 
 
 def default_settings_path() -> Path:
-    return Path.home() / ".autoee" / "model_backend.json"
+    return Path.home() / ".AutoEE" / "model_backend.json"
 
 
 @dataclass

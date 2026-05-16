@@ -134,7 +134,7 @@ class FoundationTests(unittest.TestCase):
             self.assertIn("Investor Demo", tabs)
             self.assertIn("Engineering Console", tabs)
             self.assertEqual(window.workspace_tabs.currentWidget(), window.investor_demo)
-            self.assertEqual(window.investor_demo.btn_run_demo.text(), "Run 3-Min Demo")
+            self.assertEqual(window.investor_demo.btn_run_demo.text(), "Run Demo")
             self.assertIn("Design Package", window.investor_demo.package_view.toPlainText())
             with tempfile.TemporaryDirectory() as tmp:
                 window.agent.run_all(output_dir=Path(tmp) / "run")
