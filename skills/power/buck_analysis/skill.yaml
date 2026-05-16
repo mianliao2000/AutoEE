@@ -1,0 +1,21 @@
+id: power.buck_analysis
+name: Buck Converter First-Order Analysis
+domain: power_electronics
+description: Formula-based buck converter calculations with LaTeX equations and Matplotlib plots.
+entrypoint: skills.power.buck_analysis.run:run
+timeout: 30
+dependencies:
+  - python
+  - matplotlib
+adapter_requirements: []
+outputs:
+  - results.json
+  - assumptions.json
+  - equations.tex
+  - plots/inductor_current.png
+  - plots/switch_node.png
+  - plots/duty_vs_vin.png
+  - plots/ripple_vs_vin.png
+  - plots/loss_breakdown.png
+  - analysis_log.txt
+

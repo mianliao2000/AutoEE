@@ -57,16 +57,58 @@ Current web architecture:
   - desktop-first single-line typography for short hero, package, and platform statements where the viewport allows it
   - responsive hero composition keeps desktop text sizing stable while the console screenshot scales first, preventing text/image overlap across monitor sizes
   - the hero places the left copy within the first third of the display, with capped responsive type, a small left inset, and a comfortable breathing gap so the concept screenshot can still occupy most remaining width
-  - platform expansion title: `Power first. General hardware next.`
-  - minimal platform expansion section: a compact one-line Power -> Communication -> Sensing -> Embedded -> High-Speed -> Mechanical path under the platform title
+  - centered overlay disclaimer above the hero image: `Created by Jackson Liao, © 2026 Pandora AI. All rights reserved.`
+  - Home Page is locked to a single viewport with no page scrolling
   - black, white, and neutral styling with very limited accent use, keeping Engineering Console visually separate
-- The web app opens to Engineering Console by default. Engineering Console is the technical cockpit and keeps the detailed planner output, selected workflow roadmap, active modules, validation metrics, artifact package, spec editor, evidence badges, waveform tabs, loss/thermal views, design rationale, risk summary, developer state, and collapsible logs.
-- Engineering Console uses a compact project header instead of the marketing hero, with project name, domain, product type, run status, and workflow/export actions.
-- Engineering Console uses a neutral EDA-style workspace: project navigation on the left, workflow/review content in the center, artifacts and validation in the right inspector, smaller radii, thin dividers, and semantic status colors.
-- Engineering Console keeps Project Understanding and System Map in the same left-column stack, while Generated Hardware Package and evidence panels live in the right sidebar. This keeps the workflow summary compact without blank vertical gaps.
-- Engineering Console side panels are collapsible: the left project/files rail can shrink to a compact navigation strip, and the right agent/artifact inspector can shrink to a compact Agent rail with running/done status.
-- Engineering Console notices and logs wrap long export paths inside their panels so snapshot messages do not overlap the workspace.
-- Engineering Console supports a Day/Night segmented theme switch in the project header; the selected theme is persisted in localStorage and does not affect the Home Page.
+- The web app opens to Engineering Console by default. Engineering Console is now a dark IDE / EDA-style cockpit rather than a light SaaS dashboard:
+  - compact dark top toolbar with project identity, domain, agent status, run progress bar, review status, Run Demo, Reset, and theme toggle; the left `AE` logo returns to Home Page
+  - bilingual `中 / EN` language switch beside the Day/Night toggle; it persists in `localStorage` as `autoee.uiLanguage` and currently localizes the console shell, navigation, Requirement review controls, Copilot task controls, console header, and Home Page hero/footer
+  - collapsible left workflow/artifact/session sidebar with compact tree/list navigation for Design and Test workflow steps, file-tree-style artifacts, and small pending/running/completed/verified/needs-review/failed status marks
+  - central engineering workspace with editor-style Requirement, Analysis, Simulation, BOM, PCB, and Review tabs, so component decisions happen before board layout
+  - Requirement tab is now a reviewable AI-generated Design Plan / Engineering Brief with Project Intent, Key Requirements, Proposed Architecture, Critical Design Decisions, Verification Plan, Risks / Open Questions, and Downstream Modules sections
+  - Requirement tab now uses an Engineering Brief review layout with a compact plan header, reviewed-section progress, readable selectable sections, a right-side review inspector, and section actions shown only for the selected review context
+  - reviewed Requirement sections get a subtle green row state and green status badge so engineer review progress is visible at a glance
+  - Requirement tab includes a bilingual key-metrics table for the selected demo domain, and the design brief body switches between English and Chinese with the language toggle
+  - Requirement sections can be revised independently with deterministic demo revisions, marked reviewed, opened in the AI Copilot thread, and approved before downstream modules become ready
+  - dark schematic canvas, waveform/simulation panel, BOM Component Decision Workspace, verification checks, and an integrated terminal-style console output log
+  - BOM tab is now a dedicated component decision workspace with BOM summary, filters, component table, selected-part inspector, alternatives, rationale, derating checks, supply risk, evidence state, approval/lock/replace actions, CSV export, and Copilot review actions
+  - BOM workspace labels, filters, status badges, inspector headings, and common demo evidence/risk strings switch between English and Chinese
+  - BOM tab now borrows ActiveBOM-style concepts: saved column-set style views (`Engineering`, `Procurement`, `Risk`), grouping by category/manufacturer/status, BOM health checks, solution/alternative counts, supply-chain risk, lifecycle, price/stock, and evidence visibility
+  - collapsible right AI Design Assistant panel styled as a VS Code Codex-like copilot panel with a recent-task list, task search, new task action, per-task delete action, compact module execution progress, fixed prompt input, and compact rail when collapsed
+  - Copilot no longer shows provider tabs such as `CODEX` or `CLAUDE CODE`; its toolbar actions now open history, model/settings, task view, new task, and collapse behavior
+  - Copilot composer includes example ChatGPT/Gemini/Claude/DeepSeek/Qwen model choices, intelligence level selection, and demo usage remaining controls; the current demo still routes all model choices through the configured backend provider
+  - Codex-style multi-task copilot threads where each task keeps independent messages, user messages render as right-aligned bubbles, and AutoEE responses render as normal assistant prose with parsed paragraphs, bullets, inline code, and code blocks
+  - `/api/copilot-chat` now gives the configured LLM a Codex-style engineering assistant prompt and folds AutoEE project context into the system message, so MiniMax/OpenAI-compatible providers answer the latest user message instead of dumping raw context/status tables
+  - VS Code-inspired dark console surfaces instead of blue-heavy navy dashboard panels, with neutral editor/sidebar/tab colors, subtle dividers, lower-radius surfaces, and semantic status colors reserved for active/running, completed, needs-review, and failed states
+  - downstream modules expose their Run action inside the module workspace instead of using a global disabled Run Module control
+  - refined engineering typography using Inter/Geist/system UI sans for interface text, mono fonts only for logs/code/timestamps/schematic and waveform labels, lighter 400/500 weights by default, and tabular numbers for engineering data
+- Engineering Console now has a project-driven shell:
+  - the top toolbar includes `My Projects / 我的项目` and `Add to My Projects / 添加到我的项目`
+  - `#/projects` shows local project cards with domain, source, updated time, and progress percentage
+  - `#/projects/:id` opens a project detail page with Design/Test module state, requirement summary, recent results, and pending AI change proposals
+  - the project dashboard now uses a Pandora AI-style top bar, centered project grid, rounded progress cards, bilingual controls, and Day/Night theme switching
+  - demo imports copy the selected template into a local project without copying transient demo run outputs
+  - opened projects switch Copilot into project-scoped tasks and store proposed AI design edits as pending proposals until the user applies or rejects them
+- Project records are stored in local SQLite at `runtime_base_dir()/data/autoee_projects.sqlite3` by default, or at `AUTOEE_PROJECT_DB` when that environment variable is set.
+- Engineering Console is constrained to the browser viewport with no outer page scroll. The left workflow/artifact panel, center workspace, and right AI assistant panel scroll independently.
+- Engineering Console supports resizable panes: the left workflow sidebar, right AutoEE Copilot panel, and Console Output can be resized by dragging their edges up to roughly half of the available screen/container; Console Output can also be hidden/shown from its header.
+- Engineering Console merges run progress and review status into one top-toolbar status control with a percentage readout.
+- Engineering Console validates persisted pane sizes on load so the right AutoEE Copilot panel and Console Output cannot reopen at zero size.
+- Engineering Console resize handles update pane dimensions directly while dragging, then persist the final size on pointer release.
+- Engineering Console keeps explanatory UI copy minimal by default and prioritizes images, generated results, tables, logs, and controls.
+- Requirement tab no longer displays BOM, simulation, PCB, or review outputs; BOM output is scoped to the BOM tab.
+- Requirement approval remains the first human-in-the-loop gate: AI drafts the plan, engineers inspect/revise/review sections, and downstream modules remain pending until the plan is approved.
+- BOM tab uses domain-specific demo component decision data for Power Electronics, RF / Embedded, Analog / Sensor, High-Speed Digital, Embedded / MCU, and General PCB. Supplier, price, stock, and evidence labels remain marked as demo data until real distributor adapters are connected.
+- Engineering Console waveform, Bode, efficiency, loss, pie, and thermal visuals use theme-aware black/white chart styling so visuals switch cleanly between Day and Night modes.
+- Engineering Console uses `New Design` for free-text project input. Sending that input updates the current request and mirrors it into the active AI Design Assistant task. The AI chat input calls the local `/api/copilot-chat` backend, which uses the provider configured in `.env`.
+- Engineering Console persists right-side Copilot tasks in `localStorage` under `autoee.engineering.copilotTasks` and restores the active task from `autoee.engineering.activeCopilotTaskId`.
+- Local LLM credentials live in `.env` and are ignored by git. Use `.env.example` as the template for `AUTOEE_LLM_PROVIDER`, `AUTOEE_LLM_MODEL`, `AUTOEE_LLM_BASE_URL`, and the provider API key. Supported Copilot providers include `openai`, `anthropic`, `gemini`, `minimax`, `deepseek`, `qwen`, `openrouter`, `ollama`, `custom_openai`, and `mock`. `.env.example` also includes future OpenRouter model-routing names for ChatGPT, Gemini, Claude, DeepSeek, and Qwen.
+- Engineering Console Reset only applies to preset demo requests, clears the generated demo state, removes demo/requirement Copilot tasks, and preserves manually created Copilot tasks. The copilot composer sends on Enter and supports Shift+Enter for a newline.
+- Day/Night mode now uses a compact sun/moon icon toggle and swaps the console surface, topbar, editor tabs, assistant, console output, prompt, text, divider, canvas, waveform, schematic, and status palettes rather than only changing the page background. A matching bilingual `中 / EN` toggle sits beside it for Chinese/English UI switching.
+- Empty/default/reset states keep the BOM workspace blank until the Component Selection/BOM module runs, then show reviewable component decisions instead of a static part list.
+- Engineering Console keeps the detailed planner output, selected modules, validation metrics, artifact package data, evidence, waveform/loss/risk/detail tabs, and logs available through the cockpit views.
+- Engineering Console supports persisted side panel state and a persisted Day/Night theme switch; the Home Page visual style remains separate.
+- Engineering Console no longer exposes the web snapshot/export-package action or Focus Mode; side panels remain independently collapsible.
 - All domain-pack roadmaps use the same two-section System Map layout:
   - Design / Before PCB Prototype Fabrication
   - Test / After PCB Prototype Returns
@@ -77,7 +119,7 @@ Current web architecture:
 Demo request examples available in the web UI:
 
 - Power Electronics is selected by default because it is the current runnable backend demo.
-- DIY Request: editable free-text project request that drives the same deterministic classifier and workflow planner without being treated as a preset demo.
+- New Design: editable free-text project request that drives the same deterministic classifier and workflow planner without being treated as a preset demo.
 - Power Electronics: `Design a vehicle/industrial 9-36 V to 5 V/3 A USB-C buck charger.`
 - RF / Embedded: `Design a 2.4 GHz BLE wireless temperature sensor node powered by a coin cell.`
 - Analog / Sensor: `Design a low-noise thermocouple measurement front-end with ADC output.`

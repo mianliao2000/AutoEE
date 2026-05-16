@@ -13,7 +13,7 @@ from autoee_demo.model_backend import (
     redact_secret,
     secret_fingerprint,
 )
-from autoee_demo.model_backend.types import validate_provider_config
+from autoee_demo.model_backend.types import extract_text_from_chat_completions, validate_provider_config
 
 
 class ModelBackendTests(unittest.TestCase):
@@ -81,10 +81,29 @@ class ModelBackendTests(unittest.TestCase):
 
     def test_registry_has_required_providers(self):
         registry = ProviderRegistry(MemorySecretStore())
-        for name in ["openai", "anthropic", "gemini", "openrouter", "ollama", "custom_openai", "mock"]:
+        for name in ["openai", "anthropic", "gemini", "openrouter", "minimax", "deepseek", "qwen", "ollama", "custom_openai", "mock"]:
             self.assertIn(name, registry.names())
+
+    def test_minimax_default_provider_config(self):
+        registry = ProviderRegistry(MemorySecretStore())
+        config = registry.default_config("minimax")
+        self.assertEqual(config.provider, "minimax")
+        self.assertEqual(config.model, "MiniMax-M2.7")
+        self.assertEqual(config.base_url, "https://api.minimax.io/v1")
+        self.assertEqual(config.api_key_env, "MINIMAX_API_KEY")
+
+    def test_chat_completion_text_strips_reasoning_blocks(self):
+        raw = {
+            "choices": [
+                {
+                    "message": {
+                        "content": "<think>\ninternal reasoning\n</think>\n\nFinal answer",
+                    },
+                },
+            ],
+        }
+        self.assertEqual(extract_text_from_chat_completions(raw), "Final answer")
 
 
 if __name__ == "__main__":
     unittest.main()
-

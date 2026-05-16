@@ -5,12 +5,15 @@ from typing import Dict, Type
 from .providers import (
     AnthropicProvider,
     CustomOpenAICompatibleProvider,
+    DeepSeekProvider,
     GeminiProvider,
+    MiniMaxProvider,
     MockProvider,
     ModelProvider,
     OllamaProvider,
     OpenAIProvider,
     OpenRouterProvider,
+    QwenProvider,
 )
 from .secrets import SecretStore
 from .types import ProviderConfig
@@ -45,6 +48,27 @@ DEFAULT_PROVIDER_CONFIGS: Dict[str, ProviderConfig] = {
         api_key_env="OPENROUTER_API_KEY",
         secret_name="openrouter_api_key",
     ),
+    "minimax": ProviderConfig(
+        provider="minimax",
+        model="MiniMax-M2.7",
+        base_url="https://api.minimax.io/v1",
+        api_key_env="MINIMAX_API_KEY",
+        secret_name="minimax_api_key",
+    ),
+    "deepseek": ProviderConfig(
+        provider="deepseek",
+        model="deepseek-chat",
+        base_url="https://api.deepseek.com/v1",
+        api_key_env="DEEPSEEK_API_KEY",
+        secret_name="deepseek_api_key",
+    ),
+    "qwen": ProviderConfig(
+        provider="qwen",
+        model="qwen-max",
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        api_key_env="QWEN_API_KEY",
+        secret_name="qwen_api_key",
+    ),
     "ollama": ProviderConfig(
         provider="ollama",
         model="llama3.1",
@@ -67,6 +91,9 @@ class ProviderRegistry:
         "anthropic": AnthropicProvider,
         "gemini": GeminiProvider,
         "openrouter": OpenRouterProvider,
+        "minimax": MiniMaxProvider,
+        "deepseek": DeepSeekProvider,
+        "qwen": QwenProvider,
         "ollama": OllamaProvider,
         "custom_openai": CustomOpenAICompatibleProvider,
         "mock": MockProvider,
@@ -89,4 +116,3 @@ class ProviderRegistry:
 
     def names(self):
         return list(self.provider_classes.keys())
-

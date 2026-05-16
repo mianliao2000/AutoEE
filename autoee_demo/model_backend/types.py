@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
@@ -71,10 +72,10 @@ def validate_provider_config(config: ProviderConfig) -> List[str]:
         errors.append("Provider is required.")
     if not config.model:
         errors.append("Model id is required.")
-    if config.provider in {"openai", "anthropic", "gemini", "openrouter", "custom_openai"}:
+    if config.provider in {"openai", "anthropic", "gemini", "openrouter", "minimax", "deepseek", "qwen", "custom_openai"}:
         if not config.secret_name and not config.api_key_env:
             errors.append("Cloud providers need a keyring secret name or environment variable.")
-    if config.provider in {"openai", "openrouter", "ollama", "custom_openai"} and not config.base_url:
+    if config.provider in {"openai", "openrouter", "minimax", "deepseek", "qwen", "ollama", "custom_openai"} and not config.base_url:
         errors.append("Provider base URL is required.")
     return errors
 
@@ -95,8 +96,12 @@ def extract_text_from_chat_completions(raw: Mapping[str, Any]) -> str:
     if not choices:
         return ""
     message = choices[0].get("message", {})
-    return str(message.get("content", "")).strip()
+    text = str(message.get("content", "")).strip()
+    # MiniMax M2.x and some reasoning models inject thinking blocks into the
+    # OpenAI-compatible content field. Keep raw response data, but show users
+    # the final answer text in the product chat.
+    text = re.sub(r"(?is)<think>.*?</think>\s*", "", text).strip()
+    return text
 
 
 OptionalJsonSchema = Optional[Mapping[str, Any]]
-

@@ -784,6 +784,9 @@ def build_parts_catalog(state: DesignState) -> Dict[str, Any]:
 
 
 def build_analysis_summary(state: DesignState) -> Dict[str, Any]:
+    artifact_result = safe_dict(state.deterministic_results.get("power_buck_analysis"))
+    if artifact_result:
+        return artifact_result
     result = safe_dict(state.deterministic_results.get("loss_thermal"))
     loss = safe_dict(result.get("loss_breakdown"))
     thermal = safe_dict(result.get("thermal_result"))
@@ -801,6 +804,22 @@ def build_analysis_summary(state: DesignState) -> Dict[str, Any]:
         "sourceType": str(result.get("sourceType") or "first_order_demo_model"),
         "realCapabilityStatus": str(result.get("realCapabilityStatus") or "demo_estimate_not_signoff"),
         "notice": "First-order demo estimate. Real thermal simulation and measured validation are not connected yet.",
+    }
+
+
+def build_simulation_artifacts(state: DesignState) -> Dict[str, Any]:
+    result = safe_dict(state.deterministic_results.get("power_buck_simulation"))
+    if result:
+        return result
+    return {
+        "available": False,
+        "status": "waiting",
+        "source": "not_run",
+        "adapter": {"adapter": "ngspice", "connected": False, "message": "Select a simulator adapter and run Simulation."},
+        "plots": [],
+        "rawOutputs": [],
+        "metrics": {},
+        "comparison": {},
     }
 
 
@@ -1061,6 +1080,7 @@ def build_web_state(
         "executionPlan": build_execution_plan(state),
         "partsCatalog": build_parts_catalog(state),
         "analysisSummary": build_analysis_summary(state),
+        "simulationArtifacts": build_simulation_artifacts(state),
         "controlPlan": build_control_plan(state),
         "pcbAutomationPlan": build_pcb_automation_plan(state),
         "testWorkflow": build_test_workflow(state),

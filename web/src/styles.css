@@ -32,6 +32,17 @@ body {
     linear-gradient(180deg, #fbfcff 0%, #f4f7fb 55%, #eef3f8 100%);
 }
 
+body:has(.engineeringShell) {
+  min-width: 0;
+  overflow: hidden;
+}
+
+body:has(.storyShell) {
+  min-width: 0;
+  overflow: hidden;
+  background: #050506;
+}
+
 button {
   border: 1px solid var(--line);
   background: #ffffff;
@@ -99,9 +110,7 @@ button.primary {
   --line: #263244;
   --panel: #111827;
   --soft: #172033;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(79, 70, 229, 0.1), transparent 26%),
-    linear-gradient(180deg, #0b1120 0%, #0f172a 52%, #111827 100%);
+  background: #0b1120;
   color: #e5e7eb;
 }
 
@@ -179,8 +188,7 @@ button.primary {
 }
 
 .collapsedNav button,
-.collapsedRun,
-.copilotRailAction {
+.collapsedRun {
   display: grid;
   place-items: center;
   width: 40px;
@@ -1743,11 +1751,19 @@ button.primary {
 
 /* Investor Demo: cinematic product stage. */
 .storyShell {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
   background: #050506;
 }
 
 .storyMain {
+  height: 100vh;
+  height: 100dvh;
   max-width: none;
+  overflow: hidden;
+  overscroll-behavior: none;
   padding: 0;
 }
 
@@ -1790,9 +1806,14 @@ button.primary {
 }
 
 .investorLanding {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
   gap: 0;
   max-width: none;
   margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
   background: #050506;
 }
 
@@ -1804,11 +1825,14 @@ button.primary {
   --hero-right-inset: clamp(20px, 2.4vw, 48px);
   --hero-copy-width: calc(33.333vw - var(--hero-left-inset));
   --hero-visual-gap: clamp(46px, 4vw, 86px);
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
   grid-template-columns: minmax(0, var(--hero-copy-width));
   gap: 0;
   justify-content: start;
-  padding: clamp(118px, 15vh, 178px) var(--hero-right-inset) clamp(70px, 10vh, 120px) var(--hero-left-inset);
+  overflow: hidden;
+  padding: clamp(118px, 15vh, 178px) var(--hero-right-inset) clamp(72px, 8vh, 104px) var(--hero-left-inset);
   border: 0;
   border-radius: 0;
   background: #050506;
@@ -2098,6 +2122,7 @@ button.primary {
   z-index: 1;
   width: 100%;
   max-width: 100%;
+  max-height: min(74vh, 760px);
   min-width: 0;
   justify-self: end;
   align-self: center;
@@ -2140,6 +2165,8 @@ button.primary {
   display: block;
   width: 100%;
   height: auto;
+  max-height: min(74vh, 760px);
+  object-fit: contain;
 }
 
 .landingPlatform {
@@ -2192,6 +2219,30 @@ button.primary {
   color: rgba(255, 255, 255, 0.34);
   font-size: clamp(15px, 1vw, 20px);
   font-weight: 520;
+}
+
+.landingFooter {
+  position: absolute;
+  right: auto;
+  bottom: clamp(16px, 2.8vh, 32px);
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(780px, calc(100% - 40px));
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  transform: translateX(-50%);
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
 }
 
 .landingDomainRail {
@@ -2620,8 +2671,7 @@ button.primary {
   color: #c7d2fe;
 }
 
-.engineeringShell.theme-dark .panelToggle,
-.engineeringShell.theme-dark .copilotRailAction {
+.engineeringShell.theme-dark .panelToggle {
   border-color: #334155;
   background: #111827;
   color: #cbd5e1;
@@ -2651,6 +2701,1768 @@ button.primary {
 .engineeringShell.theme-dark th,
 .engineeringShell.theme-dark td {
   border-color: #263244;
+}
+
+/* Engineering Console: dark IDE / EDA cockpit */
+.engineeringShell {
+  grid-template-columns: 292px minmax(0, 1fr);
+  min-width: 1180px;
+  background: #071016;
+  color: #d7e3ea;
+}
+
+.engineeringShell.left-collapsed {
+  grid-template-columns: 66px minmax(0, 1fr);
+}
+
+.engineeringMain {
+  min-height: 100vh;
+  padding: 10px 10px 10px 12px;
+  background: #071016;
+}
+
+.engineeringGrid {
+  grid-template-columns: minmax(0, 1fr) 328px;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.engineeringGrid.right-collapsed {
+  grid-template-columns: minmax(0, 1fr) 66px;
+}
+
+.edaSidebar,
+.edaAssistantPanel,
+.edaAssistantRail {
+  color: #dbe7ee;
+  border-color: rgba(148, 163, 184, 0.16);
+  background: #0b141c;
+}
+
+.edaSidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 12px;
+  border-right: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.edaSidebar.collapsed {
+  align-items: center;
+  width: 66px;
+  padding: 10px 8px;
+}
+
+.edaBrandBlock,
+.edaTopBrand,
+.edaAssistantHeader,
+.edaTopProject,
+.edaTopStatus,
+.edaTopActions {
+  display: flex;
+  align-items: center;
+}
+
+.edaBrandBlock {
+  gap: 10px;
+}
+
+.edaLogo {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 7px;
+  background: #14222c;
+  color: #e6f4f1;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.edaLogoButton {
+  padding: 0;
+  cursor: pointer;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.edaLogoButton:hover {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  transform: none;
+  box-shadow: none;
+}
+
+.edaBrandTitle,
+.edaTopBrand strong {
+  color: #f4fbff;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.edaBrandSub,
+.edaTopBrand span,
+.edaTopProject span,
+.edaAssistantHeader span,
+.edaPanelHeader span {
+  color: #7f96a6;
+  font-size: 11px;
+}
+
+.edaRequestPicker,
+.edaDiyInput {
+  display: grid;
+  gap: 6px;
+}
+
+.edaRequestPicker span,
+.edaSidebarSection h3,
+.edaSessionInfo h3 {
+  margin: 0;
+  color: #7f96a6;
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.edaRequestPicker select,
+.edaDiyInput,
+.edaPromptBox {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 7px;
+  background: #0a141c;
+  color: #dbe7ee;
+  font: inherit;
+  font-size: 12px;
+}
+
+.edaRequestPicker select {
+  padding: 8px 9px;
+}
+
+.edaDiyInput {
+  resize: vertical;
+  padding: 8px 9px;
+  line-height: 1.35;
+}
+
+.edaNewDesignBox {
+  display: grid;
+  gap: 7px;
+}
+
+.edaSendDesign {
+  justify-self: stretch;
+  height: 30px;
+  padding: 0 10px;
+  border-color: var(--eda-divider);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-secondary);
+  box-shadow: none;
+}
+
+.edaSendDesign:not(:disabled) {
+  border-color: rgba(110, 165, 200, 0.35);
+  background: #18384b;
+  color: #e4f2f7;
+}
+
+.edaNotice {
+  padding: 8px 9px;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 7px;
+  background: rgba(120, 53, 15, 0.2);
+  color: #f7c56d;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.edaSidebarSection {
+  display: grid;
+  gap: 9px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.edaNavList,
+.edaArtifactList,
+.edaCollapsedNav {
+  display: grid;
+  gap: 5px;
+}
+
+.edaNavList button,
+.edaArtifactList button,
+.edaCollapsedNav button {
+  display: grid;
+  align-items: center;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
+.edaNavList button,
+.edaArtifactList button {
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 9px;
+  border-radius: 8px;
+  background: transparent;
+  color: #cbd7df;
+  text-align: left;
+}
+
+.edaNavList button.selected,
+.edaNavList button:hover,
+.edaArtifactList button:hover {
+  border-color: rgba(56, 189, 248, 0.18);
+  background: #102633;
+}
+
+.edaNavList strong,
+.edaArtifactList strong {
+  display: block;
+  color: #e8f3f7;
+  font-size: 13px;
+  font-weight: 690;
+}
+
+.edaNavList small,
+.edaArtifactList small,
+.edaArtifactList em {
+  color: #6f8898;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.edaStatusMark {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+}
+
+.edaStatusMark span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #5d6f7b;
+}
+
+.edaStatusMark.running span {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(96, 165, 250, 0.25);
+  border-top-color: #38bdf8;
+  background: transparent;
+  animation: statusSpin 900ms linear infinite;
+}
+
+.edaStatusMark.completed span,
+.edaStatusMark.verified span {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+.edaStatusMark.needs_review span {
+  background: #f59e0b;
+}
+
+.edaStatusMark.failed span {
+  background: #ef4444;
+}
+
+.edaSessionInfo {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.edaSessionInfo dl {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 7px 8px;
+  margin: 10px 0 0;
+}
+
+.edaSessionInfo dt,
+.edaSessionInfo dd {
+  margin: 0;
+  font-size: 11px;
+}
+
+.edaSessionInfo dt {
+  color: #718899;
+}
+
+.edaSessionInfo dd {
+  color: #d3e1e8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edaCollapsedNav button {
+  justify-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 8px;
+  background: rgba(15, 28, 38, 0.66);
+  color: #dbe7ee;
+}
+
+.edaCollapsedRun {
+  width: 42px;
+  margin-top: auto;
+  padding: 8px 0;
+  border-color: rgba(56, 189, 248, 0.3);
+  background: rgba(14, 116, 144, 0.34);
+  color: #dffbff;
+  box-shadow: none;
+}
+
+.edaTopBar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 8px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 8px;
+  background: #0b141c;
+}
+
+.edaTopBrand {
+  gap: 10px;
+}
+
+.edaTopBrand div:last-child,
+.edaTopProject {
+  display: grid;
+  gap: 2px;
+}
+
+.edaTopProject strong {
+  color: #eef9fd;
+  font-size: 15px;
+}
+
+.edaTopStatus,
+.edaTopActions {
+  gap: 7px;
+}
+
+.edaAgentBadge,
+.edaReviewBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 7px;
+  color: #c7d6de;
+  background: rgba(10, 20, 28, 0.72);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.edaAgentBadge b {
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(34, 197, 94, 0.16);
+  color: #4ade80;
+  font-size: 11px;
+}
+
+.edaReviewBadge.ready-for-review {
+  color: #49e58e;
+}
+
+.edaReviewBadge.needs-review {
+  color: #f7c56d;
+}
+
+.edaReviewBadge.running {
+  color: #67e8f9;
+}
+
+.edaRunProgress {
+  display: inline-flex;
+  align-items: center;
+  width: 96px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 7px;
+  background: rgba(10, 20, 28, 0.72);
+}
+
+.edaRunProgress i {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.edaRunProgress b {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: block;
+  min-width: 0;
+  border-radius: inherit;
+  background: var(--eda-active);
+  transition: width 220ms ease;
+}
+
+.edaRunProgress.running b {
+  box-shadow: 0 0 8px rgba(0, 122, 204, 0.32);
+}
+
+.edaRunProgress.complete b {
+  background: var(--eda-pass);
+  box-shadow: none;
+}
+
+.edaReviewBadge {
+  min-width: 176px;
+}
+
+.edaReviewBadge i {
+  position: relative;
+  width: 56px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--eda-bg);
+}
+
+.edaReviewBadge i b {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: block;
+  border-radius: inherit;
+  background: var(--eda-active);
+  transition: width 220ms ease;
+}
+
+.edaReviewBadge em {
+  color: var(--eda-secondary);
+  font-size: 11px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.edaReviewBadge span {
+  color: inherit;
+}
+
+.edaReviewBadge.complete-progress i b {
+  background: var(--eda-pass);
+}
+
+.edaTopActions button {
+  height: 32px;
+  padding: 0 10px;
+  border-color: rgba(148, 163, 184, 0.18);
+  border-radius: 7px;
+  background: rgba(10, 20, 28, 0.8);
+  color: #dbe7ee;
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.edaTopActions button.primary {
+  border-color: rgba(56, 189, 248, 0.42);
+  background: #0e7490;
+  color: #efffff;
+}
+
+.edaWorkspace {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 8px;
+  background: #08131b;
+  overflow: hidden;
+}
+
+.edaWorkspaceTabs {
+  display: flex;
+  gap: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.13);
+  background: #0c1822;
+}
+
+.edaWorkspaceTabs button {
+  min-width: 118px;
+  padding: 0 16px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #a7bac5;
+  box-shadow: none;
+}
+
+.edaWorkspaceTabs button.active {
+  border-bottom-color: #22d3ee;
+  color: #f4fbff;
+}
+
+.edaWorkspaceGrid {
+  display: grid;
+  grid-template-columns: minmax(420px, 1.18fr) minmax(340px, 0.82fr);
+  gap: 8px;
+  padding: 8px;
+}
+
+.edaPanel {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 8px;
+  background: #0b1720;
+  overflow: hidden;
+}
+
+.edaPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.edaPanelHeader h3 {
+  margin: 0;
+  color: #edf7fb;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.edaSchematicCanvas,
+.edaPcbPreviewCanvas,
+.edaWaveCanvas {
+  padding: 10px;
+}
+
+.edaSchematicCanvas svg,
+.edaPcbPreviewCanvas svg,
+.edaWaveCanvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 7px;
+  background: #071117;
+}
+
+.edaPcbPreviewCanvas svg {
+  background: var(--eda-workspace);
+  border: 1px solid var(--eda-line);
+}
+
+.pcbBackdrop {
+  fill: url(#pcb-grid);
+  stroke: color-mix(in srgb, var(--eda-text-muted) 16%, transparent);
+}
+
+.pcbBoard {
+  fill: #174533;
+  stroke: #4f8a6e;
+  stroke-width: 2;
+}
+
+.pcbKeepout {
+  fill: rgba(255, 255, 255, 0.05);
+  stroke: rgba(255, 255, 255, 0.18);
+  stroke-dasharray: 8 6;
+}
+
+.pcbCopperZone {
+  fill: rgba(193, 126, 48, 0.30);
+  stroke: rgba(229, 171, 82, 0.82);
+  stroke-width: 1.6;
+}
+
+.pcbCopperZone.secondary {
+  fill: rgba(193, 126, 48, 0.22);
+}
+
+.pcbMounts circle {
+  fill: #0b1114;
+  stroke: #c9d4d0;
+  stroke-width: 3;
+}
+
+.pcbConnector rect,
+.pcbIc rect:first-child,
+.pcbPower rect {
+  fill: #222a2f;
+  stroke: #d0d8d6;
+  stroke-width: 1.3;
+}
+
+.pcbIc rect:not(:first-child) {
+  fill: #c2cbc8;
+}
+
+.pcbConnector path {
+  stroke: #c2cbc8;
+  stroke-width: 2;
+}
+
+.pcbTraces path {
+  fill: none;
+  stroke: #d0a24f;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pcbTraces path.wide {
+  stroke-width: 13;
+}
+
+.pcbTraces path.sense {
+  stroke: #a9c7be;
+  stroke-width: 3;
+  stroke-dasharray: 7 5;
+}
+
+.pcbVias circle {
+  fill: #101719;
+  stroke: #e1b35c;
+  stroke-width: 3;
+}
+
+.pcbLabels text,
+.pcbConnector text,
+.pcbIc text,
+.pcbPower text {
+  fill: #edf3ef;
+  font-family: var(--eda-font-mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pcbLabels text:first-child {
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+.engineeringShell.theme-light .pcbBoard {
+  fill: #d6e7dd;
+  stroke: #789383;
+}
+
+.engineeringShell.theme-light .pcbConnector rect,
+.engineeringShell.theme-light .pcbIc rect:first-child,
+.engineeringShell.theme-light .pcbPower rect {
+  fill: #f6f8f7;
+  stroke: #6f7e7a;
+}
+
+.engineeringShell.theme-light .pcbLabels text,
+.engineeringShell.theme-light .pcbConnector text,
+.engineeringShell.theme-light .pcbIc text,
+.engineeringShell.theme-light .pcbPower text {
+  fill: #172128;
+}
+
+.schemGrid,
+.waveGridBg {
+  fill: url(#eda-grid);
+  stroke: rgba(148, 163, 184, 0.12);
+}
+
+.waveGridBg {
+  fill: url(#wave-grid);
+}
+
+.schemWires path {
+  fill: none;
+  stroke: #21d07a;
+  stroke-width: 2;
+}
+
+.schemSymbol rect,
+.schemDevice rect {
+  fill: #111f2a;
+  stroke: #90a4ae;
+  stroke-width: 1.2;
+}
+
+.schemPassive path {
+  fill: none;
+  stroke: #e8b15d;
+  stroke-width: 2;
+}
+
+.schemSymbol text,
+.schemDevice text,
+.schemPassive text,
+.schemTitle,
+.edaWaveCanvas text {
+  fill: #cbdce4;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+}
+
+.schemTitle {
+  fill: #7f96a6;
+}
+
+.waveGuides line {
+  stroke: rgba(148, 163, 184, 0.14);
+}
+
+.wave {
+  fill: none;
+  stroke-width: 2;
+}
+
+.wave.red { stroke: #ef4444; }
+.wave.blue { stroke: #38bdf8; }
+.wave.purple { stroke: #a855f7; }
+.wave.green { stroke: #22c55e; }
+.wave.amber { stroke: #f59e0b; }
+
+.edaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.edaTable th,
+.edaTable td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  color: #cbdce4;
+  text-align: left;
+}
+
+.edaTable th {
+  color: #8095a4;
+  background: rgba(8, 17, 24, 0.8);
+  font-size: 11px;
+  font-weight: 760;
+}
+
+.edaEmptyTable {
+  height: 96px;
+  color: var(--eda-muted);
+  text-align: center;
+}
+
+.edaTableStatus {
+  color: #4ade80;
+  font-weight: 760;
+}
+
+.edaTableStatus.needs-review,
+.edaTableStatus.demo {
+  color: #f7c56d;
+}
+
+.edaCheckList {
+  display: grid;
+  gap: 0;
+  padding: 8px 12px 12px;
+}
+
+.edaCheckList div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  color: #cbdce4;
+  font-size: 12px;
+}
+
+.edaCheckList strong {
+  color: #4ade80;
+}
+
+.edaCheckList strong.needs-review {
+  color: #f7c56d;
+}
+
+.edaCheckList strong.pending,
+.edaCheckList strong.running {
+  color: #94a3b8;
+}
+
+.edaConsoleOutput {
+  margin: 8px;
+}
+
+.edaLogList {
+  max-height: 190px;
+  overflow: auto;
+  padding: 8px 12px 12px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.edaLogList div {
+  display: grid;
+  grid-template-columns: 74px 74px minmax(0, 1fr);
+  gap: 10px;
+  padding: 5px 0;
+  color: #b8c8d1;
+  font-size: 12px;
+}
+
+.edaLogList time {
+  color: #718899;
+}
+
+.edaLogList b {
+  color: #7dd3fc;
+  font-size: 11px;
+}
+
+.edaLogList b.success,
+.edaLogList b.complete {
+  color: #4ade80;
+}
+
+.edaLogList b.warning,
+.edaLogList b.partial {
+  color: #f7c56d;
+}
+
+.edaRequirementGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px;
+}
+
+.edaRequirementGrid div {
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 7px;
+  background: rgba(8, 17, 24, 0.62);
+}
+
+.edaRequirementGrid span,
+.edaRequirementsPanel small {
+  display: block;
+  color: #718899;
+  font-size: 11px;
+}
+
+.edaRequirementGrid strong {
+  display: block;
+  margin-top: 5px;
+  color: #e6f4f1;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.edaRequirementsPanel p,
+.edaRequirementsPanel small {
+  margin: 0;
+  padding: 0 12px 12px;
+  color: #9fb1bc;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.edaAssistantPanel {
+  position: sticky;
+  top: 10px;
+  height: calc(100vh - 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+  border-left: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 8px;
+}
+
+.edaAssistantHeader {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.edaAssistantHeader h2 {
+  margin: 0;
+  color: #f4fbff;
+  font-size: 15px;
+}
+
+.edaAssistantHeader b {
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  font-size: 11px;
+}
+
+.edaExecutionBox {
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 8px;
+  background: rgba(8, 17, 24, 0.5);
+}
+
+.edaExecutionBox h3 {
+  margin: 0 0 8px;
+  color: #91a8b6;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.edaExecutionList {
+  display: grid;
+  gap: 7px;
+}
+
+.edaExecutionList div {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  color: #cbdce4;
+  font-size: 12px;
+}
+
+.edaExecutionList small {
+  color: #718899;
+}
+
+.edaChatThread {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edaChatThread article {
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 8px;
+  background: rgba(17, 31, 42, 0.72);
+}
+
+.edaChatThread article.user {
+  margin-left: 30px;
+  background: rgba(22, 33, 44, 0.78);
+}
+
+.edaChatThread div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.edaChatThread strong {
+  color: #e6f4f1;
+  font-size: 12px;
+}
+
+.edaChatThread time {
+  color: #718899;
+  font-size: 11px;
+}
+
+.edaChatThread p {
+  margin: 0;
+  color: #c7d6de;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.edaPromptBox {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px;
+  gap: 8px;
+  padding: 8px;
+}
+
+.edaPromptBox span {
+  align-self: center;
+  color: #718899;
+  font-size: 12px;
+}
+
+.edaPromptBox button {
+  padding: 7px 8px;
+  border-color: rgba(56, 189, 248, 0.24);
+  background: rgba(14, 116, 144, 0.34);
+  color: #dffbff;
+  box-shadow: none;
+}
+
+.edaAssistantRail {
+  position: sticky;
+  top: 10px;
+  height: calc(100vh - 20px);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 8px;
+  border-left: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 8px;
+}
+
+.edaAssistantRail > span {
+  writing-mode: vertical-rl;
+  color: #7f96a6;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.edaAssistantRail .agentStatusRail,
+.edaAssistantPanel .agentStatusRail {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(8, 17, 24, 0.72);
+  color: #cbdce4;
+}
+
+.edaWorkspace .panel,
+.edaWorkspace .engineering.panel,
+.edaWorkspace .energyCard,
+.edaWorkspace .domainDetailHeader,
+.edaWorkspace .profileModuleCard,
+.edaWorkspace .rationaleSection,
+.edaWorkspace .formulaTable,
+.edaWorkspace .pieCard,
+.edaWorkspace .thermalCard {
+  border-color: rgba(148, 163, 184, 0.15);
+  background: #0b1720;
+  color: #dbe7ee;
+  box-shadow: none;
+}
+
+.edaWorkspace .panel h2,
+.edaWorkspace .panelHeader h2,
+.edaWorkspace .profileModuleCard h3,
+.edaWorkspace .domainDetailHeader h3,
+.edaWorkspace .metricTile strong,
+.edaWorkspace .energyCard strong {
+  color: #edf7fb;
+}
+
+.edaWorkspace .panelHeader p,
+.edaWorkspace .panel > p,
+.edaWorkspace .energyCard p,
+.edaWorkspace .domainDetailHeader p,
+.edaWorkspace .profileModuleCard span,
+.edaWorkspace .compactList {
+  color: #9fb1bc;
+}
+
+/* Engineering Console visual refinement: muted EDA/IDE surfaces */
+.engineeringShell,
+.engineeringShell.theme-dark {
+  --eda-bg: #0d1218;
+  --eda-main: #0b1117;
+  --eda-sidebar: #0f1720;
+  --eda-panel: #111b24;
+  --eda-panel-elevated: #15212b;
+  --eda-canvas: #0b141b;
+  --eda-text: #e6edf3;
+  --eda-secondary: #93a4b7;
+  --eda-muted: #64748b;
+  --eda-divider: rgba(255, 255, 255, 0.06);
+  --eda-divider-strong: rgba(255, 255, 255, 0.1);
+  --eda-active: #6ea5c8;
+  --eda-active-bg: #152637;
+  --eda-pass: #76b985;
+  --eda-warn: #d6a354;
+  --eda-fail: #d66a6a;
+  background: var(--eda-bg);
+  color: var(--eda-text);
+}
+
+.engineeringMain {
+  background: var(--eda-main);
+}
+
+.engineeringGrid {
+  gap: 7px;
+}
+
+.edaSidebar,
+.edaAssistantPanel,
+.edaAssistantRail,
+.edaTopBar,
+.edaWorkspace,
+.edaPanel {
+  border-color: var(--eda-divider);
+  box-shadow: none;
+}
+
+.edaSidebar,
+.edaAssistantPanel,
+.edaAssistantRail,
+.edaTopBar {
+  background: var(--eda-sidebar);
+}
+
+.edaWorkspace {
+  background: #0e161e;
+}
+
+.edaPanel,
+.edaWorkspace .panel,
+.edaWorkspace .engineering.panel,
+.edaWorkspace .energyCard,
+.edaWorkspace .domainDetailHeader,
+.edaWorkspace .profileModuleCard,
+.edaWorkspace .rationaleSection,
+.edaWorkspace .formulaTable,
+.edaWorkspace .pieCard,
+.edaWorkspace .thermalCard {
+  border-color: var(--eda-divider);
+  background: var(--eda-panel);
+  color: var(--eda-text);
+}
+
+.edaLogo,
+.edaRailBadge {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+}
+
+.edaBrandTitle,
+.edaTopBrand strong,
+.edaTopProject strong,
+.edaAssistantHeader h2,
+.edaPanelHeader h3,
+.edaWorkspace .panel h2,
+.edaWorkspace .panelHeader h2,
+.edaWorkspace .profileModuleCard h3,
+.edaWorkspace .domainDetailHeader h3,
+.edaWorkspace .metricTile strong,
+.edaWorkspace .energyCard strong {
+  color: var(--eda-text);
+  font-weight: 650;
+}
+
+.edaBrandSub,
+.edaTopBrand span,
+.edaTopProject span,
+.edaAssistantHeader span,
+.edaPanelHeader span,
+.edaNavList small,
+.edaArtifactList small,
+.edaArtifactList em,
+.edaSessionInfo dt,
+.edaExecutionList small,
+.edaChatThread time {
+  color: var(--eda-muted);
+}
+
+.edaRequestPicker span,
+.edaSidebarSection h3,
+.edaSessionInfo h3,
+.edaExecutionBox h3 {
+  color: var(--eda-muted);
+  font-weight: 700;
+}
+
+.edaRequestPicker select,
+.edaDiyInput,
+.edaPromptBox,
+.edaTopActions button,
+.edaAgentBadge,
+.edaReviewBadge,
+.edaCollapsedNav button,
+.edaCollapsedRun,
+.edaExecutionBox,
+.edaChatThread article,
+.edaRequirementGrid div,
+.edaAssistantRail .agentStatusRail,
+.edaAssistantPanel .agentStatusRail {
+  border-color: var(--eda-divider);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-secondary);
+}
+
+.edaTopActions button:hover,
+.engineeringShell.theme-dark button:hover:not(:disabled) {
+  border-color: var(--eda-divider-strong);
+  box-shadow: none;
+}
+
+.edaTopActions button.primary {
+  border-color: rgba(110, 165, 200, 0.45);
+  background: #1b4d6b;
+  color: #eef7fb;
+}
+
+.edaTopActions button.primary:hover {
+  background: #215a78;
+}
+
+.edaNavList button,
+.edaArtifactList button {
+  color: var(--eda-secondary);
+}
+
+.edaNavList button.selected,
+.edaNavList button:hover,
+.edaArtifactList button:hover {
+  border-color: transparent;
+  background: var(--eda-active-bg);
+  box-shadow: inset 2px 0 0 rgba(110, 165, 200, 0.9);
+}
+
+.edaNavList strong,
+.edaArtifactList strong,
+.edaChatThread strong,
+.edaSessionInfo dd,
+.edaRequirementGrid strong {
+  color: var(--eda-text);
+  font-weight: 620;
+}
+
+.edaStatusMark span,
+.agentStatusRail.ready span {
+  background: #667485;
+}
+
+.edaStatusMark.running span,
+.agentStatusRail.running span {
+  border-color: rgba(110, 165, 200, 0.25);
+  border-top-color: var(--eda-active);
+}
+
+.edaStatusMark.completed span,
+.edaStatusMark.verified span,
+.agentStatusRail.done span {
+  background: var(--eda-pass);
+  box-shadow: none;
+}
+
+.edaStatusMark.needs_review span {
+  background: var(--eda-warn);
+}
+
+.edaStatusMark.failed span {
+  background: var(--eda-fail);
+}
+
+.edaAgentBadge b,
+.edaAssistantHeader b {
+  background: rgba(118, 185, 133, 0.12);
+  color: var(--eda-pass);
+}
+
+.edaReviewBadge.ready-for-review,
+.edaTableStatus,
+.edaCheckList strong,
+.edaLogList b.success,
+.edaLogList b.complete {
+  color: var(--eda-pass);
+}
+
+.edaReviewBadge.needs-review,
+.edaTableStatus.needs-review,
+.edaTableStatus.demo,
+.edaCheckList strong.needs-review,
+.edaLogList b.warning,
+.edaLogList b.partial {
+  color: var(--eda-warn);
+}
+
+.edaReviewBadge.running,
+.edaLogList b {
+  color: var(--eda-active);
+}
+
+.edaWorkspaceTabs {
+  border-bottom-color: var(--eda-divider);
+  background: #0f1720;
+}
+
+.edaWorkspaceTabs button {
+  color: var(--eda-secondary);
+  font-weight: 520;
+}
+
+.edaWorkspaceTabs button.active {
+  border-bottom-color: var(--eda-active);
+  color: var(--eda-text);
+}
+
+.edaPanelHeader {
+  border-bottom-color: var(--eda-divider);
+}
+
+.edaSchematicCanvas svg,
+.edaWaveCanvas svg {
+  background: var(--eda-canvas);
+}
+
+#eda-grid path,
+#wave-grid path {
+  fill: none;
+  stroke: rgba(147, 164, 183, 0.08);
+  stroke-width: 0.7;
+}
+
+.schemGrid,
+.waveGridBg {
+  fill: url(#eda-grid);
+  stroke: var(--eda-divider);
+}
+
+.waveGridBg {
+  fill: url(#wave-grid);
+}
+
+.schemWires path {
+  stroke: #8aa3ad;
+  stroke-width: 1.35;
+}
+
+.schemSymbol rect,
+.schemDevice rect {
+  fill: #13202a;
+  stroke: #788895;
+  stroke-width: 0.9;
+}
+
+.schemPassive path {
+  stroke: #b89a68;
+  stroke-width: 1.25;
+}
+
+.schemSymbol text,
+.schemDevice text,
+.schemPassive text,
+.schemTitle,
+.edaWaveCanvas text {
+  fill: #9fb0bd;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.schemTitle {
+  fill: var(--eda-muted);
+}
+
+.waveGuides line {
+  stroke: rgba(147, 164, 183, 0.14);
+  stroke-width: 0.8;
+}
+
+.wave {
+  stroke-width: 1.35;
+}
+
+.wave.red { stroke: #bf6b6b; }
+.wave.blue { stroke: #6f99bd; }
+.wave.purple { stroke: #9b83bc; }
+.wave.green { stroke: #78a985; }
+.wave.amber { stroke: #c49a5d; }
+
+.edaTable th,
+.edaTable td,
+.edaCheckList div {
+  border-bottom-color: var(--eda-divider);
+}
+
+.edaTable th {
+  color: var(--eda-muted);
+  background: #101923;
+  font-weight: 620;
+}
+
+.edaTable td,
+.edaCheckList div,
+.edaLogList div,
+.edaChatThread p,
+.edaRequirementsPanel p,
+.edaRequirementsPanel small,
+.edaWorkspace .panelHeader p,
+.edaWorkspace .panel > p,
+.edaWorkspace .energyCard p,
+.edaWorkspace .domainDetailHeader p,
+.edaWorkspace .profileModuleCard span,
+.edaWorkspace .compactList {
+  color: var(--eda-secondary);
+}
+
+.edaLogList time,
+.edaPromptBox span,
+.edaRequirementGrid span,
+.edaRequirementsPanel small {
+  color: var(--eda-muted);
+}
+
+.edaChatThread article.user {
+  background: #141f29;
+}
+
+.edaPromptBox button {
+  border-color: rgba(110, 165, 200, 0.28);
+  background: #18384b;
+  color: #dcebf2;
+}
+
+.edaAssistantRail {
+  gap: 12px;
+  padding: 10px 7px;
+}
+
+.edaAssistantRail > span {
+  writing-mode: horizontal-tb;
+  text-transform: none;
+}
+
+.edaRailBadge {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.edaRailStatusBlock {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 0;
+  border-top: 1px solid var(--eda-divider);
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.edaRailStatusBlock small {
+  color: var(--eda-muted);
+  font-size: 10px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.edaAssistantRail .agentStatusRail {
+  width: 44px;
+  padding: 7px 4px;
+  border: 0;
+  background: transparent;
+}
+
+.edaAssistantRail .agentStatusRail strong {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.engineeringShell.theme-light {
+  color-scheme: light;
+  --eda-bg: #eef2f6;
+  --eda-main: #f6f8fb;
+  --eda-sidebar: #ffffff;
+  --eda-panel: #ffffff;
+  --eda-panel-elevated: #f3f6fa;
+  --eda-canvas: #f8fafc;
+  --eda-text: #101828;
+  --eda-secondary: #475467;
+  --eda-muted: #667085;
+  --eda-divider: rgba(16, 24, 40, 0.1);
+  --eda-divider-strong: rgba(16, 24, 40, 0.16);
+  --eda-active: #2563eb;
+  --eda-active-bg: #eaf1ff;
+  --eda-pass: #15803d;
+  --eda-warn: #b7791f;
+  --eda-fail: #b42318;
+  background: var(--eda-bg);
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-light button {
+  border-color: var(--eda-divider);
+  background: var(--eda-panel);
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-light .edaTopActions button.primary,
+.engineeringShell.theme-light .edaPromptBox button,
+.engineeringShell.theme-light .edaSendDesign:not(:disabled) {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.engineeringShell.theme-light .edaWorkspace,
+.engineeringShell.theme-light .edaWorkspaceTabs,
+.engineeringShell.theme-light .edaTable th,
+.engineeringShell.theme-light .edaChatThread article.user {
+  background: var(--eda-panel-elevated);
+}
+
+.engineeringShell.theme-light .schemWires path {
+  stroke: #52657a;
+}
+
+.engineeringShell.theme-light .schemSymbol rect,
+.engineeringShell.theme-light .schemDevice rect {
+  fill: #ffffff;
+  stroke: #7a8a9c;
+}
+
+.engineeringShell.theme-light .schemPassive path {
+  stroke: #946f2d;
+}
+
+.engineeringShell.theme-light .schemSymbol text,
+.engineeringShell.theme-light .schemDevice text,
+.engineeringShell.theme-light .schemPassive text,
+.engineeringShell.theme-light .schemTitle,
+.engineeringShell.theme-light .edaWaveCanvas text {
+  fill: #344054;
+}
+
+.engineeringShell.theme-light #eda-grid path,
+.engineeringShell.theme-light #wave-grid path {
+  stroke: rgba(71, 84, 103, 0.14);
+}
+
+.engineeringShell.theme-light .wave.red { stroke: #b54708; }
+.engineeringShell.theme-light .wave.blue { stroke: #2563eb; }
+.engineeringShell.theme-light .wave.purple { stroke: #7c3aed; }
+.engineeringShell.theme-light .wave.green { stroke: #15803d; }
+.engineeringShell.theme-light .wave.amber { stroke: #b7791f; }
+
+.edaWorkflowGroup {
+  display: grid;
+  gap: 5px;
+}
+
+.edaWorkflowGroup + .edaWorkflowGroup {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--eda-divider);
+}
+
+.edaWorkflowGroup h4 {
+  margin: 0 0 2px;
+  color: var(--eda-muted);
+  font-size: 10px;
+  font-weight: 720;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.edaPromptInput {
+  min-width: 0;
+  resize: none;
+  border: 0;
+  background: transparent;
+  color: var(--eda-text);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+  outline: none;
+}
+
+.edaPromptInput::placeholder {
+  color: var(--eda-muted);
+}
+
+.edaSidebar > .sideToggle {
+  right: 8px;
+}
+
+.edaAssistantPanel > .rightSideToggle {
+  left: 8px;
+}
+
+.edaAssistantHeader {
+  padding-left: 28px;
+}
+
+/* Engineering Console viewport fit: three independently scrollable panes */
+.engineeringShell {
+  width: 100vw;
+  height: 100vh;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  grid-template-columns: var(--eda-left-width) minmax(0, 1fr);
+}
+
+.engineeringShell.left-collapsed {
+  grid-template-columns: 66px minmax(0, 1fr);
+}
+
+.engineeringMain {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.edaTopBar {
+  flex: 0 0 auto;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(0, auto);
+  min-width: 0;
+}
+
+.edaTopBrand,
+.edaTopProject,
+.edaTopStatus,
+.edaTopActions {
+  min-width: 0;
+}
+
+.edaTopProject strong,
+.edaTopProject span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edaTopStatus {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.edaTopActions {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.edaTopActions button {
+  height: 30px;
+  padding: 0 9px;
+  flex: 0 0 auto;
+  max-width: 138px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edaTopActions .themeIconSwitch,
+.edaTopActions .languageSwitch {
+  flex: 0 0 auto;
+}
+
+.engineeringGrid {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) clamp(280px, 17vw, 328px);
+  margin-top: 7px;
+  overflow: hidden;
+}
+
+.engineeringGrid.right-collapsed {
+  grid-template-columns: minmax(0, 1fr) 66px;
+}
+
+.edaSidebar {
+  position: relative;
+  height: 100vh;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.edaSidebar.collapsed {
+  overflow: hidden;
+}
+
+.edaWorkspace {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.edaWorkspaceTabs {
+  flex: 0 0 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.edaWorkspaceGrid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.edaConsoleOutput {
+  flex: 0 0 auto;
+  max-height: 50%;
+}
+
+.edaAssistantPanel,
+.edaAssistantRail {
+  position: relative;
+  top: auto;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.edaAssistantPanel {
+  display: flex;
+}
+
+.edaChatThread {
+  min-height: 0;
+}
+
+@media (max-width: 1450px) {
+  .edaTopBar {
+    grid-template-columns: minmax(220px, 1fr) minmax(130px, auto) minmax(300px, auto);
+  }
+
+.edaAgentBadge {
+    display: none;
+  }
+}
+
+@media (max-width: 1260px) {
+  .engineeringShell {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .engineeringGrid {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+
+  .edaTopBrand span,
+  .edaTopStatus {
+    display: none;
+  }
 }
 
 .panelHeader {
@@ -4665,8 +6477,11 @@ code {
     --hero-copy-width: calc(33.333vw - var(--hero-left-inset));
     --hero-visual-gap: clamp(34px, 3.6vw, 58px);
     grid-template-columns: minmax(0, var(--hero-copy-width));
-    min-height: 100vh;
-    padding: clamp(112px, 15vh, 168px) var(--hero-right-inset) clamp(64px, 9vh, 108px) var(--hero-left-inset);
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    padding: clamp(112px, 15vh, 168px) var(--hero-right-inset) clamp(70px, 8vh, 96px) var(--hero-left-inset);
   }
 
   .landingHero.console-visible {
@@ -4749,9 +6564,12 @@ code {
   }
 
   .landingHero {
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
     grid-template-columns: 1fr;
-    padding: 112px 22px 46px;
+    overflow: hidden;
+    padding: 112px 22px 64px;
     border-radius: 0;
   }
 
@@ -4783,7 +6601,18 @@ code {
 
   .landingConsolePreview {
     width: 100%;
+    max-height: 40vh;
     justify-self: stretch;
+  }
+
+  .landingConsolePreview img {
+    max-height: 40vh;
+  }
+
+.landingFooter {
+    bottom: 12px;
+    width: calc(100% - 28px);
+    font-size: 14px;
   }
 
   .landingPackagePreview h2 {
@@ -4833,5 +6662,5387 @@ code {
     justify-content: flex-start;
     flex-wrap: wrap;
     white-space: normal;
+  }
+}
+
+/* Final Engineering Console IDE shell pass */
+.engineeringShell,
+.engineeringShell.theme-dark {
+  --eda-bg: #080d12;
+  --eda-main: #0d141c;
+  --eda-sidebar: #0b1118;
+  --eda-panel: #111a24;
+  --eda-panel-elevated: #162231;
+  --eda-canvas: #0a1118;
+  --eda-text: #e6edf3;
+  --eda-secondary: #9aa7b3;
+  --eda-muted: #667481;
+  --eda-divider: rgba(255, 255, 255, 0.06);
+  --eda-divider-strong: rgba(255, 255, 255, 0.08);
+  --eda-active: #57c7f3;
+  --eda-active-bg: rgba(31, 91, 130, 0.36);
+  --eda-pass: #55d184;
+  --eda-warn: #d8a54e;
+  --eda-fail: #e26c6c;
+  background: var(--eda-bg);
+}
+
+.engineeringMain {
+  padding: 0;
+  background: var(--eda-main);
+}
+
+.engineeringGrid {
+  gap: 0;
+  margin-top: 0;
+  background: var(--eda-main);
+}
+
+.edaSidebar {
+  gap: 12px;
+  padding: 12px 10px;
+  border-right: 1px solid var(--eda-divider);
+  background: var(--eda-sidebar);
+}
+
+.edaBrandBlock {
+  padding: 2px 4px 8px;
+}
+
+.edaLogo {
+  width: 30px;
+  height: 30px;
+  border-color: var(--eda-divider);
+  border-radius: 6px;
+  background: transparent;
+}
+
+.edaRequestPicker select,
+.edaDiyInput {
+  border-color: var(--eda-divider);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.edaSidebarSection {
+  gap: 5px;
+  padding-top: 8px;
+  border-top-color: var(--eda-divider);
+}
+
+.edaNavList,
+.edaArtifactList,
+.edaWorkflowGroup {
+  gap: 1px;
+}
+
+.edaWorkflowGroup + .edaWorkflowGroup {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top-color: var(--eda-divider);
+}
+
+.edaWorkflowGroup h4,
+.edaSidebarSection h3 {
+  padding: 0 8px;
+  color: var(--eda-muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.edaNavList button,
+.edaArtifactList button {
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  gap: 8px;
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--eda-secondary);
+}
+
+.edaArtifactList button {
+  grid-template-columns: 10px 14px minmax(0, 1fr) auto;
+}
+
+.edaNavList button:hover,
+.edaArtifactList button:hover {
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: none;
+}
+
+.edaNavList button.selected,
+.edaArtifactList button.selected {
+  background: var(--eda-active-bg);
+  box-shadow: inset 2px 0 0 var(--eda-active);
+  color: var(--eda-text);
+}
+
+.edaNavList strong,
+.edaArtifactList strong {
+  min-width: 0;
+  overflow: hidden;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edaNavList small,
+.edaArtifactList small {
+  color: var(--eda-muted);
+  font-size: 10px;
+}
+
+.edaArtifactList em {
+  color: var(--eda-muted);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.edaStatusMark {
+  width: 12px;
+  height: 12px;
+}
+
+.edaStatusMark span {
+  width: 7px;
+  height: 7px;
+  background: #69737f;
+  box-shadow: none;
+}
+
+.edaStatusMark.completed span,
+.edaStatusMark.verified span {
+  background: var(--eda-pass);
+  box-shadow: none;
+}
+
+.edaStatusMark.needs_review span {
+  background: var(--eda-warn);
+}
+
+.edaSessionInfo {
+  border-top-color: var(--eda-divider);
+}
+
+.edaTopBar {
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--eda-divider);
+  border-radius: 0;
+  background: #0b1118;
+}
+
+.edaTopActions button,
+.edaAgentBadge,
+.edaReviewBadge {
+  height: 28px;
+  border-color: var(--eda-divider);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.edaTopActions > button {
+  height: 28px;
+  padding: 0 8px;
+}
+
+.edaTopActions > button:nth-of-type(2) {
+  max-width: 128px;
+}
+
+.edaWorkspace {
+  border: 0;
+  border-radius: 0;
+  background: var(--eda-main);
+}
+
+.edaWorkspaceTabs {
+  min-height: 34px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: #0b1118;
+}
+
+.edaWorkspaceTabs button {
+  min-width: 104px;
+  height: 34px;
+  padding: 0 14px;
+  border-right: 1px solid var(--eda-divider);
+  border-bottom: 0;
+  color: var(--eda-secondary);
+  font-size: 12px;
+}
+
+.edaWorkspaceTabs button:first-child {
+  border-left: 1px solid var(--eda-divider);
+}
+
+.edaWorkspaceTabs button.active {
+  background: var(--eda-main);
+  box-shadow: inset 0 2px 0 var(--eda-active);
+  color: var(--eda-text);
+}
+
+.edaWorkspaceGrid {
+  grid-template-columns: minmax(420px, 1.2fr) minmax(280px, 0.8fr);
+  gap: 0;
+  padding: 0;
+  background: var(--eda-main);
+}
+
+.edaPanel,
+.edaWorkspace .panel,
+.edaWorkspace .engineering.panel,
+.edaWorkspace .energyCard,
+.edaWorkspace .domainDetailHeader,
+.edaWorkspace .profileModuleCard,
+.edaWorkspace .rationaleSection,
+.edaWorkspace .formulaTable,
+.edaWorkspace .pieCard,
+.edaWorkspace .thermalCard,
+.edaWorkspace .metricTile,
+.edaWorkspace .moduleSelectCard,
+.edaWorkspace .plannerNotice,
+.edaWorkspace .circuitDraftPanel {
+  border-color: var(--eda-divider);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.edaPanel,
+.edaWorkspace .panel {
+  border-width: 0 1px 1px 0;
+}
+
+.edaPanelHeader,
+.edaWorkspace .panelHeader {
+  min-height: 38px;
+  margin: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.edaPanelHeader h3,
+.edaWorkspace .panel h2,
+.edaWorkspace .panelHeader h2 {
+  font-size: 13px;
+  font-weight: 560;
+}
+
+.edaWorkspace .panelHeader p,
+.edaWorkspace .panel > p {
+  font-size: 12px;
+}
+
+.edaSchematicCanvas,
+.edaWaveCanvas {
+  padding: 12px;
+}
+
+.edaSchematicCanvas svg,
+.edaWaveCanvas svg {
+  border-radius: 6px;
+  background: var(--eda-canvas);
+}
+
+.edaRequirementGrid div,
+.edaWorkspace .energyCard,
+.edaWorkspace .metricTile,
+.edaWorkspace .profileModuleCard {
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.edaTable th {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.edaEmptyState {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-height: 92px;
+  padding: 18px;
+  color: var(--eda-muted);
+  text-align: center;
+}
+
+.edaEmptyState strong {
+  color: var(--eda-secondary);
+  font-size: 12px;
+  font-weight: 560;
+}
+
+.edaEmptyState p {
+  margin: 0;
+  color: var(--eda-muted);
+  font-size: 12px;
+}
+
+.edaEmptyState button {
+  height: 26px;
+  margin-top: 4px;
+  padding: 0 9px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--eda-muted);
+  font-size: 11px;
+  box-shadow: none;
+}
+
+.edaEmptyTable {
+  height: auto;
+  padding: 0;
+}
+
+.edaConsoleOutput {
+  margin: 0;
+  border-top: 1px solid var(--eda-divider);
+  background: #090f15;
+}
+
+.edaConsoleOutput .edaPanelHeader {
+  min-height: 32px;
+  background: #0b1118;
+}
+
+.edaLogList {
+  max-height: 150px;
+  padding: 6px 12px 10px;
+  background: #090f15;
+}
+
+.edaLogList div {
+  padding: 3px 0;
+  font-size: 11px;
+}
+
+.edaAssistantPanel,
+.edaAssistantRail {
+  border-left: 1px solid var(--eda-divider);
+  border-radius: 0;
+  background: var(--eda-sidebar);
+}
+
+.edaAssistantPanel {
+  gap: 0;
+  padding: 0;
+}
+
+.edaAssistantHeader {
+  min-height: 44px;
+  padding: 8px 10px 8px 36px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.edaExecutionBox {
+  padding: 9px 10px;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.edaExecutionList {
+  gap: 2px;
+}
+
+.edaExecutionList div {
+  min-height: 24px;
+  padding: 0 2px;
+}
+
+.edaChatThread {
+  gap: 14px;
+  padding: 12px 10px;
+  background: #0b1118;
+}
+
+.edaChatThread article {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.edaChatThread article.user {
+  margin-left: 18px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(87, 199, 243, 0.55);
+  background: transparent;
+}
+
+.edaChatThread article.assistant {
+  padding-left: 10px;
+  border-left: 2px solid var(--eda-divider-strong);
+}
+
+.edaChatThread div {
+  margin-bottom: 4px;
+}
+
+.edaChatThread p {
+  font-size: 12px;
+}
+
+.edaPromptBox {
+  margin: 0;
+  padding: 8px;
+  border-width: 1px 0 0;
+  border-radius: 0;
+  background: #0b1118;
+}
+
+.edaPromptBox button {
+  border-radius: 6px;
+}
+
+.engineeringShell.theme-light {
+  --eda-bg: #f1f4f7;
+  --eda-main: #f7f9fc;
+  --eda-sidebar: #ffffff;
+  --eda-panel: #ffffff;
+  --eda-panel-elevated: #eef3f8;
+  --eda-canvas: #ffffff;
+  --eda-divider: rgba(16, 24, 40, 0.1);
+  --eda-divider-strong: rgba(16, 24, 40, 0.16);
+}
+
+.edaAssistantPanel > .rightSideToggle {
+  left: 8px;
+  top: 10px;
+}
+
+.edaAssistantHeader {
+  padding-left: 52px;
+}
+
+.themeIconSwitch,
+.languageSwitch {
+  display: inline-grid;
+  grid-template-columns: repeat(2, 28px);
+  align-items: center;
+  gap: 0;
+  height: 30px;
+  padding: 2px;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 999px;
+  background: var(--eda-panel-elevated);
+}
+
+.languageSwitch {
+  grid-template-columns: 28px 34px;
+}
+
+.edaTopActions .themeIconSwitch button,
+.edaTopActions .languageSwitch button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--eda-muted);
+  box-shadow: none;
+}
+
+.edaTopActions .languageSwitch button {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.edaTopActions .languageSwitch button:last-child {
+  width: 32px;
+}
+
+.edaTopActions .themeIconSwitch button.active,
+.edaTopActions .languageSwitch button.active {
+  background: var(--eda-text);
+  color: var(--eda-main);
+}
+
+.themeIconSwitch svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.themeIconSwitch svg circle {
+  fill: currentColor;
+  stroke: none;
+}
+
+.themeIconSwitch button:last-child svg {
+  fill: currentColor;
+}
+
+.engineeringShell.theme-light {
+  color-scheme: light;
+  --eda-bg: #eef2f6;
+  --eda-main: #f7f9fc;
+  --eda-sidebar: #ffffff;
+  --eda-panel: #ffffff;
+  --eda-panel-elevated: #eef3f8;
+  --eda-canvas: #ffffff;
+  --eda-text: #111827;
+  --eda-secondary: #475569;
+  --eda-muted: #697586;
+  --eda-divider: rgba(16, 24, 40, 0.1);
+  --eda-divider-strong: rgba(16, 24, 40, 0.16);
+  --eda-active: #2563eb;
+  --eda-active-bg: rgba(37, 99, 235, 0.11);
+  --eda-pass: #15803d;
+  --eda-warn: #b7791f;
+  --eda-fail: #b42318;
+}
+
+.engineeringShell.theme-light .edaTopBar,
+.engineeringShell.theme-light .edaWorkspaceTabs,
+.engineeringShell.theme-light .edaAssistantPanel,
+.engineeringShell.theme-light .edaAssistantRail,
+.engineeringShell.theme-light .edaAssistantHeader,
+.engineeringShell.theme-light .edaExecutionBox,
+.engineeringShell.theme-light .edaChatThread,
+.engineeringShell.theme-light .edaPromptBox,
+.engineeringShell.theme-light .edaConsoleOutput .edaPanelHeader {
+  background: var(--eda-sidebar);
+}
+
+.engineeringShell.theme-light .edaConsoleOutput,
+.engineeringShell.theme-light .edaLogList {
+  background: #f8fafc;
+}
+
+.engineeringShell.theme-light .edaWorkspace,
+.engineeringShell.theme-light .edaWorkspaceGrid,
+.engineeringShell.theme-light .engineeringGrid,
+.engineeringShell.theme-light .engineeringMain {
+  background: var(--eda-main);
+}
+
+.engineeringShell.theme-light .edaSidebar {
+  background: var(--eda-sidebar);
+}
+
+.engineeringShell.theme-light .edaPanelHeader,
+.engineeringShell.theme-light .edaTable th {
+  background: rgba(16, 24, 40, 0.025);
+}
+
+.engineeringShell.theme-light .edaNavList button:hover,
+.engineeringShell.theme-light .edaArtifactList button:hover {
+  background: rgba(16, 24, 40, 0.045);
+}
+
+.engineeringShell.theme-light .edaNavList button.selected,
+.engineeringShell.theme-light .edaArtifactList button.selected {
+  background: var(--eda-active-bg);
+  box-shadow: inset 2px 0 0 var(--eda-active);
+}
+
+.engineeringShell.theme-light .edaTopActions button,
+.engineeringShell.theme-light .edaAgentBadge,
+.engineeringShell.theme-light .edaRequestPicker select,
+.engineeringShell.theme-light .edaDiyInput,
+.engineeringShell.theme-light .edaPromptBox,
+.engineeringShell.theme-light .themeIconSwitch,
+.engineeringShell.theme-light .languageSwitch {
+  border-color: var(--eda-divider);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-secondary);
+}
+
+.engineeringShell.theme-light .edaReviewBadge {
+  border-color: var(--eda-divider);
+  background: transparent;
+}
+
+.engineeringShell.theme-light .edaReviewBadge i {
+  border: 1px solid var(--eda-divider);
+  background: #ffffff;
+}
+
+.engineeringShell.theme-light .edaReviewBadge em {
+  color: var(--eda-secondary);
+}
+
+.engineeringShell.theme-light .edaTopActions button.primary {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.engineeringShell.theme-light .edaTopActions .themeIconSwitch button,
+.engineeringShell.theme-light .edaTopActions .languageSwitch button {
+  background: transparent;
+  color: var(--eda-muted);
+}
+
+.engineeringShell.theme-light .edaTopActions .themeIconSwitch button.active,
+.engineeringShell.theme-light .edaTopActions .languageSwitch button.active {
+  background: #111827;
+  color: #ffffff;
+}
+
+.engineeringShell.theme-light .edaPromptInput {
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-light .edaPromptInput::placeholder {
+  color: var(--eda-muted);
+}
+
+.engineeringShell.theme-light .edaChatThread article.assistant {
+  border-left-color: rgba(16, 24, 40, 0.16);
+}
+
+.engineeringShell.theme-light .edaChatThread article.user {
+  border-left-color: rgba(37, 99, 235, 0.55);
+}
+
+/* Engineering Console typography system */
+.engineeringShell {
+  --eda-font-sans: Inter, "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --eda-font-mono: "JetBrains Mono", "SF Mono", "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-family: var(--eda-font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+.engineeringShell *,
+.engineeringShell *::before,
+.engineeringShell *::after {
+  letter-spacing: 0;
+}
+
+.edaTopProject strong {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.edaTopProject span,
+.edaBrandSub,
+.edaPanelHeader span,
+.edaAssistantHeader span {
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.edaBrandTitle,
+.edaAssistantHeader h2 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.edaRequestPicker span,
+.edaSidebarSection h3,
+.edaWorkflowGroup h4,
+.edaSessionInfo h3,
+.edaExecutionBox h3 {
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.edaNavList strong,
+.edaArtifactList strong,
+.edaExecutionList span {
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.edaNavList button.selected strong,
+.edaArtifactList button.selected strong {
+  font-weight: 600;
+}
+
+.edaNavList small,
+.edaArtifactList small,
+.edaExecutionList small,
+.edaAgentBadge,
+.edaReviewBadge,
+.edaTableStatus,
+.edaCheckList strong,
+.agentStatusRail strong {
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.edaWorkspaceTabs button {
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.edaWorkspaceTabs button.active {
+  font-weight: 600;
+}
+
+.edaPanelHeader h3,
+.edaWorkspace .panel h2,
+.edaWorkspace .panelHeader h2,
+.edaConsoleOutput h3 {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.edaRequirementsPanel p,
+.edaRequirementsPanel small,
+.edaWorkspace .panelHeader p,
+.edaWorkspace .panel > p,
+.edaWorkspace .energyCard p,
+.edaWorkspace .domainDetailHeader p,
+.edaWorkspace .profileModuleCard span,
+.edaEmptyState p,
+.edaChatThread p {
+  font-size: 12.75px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.edaRequirementGrid span,
+.edaEmptyState strong,
+.edaSessionInfo dt,
+.edaSessionInfo dd {
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.edaRequirementGrid strong,
+.edaWorkspace .energyCard strong,
+.edaWorkspace .metricTile strong,
+.edaWorkspace .profileModuleCard h3 {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.edaTopActions button,
+.edaPromptBox button,
+.edaSendDesign {
+  font-family: var(--eda-font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.edaTable {
+  font-family: var(--eda-font-sans);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+.edaTable th {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.edaTable td {
+  font-size: clamp(15px, 1vw, 18px);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.edaTable td:first-child,
+.edaTable td:nth-child(2),
+.edaTable td:nth-child(5),
+.edaRequirementGrid strong,
+.edaSessionInfo dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.edaLogList,
+.edaLogList *,
+.edaWaveCanvas text,
+.schemSymbol text,
+.schemDevice text,
+.schemPassive text,
+.schemTitle {
+  font-family: var(--eda-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.edaLogList div {
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.edaLogList b {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.edaLogList time {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.edaChatThread strong {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.edaChatThread time {
+  font-size: 11px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.edaPromptInput,
+.edaRequestPicker select,
+.edaDiyInput {
+  font-family: var(--eda-font-sans);
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.edaNavList small,
+.edaArtifactList small,
+.edaExecutionList small {
+  color: var(--eda-muted);
+  opacity: 0.82;
+}
+
+.edaCheckList div {
+  font-size: 12.5px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* Engineering Console graphite / charcoal dark color system */
+.engineeringShell.theme-dark {
+  --eda-bg: #080a0d;
+  --eda-main: #101418;
+  --eda-sidebar: #0d1117;
+  --eda-panel: #151a20;
+  --eda-panel-elevated: #1b222a;
+  --eda-canvas: #0b0e12;
+  --eda-selected: #182433;
+  --eda-text: #e6e8eb;
+  --eda-secondary: #9aa4af;
+  --eda-muted: #66717d;
+  --eda-divider: rgba(255, 255, 255, 0.06);
+  --eda-divider-strong: rgba(255, 255, 255, 0.1);
+  --eda-active: #38bdf8;
+  --eda-active-bg: #182433;
+  --eda-pass: #22c55e;
+  --eda-warn: #f59e0b;
+  --eda-fail: #ef4444;
+  background: var(--eda-bg);
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-dark .engineeringMain,
+.engineeringShell.theme-dark .engineeringGrid,
+.engineeringShell.theme-dark .edaWorkspace,
+.engineeringShell.theme-dark .edaWorkspaceGrid {
+  background: var(--eda-main);
+}
+
+.engineeringShell.theme-dark .edaSidebar,
+.engineeringShell.theme-dark .edaTopBar,
+.engineeringShell.theme-dark .edaWorkspaceTabs,
+.engineeringShell.theme-dark .edaAssistantPanel,
+.engineeringShell.theme-dark .edaAssistantRail,
+.engineeringShell.theme-dark .edaAssistantHeader,
+.engineeringShell.theme-dark .edaExecutionBox,
+.engineeringShell.theme-dark .edaChatThread,
+.engineeringShell.theme-dark .edaPromptBox,
+.engineeringShell.theme-dark .edaConsoleOutput .edaPanelHeader {
+  background: var(--eda-sidebar);
+}
+
+.engineeringShell.theme-dark .edaConsoleOutput,
+.engineeringShell.theme-dark .edaLogList {
+  background: var(--eda-bg);
+}
+
+.engineeringShell.theme-dark .edaPanelHeader,
+.engineeringShell.theme-dark .edaTable th {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.engineeringShell.theme-dark .edaSchematicCanvas svg,
+.engineeringShell.theme-dark .edaWaveCanvas svg {
+  background: var(--eda-canvas);
+}
+
+.engineeringShell.theme-dark .edaTopActions button,
+.engineeringShell.theme-dark .edaAgentBadge,
+.engineeringShell.theme-dark .edaReviewBadge,
+.engineeringShell.theme-dark .edaRequestPicker select,
+.engineeringShell.theme-dark .edaDiyInput,
+.engineeringShell.theme-dark .edaPromptBox,
+.engineeringShell.theme-dark .themeIconSwitch,
+.engineeringShell.theme-dark .languageSwitch,
+.engineeringShell.theme-dark .edaEmptyState button {
+  border-color: var(--eda-divider);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-secondary);
+}
+
+.engineeringShell.theme-dark .edaTopActions button.primary {
+  border-color: rgba(56, 189, 248, 0.42);
+  background: #173044;
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-dark .edaTopActions button.primary:hover {
+  background: #1b3a52;
+}
+
+.engineeringShell.theme-dark .edaTopActions .themeIconSwitch button,
+.engineeringShell.theme-dark .edaTopActions .languageSwitch button {
+  background: transparent;
+  color: var(--eda-muted);
+}
+
+.engineeringShell.theme-dark .edaTopActions .themeIconSwitch button.active,
+.engineeringShell.theme-dark .edaTopActions .languageSwitch button.active {
+  background: var(--eda-text);
+  color: var(--eda-bg);
+}
+
+.engineeringShell.theme-dark .edaNavList button:hover,
+.engineeringShell.theme-dark .edaArtifactList button:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.engineeringShell.theme-dark .edaNavList button.selected,
+.engineeringShell.theme-dark .edaArtifactList button.selected {
+  background: var(--eda-selected);
+  box-shadow: inset 2px 0 0 rgba(56, 189, 248, 0.72);
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-dark .edaWorkspaceTabs button.active {
+  background: var(--eda-main);
+  box-shadow: inset 0 2px 0 rgba(56, 189, 248, 0.8);
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-dark .edaChatThread article.user {
+  border-left-color: rgba(56, 189, 248, 0.54);
+}
+
+.engineeringShell.theme-dark .edaChatThread article.assistant {
+  border-left-color: var(--eda-divider-strong);
+}
+
+.engineeringShell.theme-dark .edaStatusMark span,
+.engineeringShell.theme-dark .agentStatusRail.ready span {
+  background: var(--eda-muted);
+}
+
+.engineeringShell.theme-dark .edaStatusMark.running span,
+.engineeringShell.theme-dark .agentStatusRail.running span {
+  border-color: rgba(56, 189, 248, 0.24);
+  border-top-color: var(--eda-active);
+  background: transparent;
+}
+
+.engineeringShell.theme-dark .edaStatusMark.completed span,
+.engineeringShell.theme-dark .edaStatusMark.verified span,
+.engineeringShell.theme-dark .agentStatusRail.done span {
+  background: var(--eda-pass);
+}
+
+.engineeringShell.theme-dark .edaStatusMark.needs_review span {
+  background: var(--eda-warn);
+}
+
+.engineeringShell.theme-dark .edaStatusMark.failed span {
+  background: var(--eda-fail);
+}
+
+.engineeringShell.theme-dark .edaReviewBadge.ready-for-review,
+.engineeringShell.theme-dark .edaTableStatus,
+.engineeringShell.theme-dark .edaCheckList strong,
+.engineeringShell.theme-dark .edaLogList b.success,
+.engineeringShell.theme-dark .edaLogList b.complete {
+  color: var(--eda-pass);
+}
+
+.engineeringShell.theme-dark .edaReviewBadge.needs-review,
+.engineeringShell.theme-dark .edaTableStatus.needs-review,
+.engineeringShell.theme-dark .edaTableStatus.demo,
+.engineeringShell.theme-dark .edaCheckList strong.needs-review,
+.engineeringShell.theme-dark .edaLogList b.warning,
+.engineeringShell.theme-dark .edaLogList b.partial {
+  color: var(--eda-warn);
+}
+
+.engineeringShell.theme-dark .edaReviewBadge.running,
+.engineeringShell.theme-dark .edaLogList b {
+  color: var(--eda-active);
+}
+
+.engineeringShell.theme-dark .edaCheckList strong.pending,
+.engineeringShell.theme-dark .edaCheckList strong.running,
+.engineeringShell.theme-dark .edaNavList small,
+.engineeringShell.theme-dark .edaArtifactList small,
+.engineeringShell.theme-dark .edaExecutionList small {
+  color: var(--eda-muted);
+}
+
+.engineeringShell.theme-dark .wave.blue {
+  stroke: #38bdf8;
+}
+
+.engineeringShell.theme-dark .wave.green {
+  stroke: #9aa4af;
+}
+
+.engineeringShell.theme-dark .wave.purple {
+  stroke: #a6a1c6;
+}
+
+.engineeringShell.theme-dark .wave.amber {
+  stroke: #f59e0b;
+}
+
+.engineeringShell.theme-dark .wave.red {
+  stroke: #ef4444;
+}
+
+.engineeringShell.theme-dark button {
+  border-color: var(--eda-divider);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-secondary);
+}
+
+.engineeringShell.theme-dark button:hover:not(:disabled) {
+  border-color: var(--eda-divider-strong);
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaNavList button:not(.selected),
+.engineeringShell.theme-dark .edaArtifactList button:not(.selected),
+.engineeringShell.theme-dark .edaExecutionList div {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaNavList button:not(.selected):hover,
+.engineeringShell.theme-dark .edaArtifactList button:not(.selected):hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+/* Theme-aware monochrome engineering plots */
+.engineeringShell {
+  --chart-card-bg: #ffffff;
+  --chart-plot-bg: #ffffff;
+  --chart-border: rgba(16, 24, 40, 0.12);
+  --chart-grid: rgba(16, 24, 40, 0.12);
+  --chart-text: #111827;
+  --chart-muted: #66717d;
+  --chart-trace-1: #111827;
+  --chart-trace-2: #374151;
+  --chart-trace-3: #6b7280;
+  --chart-trace-4: #9ca3af;
+  --chart-fill-1: #111827;
+  --chart-fill-2: #374151;
+  --chart-fill-3: #6b7280;
+  --chart-fill-4: #9ca3af;
+  --chart-fill-5: #d1d5db;
+}
+
+.engineeringShell.theme-dark {
+  --chart-card-bg: #0d1117;
+  --chart-plot-bg: #080a0d;
+  --chart-border: rgba(255, 255, 255, 0.1);
+  --chart-grid: rgba(255, 255, 255, 0.1);
+  --chart-text: #e6e8eb;
+  --chart-muted: #9aa4af;
+  --chart-trace-1: #f4f5f6;
+  --chart-trace-2: #c9ced4;
+  --chart-trace-3: #9aa4af;
+  --chart-trace-4: #66717d;
+  --chart-fill-1: #f4f5f6;
+  --chart-fill-2: #c9ced4;
+  --chart-fill-3: #9aa4af;
+  --chart-fill-4: #66717d;
+  --chart-fill-5: #343b44;
+}
+
+.engineeringShell .sourceBanner {
+  display: none;
+}
+
+.engineeringShell.theme-light .chartCard,
+.engineeringShell.theme-light .controlBode,
+.engineeringShell.theme-light .pieCard,
+.engineeringShell.theme-light .thermalCard,
+.engineeringShell.theme-light .formulaTable,
+.engineeringShell.theme-light .rationaleSection,
+.engineeringShell.theme-dark .chartCard,
+.engineeringShell.theme-dark .controlBode,
+.engineeringShell.theme-dark .pieCard,
+.engineeringShell.theme-dark .thermalCard,
+.engineeringShell.theme-dark .formulaTable,
+.engineeringShell.theme-dark .rationaleSection {
+  border-color: var(--chart-border);
+  background: var(--chart-card-bg);
+  color: var(--chart-text);
+}
+
+.engineeringShell .chartTitle,
+.engineeringShell .controlBode h3,
+.engineeringShell .pieCard h3,
+.engineeringShell .thermalCard strong {
+  color: var(--chart-text);
+}
+
+.engineeringShell .chartTitle {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.engineeringShell .lineChart rect,
+.engineeringShell .bodeChart rect {
+  fill: var(--chart-plot-bg);
+  stroke: var(--chart-border);
+}
+
+.engineeringShell .lineChart path,
+.engineeringShell .bodeChart path {
+  stroke-width: 2;
+}
+
+.engineeringShell .lossChart path.area {
+  opacity: 0.26;
+}
+
+.engineeringShell .guide,
+.engineeringShell .guide.good,
+.engineeringShell .guide.warn,
+.engineeringShell .guide.nominal {
+  stroke: var(--chart-grid);
+}
+
+.engineeringShell .lineChart path,
+.engineeringShell .bodeChart path,
+.engineeringShell .pieSvg path {
+  transition: stroke 160ms ease, fill 160ms ease;
+}
+
+.engineeringShell .axisLabel,
+.engineeringShell .legend.outside,
+.engineeringShell .pieLegend span,
+.engineeringShell .pieLegend strong,
+.engineeringShell .thermalCard span,
+.engineeringShell .thermalLegend {
+  color: var(--chart-muted);
+  fill: var(--chart-muted);
+}
+
+.engineeringShell .metricChip {
+  border-color: var(--chart-border);
+  background: var(--chart-card-bg);
+  color: var(--chart-text);
+}
+
+.engineeringShell .metricChip span {
+  color: var(--chart-muted);
+}
+
+.engineeringShell .metricChip strong {
+  color: var(--chart-text);
+}
+
+.engineeringShell .pieSvg path {
+  stroke: var(--chart-card-bg);
+}
+
+.engineeringShell .pieLegend div,
+.engineeringShell .thermalLegend {
+  background: var(--chart-plot-bg);
+}
+
+/* Engineering Console resizable panes */
+.engineeringShell {
+  --eda-left-width: 236px;
+  --eda-right-width: 328px;
+  --eda-console-height: 128px;
+}
+
+.engineeringShell.left-open {
+  grid-template-columns: var(--eda-left-width) minmax(0, 1fr);
+}
+
+.engineeringShell.left-collapsed {
+  grid-template-columns: 66px minmax(0, 1fr);
+}
+
+.engineeringShell.left-open > .edaSidebar {
+  width: var(--eda-left-width);
+}
+
+.engineeringGrid.right-open {
+  grid-template-columns: minmax(0, 1fr) var(--eda-right-width);
+}
+
+.engineeringGrid.right-open > .edaAssistantPanel {
+  width: var(--eda-right-width);
+}
+
+.engineeringGrid.right-collapsed {
+  grid-template-columns: minmax(0, 1fr) 66px;
+}
+
+.edaAssistantPanel {
+  position: relative;
+}
+
+.edaLeftResizeHandle {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  bottom: 0;
+  z-index: 5;
+  width: 7px;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.edaLeftResizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 48px;
+  bottom: 0;
+  left: 3px;
+  width: 1px;
+  background: transparent;
+}
+
+.edaLeftResizeHandle:hover::after,
+.edaResizingLeft .edaLeftResizeHandle::after {
+  background: rgba(56, 189, 248, 0.44);
+}
+
+.edaRightResizeHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -3px;
+  z-index: 4;
+  width: 7px;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.edaRightResizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 48px;
+  bottom: 0;
+  left: 3px;
+  width: 1px;
+  background: transparent;
+}
+
+.edaRightResizeHandle:hover::after,
+.edaResizingRight .edaRightResizeHandle::after {
+  background: rgba(56, 189, 248, 0.44);
+}
+
+.edaConsoleOutput {
+  position: relative;
+  height: var(--eda-console-height);
+  min-height: 74px;
+  max-height: none;
+}
+
+.edaConsoleOutput.collapsed {
+  height: 34px;
+  min-height: 34px;
+}
+
+.edaConsoleResizeHandle {
+  position: absolute;
+  top: -4px;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  height: 8px;
+  cursor: row-resize;
+  background: transparent;
+}
+
+.edaConsoleResizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: transparent;
+}
+
+.edaConsoleResizeHandle:hover::after,
+.edaResizingConsole .edaConsoleResizeHandle::after {
+  background: rgba(56, 189, 248, 0.44);
+}
+
+.edaConsoleActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edaConsoleActions button {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+.edaConsoleOutput.collapsed .edaPanelHeader {
+  min-height: 34px;
+}
+
+.edaConsoleOutput.collapsed .edaLogList {
+  display: none;
+}
+
+.edaLogList {
+  height: calc(var(--eda-console-height) - 33px);
+  max-height: none;
+}
+
+.edaResizing,
+.edaResizing * {
+  user-select: none;
+}
+
+.edaResizing .engineeringShell,
+.edaResizing .engineeringGrid,
+.edaResizing .edaSidebar,
+.edaResizing .edaAssistantPanel,
+.edaResizing .edaConsoleOutput {
+  transition: none !important;
+}
+
+.edaResizingRight,
+.edaResizingRight * {
+  cursor: col-resize !important;
+}
+
+.edaResizingLeft,
+.edaResizingLeft * {
+  cursor: col-resize !important;
+}
+
+.edaResizingConsole,
+.edaResizingConsole * {
+  cursor: row-resize !important;
+}
+
+/* Minimal engineering console copy: keep data, tables, logs, and controls. */
+.engineeringShell .edaBrandSub,
+.engineeringShell .edaTopProject span,
+.engineeringShell .edaPanelHeader > span,
+.engineeringShell .edaPanelHeader > div > span,
+.engineeringShell .edaAssistantHeader span,
+.engineeringShell .edaConsoleActions span,
+.engineeringShell .edaWorkspace .panelHeader p,
+.engineeringShell .edaWorkspace .panel > p,
+.engineeringShell .edaWorkspace .domainDetailHeader p,
+.engineeringShell .edaWorkspace .profileModuleCard span,
+.engineeringShell .edaWorkspace .energyCard p,
+.engineeringShell .edaEmptyState p {
+  display: none;
+}
+
+/* VS Code style dark shell: neutral surfaces, no blue module backgrounds. */
+.engineeringShell.theme-dark {
+  color-scheme: dark;
+  --eda-bg: #1e1e1e;
+  --eda-main: #1e1e1e;
+  --eda-sidebar: #181818;
+  --eda-panel: #1e1e1e;
+  --eda-panel-elevated: #252526;
+  --eda-canvas: #1e1e1e;
+  --eda-selected: #2a2d2e;
+  --eda-text: #cccccc;
+  --eda-secondary: #b3b3b3;
+  --eda-muted: #858585;
+  --eda-divider: #2b2b2b;
+  --eda-divider-strong: #3c3c3c;
+  --eda-active: #007acc;
+  --eda-active-bg: #2a2d2e;
+  --eda-pass: #3fb950;
+  --eda-warn: #d19a66;
+  --eda-fail: #f85149;
+  --chart-card-bg: #1e1e1e;
+  --chart-plot-bg: #1e1e1e;
+  --chart-border: #3c3c3c;
+  --chart-grid: #3c3c3c;
+  --chart-text: #cccccc;
+  --chart-muted: #858585;
+  --chart-trace-1: #d4d4d4;
+  --chart-trace-2: #b3b3b3;
+  --chart-trace-3: #858585;
+  --chart-trace-4: #6a6a6a;
+  --chart-fill-1: #d4d4d4;
+  --chart-fill-2: #b3b3b3;
+  --chart-fill-3: #858585;
+  --chart-fill-4: #6a6a6a;
+  --chart-fill-5: #3c3c3c;
+  background: var(--eda-bg);
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-dark .engineeringMain,
+.engineeringShell.theme-dark .engineeringGrid,
+.engineeringShell.theme-dark .edaWorkspace,
+.engineeringShell.theme-dark .edaWorkspaceGrid {
+  background: var(--eda-main);
+}
+
+.engineeringShell.theme-dark .edaSidebar,
+.engineeringShell.theme-dark .edaTopBar,
+.engineeringShell.theme-dark .edaWorkspaceTabs,
+.engineeringShell.theme-dark .edaAssistantPanel,
+.engineeringShell.theme-dark .edaAssistantRail,
+.engineeringShell.theme-dark .edaAssistantHeader,
+.engineeringShell.theme-dark .edaExecutionBox,
+.engineeringShell.theme-dark .edaChatThread,
+.engineeringShell.theme-dark .edaPromptBox,
+.engineeringShell.theme-dark .edaConsoleOutput .edaPanelHeader {
+  background: var(--eda-sidebar);
+}
+
+.engineeringShell.theme-dark .edaPanel,
+.engineeringShell.theme-dark .edaWorkspace .panel,
+.engineeringShell.theme-dark .edaWorkspace .engineering.panel,
+.engineeringShell.theme-dark .edaWorkspace .energyCard,
+.engineeringShell.theme-dark .edaWorkspace .domainDetailHeader,
+.engineeringShell.theme-dark .edaWorkspace .profileModuleCard,
+.engineeringShell.theme-dark .edaWorkspace .rationaleSection,
+.engineeringShell.theme-dark .edaWorkspace .formulaTable,
+.engineeringShell.theme-dark .edaWorkspace .pieCard,
+.engineeringShell.theme-dark .edaWorkspace .thermalCard,
+.engineeringShell.theme-dark .edaWorkspace .metricTile,
+.engineeringShell.theme-dark .edaWorkspace .moduleSelectCard,
+.engineeringShell.theme-dark .edaWorkspace .plannerNotice,
+.engineeringShell.theme-dark .edaWorkspace .circuitDraftPanel,
+.engineeringShell.theme-dark .edaRequirementGrid div {
+  border-color: var(--eda-divider);
+  background: var(--eda-panel);
+  color: var(--eda-text);
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaPanelHeader,
+.engineeringShell.theme-dark .edaWorkspace .panelHeader,
+.engineeringShell.theme-dark .edaTable th {
+  border-color: var(--eda-divider);
+  background: #252526;
+}
+
+.engineeringShell.theme-dark .edaTable td,
+.engineeringShell.theme-dark .edaCheckList div,
+.engineeringShell.theme-dark .metricTile,
+.engineeringShell.theme-dark .edaRequirementGrid div {
+  border-color: var(--eda-divider);
+}
+
+.engineeringShell.theme-dark .edaWorkspaceTabs button {
+  border-color: var(--eda-divider);
+  background: #2d2d2d;
+  color: var(--eda-secondary);
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaWorkspaceTabs button.active {
+  border-top: 1px solid var(--eda-active);
+  border-bottom-color: var(--eda-main);
+  background: var(--eda-main);
+  color: var(--eda-text);
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaNavList button.selected,
+.engineeringShell.theme-dark .edaArtifactList button.selected,
+.engineeringShell.theme-dark .edaNavList button:hover,
+.engineeringShell.theme-dark .edaArtifactList button:hover {
+  border-color: transparent;
+  background: var(--eda-selected);
+  box-shadow: none;
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-dark .edaNavList button:not(.selected),
+.engineeringShell.theme-dark .edaArtifactList button:not(.selected),
+.engineeringShell.theme-dark .edaExecutionList div {
+  background: transparent;
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaTopActions button,
+.engineeringShell.theme-dark .edaTopActions button.primary,
+.engineeringShell.theme-dark .edaAgentBadge,
+.engineeringShell.theme-dark .edaReviewBadge,
+.engineeringShell.theme-dark .edaRequestPicker select,
+.engineeringShell.theme-dark .edaDiyInput,
+.engineeringShell.theme-dark .edaPromptBox,
+.engineeringShell.theme-dark .themeIconSwitch,
+.engineeringShell.theme-dark .languageSwitch,
+.engineeringShell.theme-dark .edaEmptyState button,
+.engineeringShell.theme-dark .edaPromptBox button,
+.engineeringShell.theme-dark .edaSendDesign:not(:disabled),
+.engineeringShell.theme-dark button {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaReviewBadge {
+  background: transparent;
+}
+
+.engineeringShell.theme-dark .edaReviewBadge i {
+  border: 1px solid var(--eda-divider-strong);
+  background: var(--eda-bg);
+}
+
+.engineeringShell.theme-dark .edaReviewBadge em {
+  color: var(--eda-secondary);
+}
+
+.engineeringShell.theme-dark .edaRunProgress i {
+  background: var(--eda-divider-strong);
+}
+
+.engineeringShell.theme-dark .edaRunProgress b {
+  background: var(--eda-active);
+}
+
+.engineeringShell.theme-dark .edaRunProgress.complete b {
+  background: var(--eda-pass);
+}
+
+.engineeringShell.theme-dark .sideToggle,
+.engineeringShell.theme-dark .rightSideToggle,
+.engineeringShell.theme-dark .edaCollapsedNav button,
+.engineeringShell.theme-dark .edaCollapsedRun,
+.engineeringShell.theme-dark .edaRailBadge,
+.engineeringShell.theme-dark .edaAssistantRail .agentStatusRail,
+.engineeringShell.theme-dark .edaAssistantPanel .agentStatusRail {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaTopActions button:hover:not(:disabled),
+.engineeringShell.theme-dark .edaPromptBox button:hover:not(:disabled),
+.engineeringShell.theme-dark .edaSendDesign:not(:disabled):hover,
+.engineeringShell.theme-dark button:hover:not(:disabled) {
+  border-color: #4a4a4a;
+  background: #2a2d2e;
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .edaTopActions .themeIconSwitch button,
+.engineeringShell.theme-dark .edaTopActions .languageSwitch button {
+  border-color: transparent;
+  background: transparent;
+  color: var(--eda-muted);
+}
+
+.engineeringShell.theme-dark .edaTopActions .themeIconSwitch button.active,
+.engineeringShell.theme-dark .edaTopActions .languageSwitch button.active {
+  background: var(--eda-text);
+  color: #1e1e1e;
+}
+
+.engineeringShell.theme-dark .edaPromptInput {
+  background: transparent;
+  color: var(--eda-text);
+}
+
+.engineeringShell.theme-dark .edaConsoleOutput,
+.engineeringShell.theme-dark .edaLogList {
+  background: #0c0c0c;
+}
+
+.engineeringShell.theme-dark .edaSchematicCanvas svg,
+.engineeringShell.theme-dark .edaWaveCanvas svg,
+.engineeringShell.theme-dark .lineChart rect,
+.engineeringShell.theme-dark .bodeChart rect {
+  background: var(--eda-canvas);
+  fill: var(--eda-canvas);
+  stroke: var(--eda-divider-strong);
+}
+
+.engineeringShell.theme-dark .chartCard,
+.engineeringShell.theme-dark .controlBode,
+.engineeringShell.theme-dark .metricChip,
+.engineeringShell.theme-dark .pieCard,
+.engineeringShell.theme-dark .thermalCard,
+.engineeringShell.theme-dark .formulaTable,
+.engineeringShell.theme-dark .rationaleSection {
+  border-color: var(--chart-border);
+  background: var(--chart-card-bg);
+  color: var(--chart-text);
+}
+
+.engineeringShell.theme-dark .edaChatThread article,
+.engineeringShell.theme-dark .edaChatThread article.user,
+.engineeringShell.theme-dark .edaChatThread article.assistant {
+  border-color: transparent;
+  border-left-color: var(--eda-divider-strong);
+  background: transparent;
+}
+
+.engineeringShell.theme-dark .edaRightResizeHandle:hover::after,
+.engineeringShell.theme-dark .edaResizingRight .edaRightResizeHandle::after,
+.engineeringShell.theme-dark .edaLeftResizeHandle:hover::after,
+.engineeringShell.theme-dark .edaResizingLeft .edaLeftResizeHandle::after,
+.engineeringShell.theme-dark .edaConsoleResizeHandle:hover::after,
+.engineeringShell.theme-dark .edaResizingConsole .edaConsoleResizeHandle::after {
+  background: var(--eda-active);
+}
+
+/* Requirement design brief */
+.engineeringShell .edaWorkspaceGrid.tab-requirements {
+  display: block;
+  padding: 0;
+  overflow: auto;
+}
+
+.edaRequirementsDocument {
+  min-height: 100%;
+  background: var(--eda-main);
+  color: var(--eda-text);
+}
+
+.requirementSummaryStrip {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.35fr) repeat(5, minmax(116px, 0.8fr)) auto;
+  align-items: stretch;
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.requirementSummaryStrip > div,
+.requirementSummaryStrip > button {
+  min-width: 0;
+  padding: 10px 12px;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.requirementSummaryStrip span,
+.requirementDocumentLead span,
+.requirementDownstream header span,
+.requirementRevisionHistory span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.requirementSummaryStrip strong {
+  display: block;
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.requirementSummaryStrip > button {
+  border-width: 0 0 0 1px;
+  border-style: solid;
+  border-color: var(--eda-divider);
+  border-radius: 0;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.requirementSummaryStrip > button:disabled {
+  color: var(--eda-pass);
+  opacity: 1;
+}
+
+.requirementChangeNotice {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.22);
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--eda-warn);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.requirementDocumentLead {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.requirementDocumentLead h3 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.requirementDocumentLead p {
+  max-width: 860px;
+  margin: 7px 0 0;
+  color: var(--eda-secondary);
+  font-size: 12.75px;
+  line-height: 1.45;
+}
+
+.requirementPlanSections {
+  display: grid;
+}
+
+.requirementPlanSection {
+  padding: 0;
+  border-bottom: 1px solid var(--eda-divider);
+  background: transparent;
+}
+
+.requirementPlanSection > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 44px;
+  padding: 10px 18px;
+}
+
+.requirementPlanSection > header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.requirementPlanSection h4,
+.requirementDownstream h4 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.requirementPlanStatus {
+  display: inline-grid;
+  place-items: center;
+  width: max-content;
+  height: 20px;
+  min-height: 20px;
+  padding: 0 7px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 999px;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.requirementPlanStatus.revised,
+.requirementPlanStatus.needs_review {
+  border-color: rgba(245, 158, 11, 0.34);
+  color: var(--eda-warn);
+}
+
+.requirementPlanStatus.reviewed {
+  border-color: rgba(34, 197, 94, 0.24);
+  background: rgba(34, 197, 94, 0.08);
+  color: var(--eda-pass);
+}
+
+.requirementPlanStatus.approved {
+  border-color: rgba(34, 197, 94, 0.32);
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--eda-pass);
+}
+
+.requirementSectionActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.requirementSectionActions button,
+.requirementRevisionBox button,
+.edaRequirementQuickActions button {
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--eda-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.requirementSectionActions button:hover,
+.requirementRevisionBox button:hover,
+.edaRequirementQuickActions button:hover {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+}
+
+.requirementPlanSection ul {
+  display: grid;
+  gap: 7px;
+  max-width: 960px;
+  margin: 0;
+  padding: 0 18px 14px 34px;
+  color: var(--eda-secondary);
+  font-size: 12.75px;
+  line-height: 1.45;
+}
+
+.requirementPlanSection li::marker {
+  color: var(--eda-muted);
+}
+
+.requirementRevisionHistory {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0 18px 12px;
+  color: var(--eda-muted);
+  font-size: 11.5px;
+}
+
+.requirementRevisionHistory span {
+  margin: 0;
+}
+
+.requirementRevisionHistory strong {
+  color: var(--eda-secondary);
+  font-weight: 400;
+}
+
+.requirementRevisionBox {
+  display: grid;
+  gap: 8px;
+  margin: 0 18px 16px;
+  padding: 10px;
+  border: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.requirementRevisionBox textarea {
+  resize: vertical;
+  min-height: 64px;
+  border: 0;
+  background: transparent;
+  color: var(--eda-text);
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.4;
+  outline: none;
+}
+
+.requirementRevisionBox div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.requirementDownstream {
+  padding: 14px 18px 18px;
+}
+
+.requirementDownstream header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.requirementModuleList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  border-top: 1px solid var(--eda-divider);
+  border-left: 1px solid var(--eda-divider);
+}
+
+.requirementModuleList div {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 7px 8px;
+  align-items: center;
+  min-height: 58px;
+  padding: 9px 10px;
+  border-right: 1px solid var(--eda-divider);
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.requirementModuleList strong {
+  color: var(--eda-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.requirementModuleList span {
+  color: var(--eda-muted);
+  font-size: 11px;
+}
+
+.requirementModuleList small {
+  grid-column: 2 / 4;
+  color: var(--eda-muted);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.edaStatusMark.ready span {
+  background: var(--eda-active);
+  opacity: 0.74;
+}
+
+.edaStatusMark.outdated span {
+  background: var(--eda-warn);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+}
+
+.edaRequirementQuickActions {
+  display: grid;
+  gap: 8px;
+  padding: 9px 10px;
+  border-top: 1px solid var(--eda-divider);
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-sidebar);
+}
+
+.edaRequirementQuickActions h3 {
+  margin: 0;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.edaRequirementQuickActions div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+@media (max-width: 1320px) {
+  .requirementSummaryStrip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .requirementSummaryStrip > button {
+    grid-column: 1 / -1;
+    min-height: 34px;
+  }
+}
+
+/* Requirement engineering brief review layout */
+.edaRequirementsDocument {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  min-height: 100%;
+  background: var(--eda-main);
+}
+
+.requirementBriefHeader {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(220px, auto) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.requirementBriefHeader span,
+.requirementBriefState small,
+.requirementReviewInspector header span,
+.requirementInspectorMeta span {
+  display: block;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.requirementBriefHeader h3 {
+  margin: 4px 0 3px;
+  color: var(--eda-text);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.22;
+}
+
+.requirementBriefHeader p,
+.requirementBriefState span {
+  margin: 0;
+  color: var(--eda-secondary);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.requirementBriefState {
+  display: grid;
+  justify-items: start;
+  gap: 5px;
+}
+
+.requirementBriefState small {
+  max-width: 260px;
+  color: var(--eda-muted);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.requirementBriefActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.requirementBriefActions button,
+.requirementInspectorActions button,
+.requirementSectionActions button,
+.requirementRevisionBox button {
+  min-height: 27px;
+  padding: 0 10px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--eda-secondary);
+  font-size: 11.75px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.requirementBriefActions button.primary {
+  border-color: rgba(56, 189, 248, 0.28);
+  background: var(--eda-active-bg);
+  color: var(--eda-text);
+}
+
+.requirementBriefActions button:hover,
+.requirementInspectorActions button:hover,
+.requirementSectionActions button:hover,
+.requirementRevisionBox button:hover {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+}
+
+.requirementBriefActions button:disabled,
+.requirementRevisionBox button:disabled {
+  color: var(--eda-muted);
+  opacity: 0.56;
+}
+
+.requirementGateNotice {
+  padding: 8px 22px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.18);
+  background: rgba(245, 158, 11, 0.065);
+  color: var(--eda-warn);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.requirementBriefLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+  min-height: 0;
+}
+
+.requirementBriefMain {
+  min-width: 0;
+  overflow: auto;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.requirementDocumentLead {
+  max-width: 900px;
+  padding: 22px 28px 16px;
+  border-bottom: 0;
+}
+
+.requirementDocumentLead h3 {
+  font-size: 15px;
+}
+
+.requirementDocumentLead p {
+  max-width: 780px;
+  font-size: 13.25px;
+}
+
+.requirementPlanSections {
+  display: grid;
+  max-width: 900px;
+  padding: 0 28px 14px;
+}
+
+.requirementPlanSection {
+  padding: 0;
+  border-top: 1px solid var(--eda-divider);
+  border-bottom: 0;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.requirementPlanSection:last-child {
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.requirementPlanSection:hover {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.requirementPlanSection.reviewed,
+.requirementPlanSection.approved {
+  background: rgba(34, 197, 94, 0.04);
+}
+
+.requirementPlanSection.reviewed:hover,
+.requirementPlanSection.approved:hover {
+  background: rgba(34, 197, 94, 0.065);
+}
+
+.requirementPlanSection.selected {
+  background: rgba(56, 189, 248, 0.045);
+  box-shadow: inset 2px 0 0 var(--eda-active);
+}
+
+.requirementPlanSection.reviewed.selected,
+.requirementPlanSection.approved.selected {
+  background: rgba(34, 197, 94, 0.075);
+  box-shadow: inset 2px 0 0 var(--eda-pass);
+}
+
+.requirementPlanSection > header {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.34fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 18px;
+  min-height: 0;
+  padding: 15px 14px 13px 16px;
+}
+
+.requirementPlanSection > header > div:first-child {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.requirementPlanSection h4 {
+  font-size: 14px;
+}
+
+.requirementPlanSection > header p {
+  max-width: 620px;
+  margin: 0;
+  color: var(--eda-secondary);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.requirementSectionExpanded {
+  display: grid;
+  gap: 12px;
+  max-width: 720px;
+  padding: 0 18px 17px 220px;
+}
+
+.requirementSectionExpanded ul,
+.requirementPlanSection ul {
+  display: grid;
+  gap: 8px;
+  max-width: 690px;
+  margin: 0;
+  padding: 0 0 0 18px;
+  color: var(--eda-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.requirementSectionActions {
+  justify-content: flex-start;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.requirementPlanSection.selected .requirementSectionActions,
+.requirementPlanSection:hover .requirementSectionActions {
+  opacity: 1;
+}
+
+.requirementReviewInspector {
+  min-width: 0;
+  overflow: auto;
+  background: var(--eda-panel);
+}
+
+.requirementReviewInspector header {
+  display: grid;
+  gap: 6px;
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.requirementReviewInspector h4 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.requirementInspectorMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.requirementInspectorMeta div {
+  min-width: 0;
+  padding: 10px 12px;
+  border-right: 1px solid var(--eda-divider);
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.requirementInspectorMeta strong {
+  display: block;
+  overflow: hidden;
+  margin-top: 4px;
+  color: var(--eda-text);
+  font-size: 11.75px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.requirementReviewInspector section {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.requirementReviewInspector h5 {
+  margin: 0 0 8px;
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.requirementReviewInspector ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 17px;
+  color: var(--eda-secondary);
+  font-size: 12.25px;
+  line-height: 1.42;
+}
+
+.requirementReviewInspector p {
+  margin: 0;
+  color: var(--eda-muted);
+  font-size: 12.25px;
+  line-height: 1.42;
+}
+
+.requirementRevisionBox {
+  margin: 12px 14px;
+  padding: 10px;
+  border: 1px solid var(--eda-divider);
+  background: var(--eda-sidebar);
+}
+
+.requirementRevisionBox textarea {
+  font-size: 12.75px;
+}
+
+.requirementInspectorActions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 11px 14px;
+  border-top: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.requirementDownstream {
+  max-width: 900px;
+  padding: 18px 28px 24px;
+}
+
+.requirementDownstream header {
+  max-width: 780px;
+}
+
+@media (max-width: 1380px) {
+  .requirementBriefHeader {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .requirementBriefActions {
+    justify-content: flex-start;
+  }
+
+  .requirementBriefLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .requirementBriefMain {
+    border-right: 0;
+  }
+
+  .requirementReviewInspector {
+    max-height: 440px;
+    border-top: 1px solid var(--eda-divider);
+  }
+}
+
+@media (max-width: 900px) {
+  .requirementPlanSection > header {
+    grid-template-columns: 1fr;
+  }
+
+  .requirementSectionExpanded {
+    padding-left: 18px;
+  }
+}
+
+/* BOM component decision workspace */
+.engineeringShell .edaWorkspaceGrid.tab-bom {
+  display: block;
+  padding: 0;
+  overflow: auto;
+}
+
+.bomDecisionWorkspace {
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  min-height: 100%;
+  background: var(--eda-main);
+  color: var(--eda-text);
+}
+
+.bomDecisionWorkspace.empty {
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.bomSummaryStrip {
+  display: grid;
+  grid-template-columns: minmax(126px, 0.9fr) repeat(6, minmax(104px, 0.72fr));
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.bomSummaryStrip > div {
+  min-width: 0;
+  padding: 9px 12px;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.bomSummaryStrip span,
+.bomInspector header span,
+.bomInspectorMetrics span,
+.bomEvidenceNotice span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.bomSummaryStrip strong {
+  display: block;
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bomActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-sidebar);
+}
+
+.bomFilters,
+.bomActions,
+.bomInspectorActions,
+.bomViewControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bomViewControls {
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.bomViewControls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bomViewControls select {
+  height: 25px;
+  min-width: 116px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 5px;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-secondary);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.bomFilters button,
+.bomActions button,
+.bomInspectorActions button,
+.bomEmptyState button {
+  min-height: 25px;
+  padding: 0 9px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--eda-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.bomFilters button:hover,
+.bomActions button:hover,
+.bomInspectorActions button:hover,
+.bomEmptyState button:hover {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+}
+
+.bomFilters button.active {
+  border-color: rgba(56, 189, 248, 0.24);
+  background: var(--eda-active-bg);
+  color: var(--eda-text);
+}
+
+.bomEvidenceNotice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: rgba(245, 158, 11, 0.055);
+}
+
+.bomEvidenceNotice span {
+  margin: 0;
+  color: var(--eda-warn);
+  font-size: 10.5px;
+  text-transform: none;
+}
+
+.bomChecksStrip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(108px, 1fr));
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.bomChecksStrip > div {
+  min-width: 0;
+  padding: 7px 12px;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.bomChecksStrip span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.bomChecksStrip strong {
+  color: var(--eda-text);
+  font-family: var(--eda-font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.bomChecksStrip .warn strong {
+  color: var(--eda-warn);
+}
+
+.bomChecksStrip .pass strong {
+  color: var(--eda-pass);
+}
+
+.bomWorkspaceBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+  min-height: 0;
+}
+
+.bomTablePane {
+  min-width: 0;
+  overflow: auto;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.bomDecisionTable {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.bomDecisionTable th,
+.bomDecisionTable td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--eda-divider);
+  color: var(--eda-secondary);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.35;
+  text-align: left;
+  vertical-align: top;
+}
+
+.bomDecisionTable th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--eda-panel);
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bomDecisionTable tbody tr {
+  cursor: pointer;
+}
+
+.bomDecisionTable tbody tr:hover,
+.bomDecisionTable tbody tr.selected {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.bomDecisionTable .bomGroupRow td {
+  position: sticky;
+  top: 32px;
+  z-index: 1;
+  padding: 6px 10px;
+  background: var(--eda-sidebar);
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bomDecisionTable tbody tr.selected {
+  box-shadow: inset 2px 0 0 var(--eda-active);
+}
+
+.bomDecisionTable td:first-child,
+.bomDecisionTable td:nth-child(5) {
+  color: var(--eda-text);
+  font-family: var(--eda-font-mono);
+  font-size: 11.5px;
+}
+
+.bomDecisionTable strong {
+  display: block;
+  color: var(--eda-text);
+  font-size: 12.25px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.bomDecisionTable span {
+  display: block;
+  margin-top: 2px;
+  color: var(--eda-muted);
+  font-size: 11.25px;
+}
+
+.bomNoRows {
+  height: 96px;
+  color: var(--eda-muted);
+  text-align: center;
+}
+
+.bomStatusBadge {
+  display: inline-grid;
+  grid-auto-flow: column;
+  place-items: center;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 22px;
+  min-height: 22px;
+  width: max-content;
+  max-width: 100%;
+  padding: 0 9px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 999px;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 22px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bomStatusBadge svg {
+  width: 12px;
+  height: 12px;
+}
+
+.bomDecisionTable .bomStatusBadge {
+  vertical-align: middle;
+}
+
+.bomStatusBadge.approved {
+  border-color: rgba(34, 197, 94, 0.28);
+  color: var(--eda-pass);
+}
+
+.bomStatusBadge.locked {
+  border-color: var(--eda-divider-strong);
+  color: var(--eda-text);
+}
+
+.bomStatusBadge.needs-review,
+.bomStatusBadge.supply-risk {
+  border-color: rgba(245, 158, 11, 0.34);
+  color: var(--eda-warn);
+}
+
+.bomStatusBadge.missing-evidence {
+  border-color: rgba(154, 164, 175, 0.3);
+  color: var(--eda-warn);
+}
+
+.bomStatusBadge.replaced,
+.bomStatusBadge.outdated {
+  color: var(--eda-muted);
+}
+
+.bomInspector {
+  min-width: 0;
+  overflow: auto;
+  background: var(--eda-panel);
+}
+
+.bomInspector header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.bomInspector h3 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.bomInspector p {
+  margin: 4px 0 0;
+  color: var(--eda-secondary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.bomInspectorMetrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.bomInspectorMetrics div {
+  min-width: 0;
+  padding: 9px 10px;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.bomInspectorMetrics strong {
+  display: block;
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 11.75px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bomInspector section {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.bomInspector h4 {
+  margin: 0 0 7px;
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.bomInspector ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 17px;
+  color: var(--eda-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.bomInspector li::marker {
+  color: var(--eda-muted);
+}
+
+.bomAlternatives {
+  display: grid;
+  border-top: 1px solid var(--eda-divider);
+}
+
+.bomAlternatives article {
+  min-width: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.bomAlternatives strong,
+.bomAlternatives span,
+.bomAlternatives small,
+.bomAlternatives em {
+  display: block;
+}
+
+.bomAlternatives strong {
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.bomAlternatives span,
+.bomAlternatives em {
+  color: var(--eda-muted);
+  font-size: 11.5px;
+  font-style: normal;
+}
+
+.bomAlternatives small {
+  color: var(--eda-secondary);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+.bomInspectorActions {
+  position: sticky;
+  bottom: 0;
+  padding: 10px 12px;
+  border-top: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.bomEmptyState {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  max-width: 520px;
+  padding: 24px;
+  border: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+  text-align: center;
+}
+
+.bomEmptyState strong {
+  color: var(--eda-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bomEmptyState span {
+  color: var(--eda-muted);
+  font-size: 12px;
+}
+
+.bomEmptyState button:disabled {
+  opacity: 0.55;
+}
+
+@media (max-width: 1360px) {
+  .bomSummaryStrip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .bomWorkspaceBody {
+    grid-template-columns: 1fr;
+  }
+
+  .bomTablePane {
+    border-right: 0;
+    border-bottom: 1px solid var(--eda-divider);
+  }
+
+  .bomInspector {
+    max-height: 420px;
+  }
+}
+
+/* VS Code Codex-style multi-task copilot panel */
+.engineeringShell .edaAssistantPanel {
+  position: relative;
+  gap: 0;
+  padding: 0;
+  background: var(--eda-sidebar);
+}
+
+.codexPanelTop,
+.codexChatHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 10px 0 14px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-sidebar);
+}
+
+.codexTabs {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 16px;
+  min-width: 0;
+  height: 100%;
+  flex: 1 1 auto;
+}
+
+.codexPanelTitle {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 2px;
+}
+
+.codexPanelTitle strong {
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codexPanelTitle span {
+  overflow: hidden;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codexTabs button,
+.codexPanelActions button,
+.codexChatHeader > button,
+.codexTaskFilter button {
+  display: inline-grid;
+  place-items: center;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--eda-muted);
+  box-shadow: none;
+}
+
+.codexTabs button {
+  position: relative;
+  min-width: 0;
+  height: 42px;
+  padding: 0 0;
+  color: var(--eda-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.codexTabs button.active {
+  color: var(--eda-text);
+}
+
+.codexTabs button.active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: var(--eda-active);
+}
+
+.codexPanelActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.codexPanelActions svg,
+.codexChatHeader svg,
+.codexTaskSearch svg,
+.codexTaskFilter svg,
+.codexTaskList em svg,
+.edaPromptBox button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.codexPanelActions button:hover,
+.codexChatHeader > button:hover,
+.codexTaskFilter button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--eda-text);
+}
+
+.edaAssistantPanel.expanded {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 50;
+  width: min(720px, calc(100vw - 32px));
+  border: 1px solid var(--eda-divider-strong);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.42);
+}
+
+.copilotFloatingMenu,
+.copilotTaskMenu {
+  position: absolute;
+  z-index: 70;
+  display: grid;
+  gap: 8px;
+  width: min(254px, calc(100% - 24px));
+  padding: 8px;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 9px;
+  background: var(--eda-panel);
+  color: var(--eda-text);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.36);
+}
+
+.copilotFloatingMenu.top {
+  top: 40px;
+  right: 10px;
+}
+
+.copilotFloatingMenu.composer {
+  right: 8px;
+  bottom: 56px;
+}
+
+.copilotFloatingMenu section {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.copilotFloatingMenu section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.copilotFloatingMenu section > span {
+  padding: 4px 7px 5px;
+  color: var(--eda-muted);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.copilotFloatingMenu button,
+.copilotTaskMenu button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--eda-secondary);
+  font-size: 12px;
+  text-align: left;
+}
+
+.copilotFloatingMenu button:hover,
+.copilotTaskMenu button:hover {
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+}
+
+.copilotFloatingMenu button:disabled {
+  opacity: 0.45;
+}
+
+.copilotFloatingMenu button small {
+  grid-column: 2 / 4;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+}
+
+.copilotFloatingMenu svg,
+.copilotTaskMenu svg {
+  width: 14px;
+  height: 14px;
+}
+
+.copilotFloatingMenu b {
+  color: var(--eda-text);
+  font-weight: 500;
+}
+
+.copilotTaskMenu {
+  top: 36px;
+  right: 8px;
+}
+
+.copilotTaskMenu .danger {
+  color: var(--eda-fail);
+}
+
+.codexTaskListView {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  padding: 10px 10px 0;
+  background: var(--eda-sidebar);
+}
+
+.codexTaskSearch {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--eda-divider);
+  color: var(--eda-muted);
+}
+
+.codexTaskSearch input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--eda-text);
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.35;
+  outline: none;
+}
+
+.codexTaskSearch input::placeholder {
+  color: var(--eda-muted);
+}
+
+.codexTaskFilter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 38px;
+  padding: 0 4px 0 8px;
+  color: var(--eda-muted);
+}
+
+.codexTaskFilter button:first-child {
+  display: inline-flex;
+  justify-content: flex-start;
+  width: auto;
+  padding: 0;
+  color: var(--eda-muted);
+  font-size: 12px;
+}
+
+.codexTaskFilter button:first-child::after {
+  content: "⌄";
+  margin-left: 5px;
+  color: var(--eda-muted);
+}
+
+.codexTaskList {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+  padding-bottom: 10px;
+}
+
+.codexTaskList > button {
+  position: relative;
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto 24px;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 2px 8px;
+  min-height: 40px;
+  padding: 6px 4px 6px 8px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--eda-secondary);
+  box-shadow: none;
+  text-align: left;
+}
+
+.codexTaskList > button:hover,
+.codexTaskList > button.selected {
+  background: var(--eda-selected);
+}
+
+.codexTaskStatus {
+  grid-row: 1 / 3;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--eda-muted);
+}
+
+.codexTaskStatus.active {
+  background: var(--eda-active);
+}
+
+.codexTaskStatus.done {
+  background: var(--eda-pass);
+}
+
+.codexTaskStatus.error {
+  background: var(--eda-fail);
+}
+
+.codexTaskList strong {
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codexTaskList small {
+  grid-column: 2 / 4;
+  overflow: hidden;
+  color: var(--eda-muted);
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codexTaskList time {
+  color: var(--eda-muted);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.codexTaskList em {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  color: var(--eda-muted);
+  font-style: normal;
+  opacity: 0;
+}
+
+.codexTaskList > button:hover em,
+.codexTaskList > button.selected em {
+  opacity: 1;
+}
+
+.codexTaskList em:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--eda-fail);
+}
+
+.codexNoTasks {
+  padding: 14px 8px;
+  color: var(--eda-muted);
+  font-size: 12px;
+}
+
+.codexChatHeader {
+  padding-left: 8px;
+}
+
+.codexChatHeader div {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.codexChatHeader strong {
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.codexChatHeader span {
+  overflow: hidden;
+  color: var(--eda-muted);
+  font-size: 11.5px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.engineeringShell .edaAssistantPanel .edaExecutionBox,
+.engineeringShell .edaAssistantPanel .edaRequirementQuickActions {
+  flex: 0 0 auto;
+}
+
+.engineeringShell .edaAssistantPanel .edaPromptBox {
+  flex: 0 0 auto;
+}
+
+.engineeringShell .edaPromptBox {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 7px;
+  padding: 8px;
+}
+
+.engineeringShell .edaPromptInput {
+  min-height: 48px;
+}
+
+.engineeringShell .copilotComposerFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.engineeringShell .copilotComposerLeft {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.engineeringShell .copilotModelPicker,
+.engineeringShell .copilotUsagePicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  max-width: 176px;
+  padding: 0 8px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--eda-secondary);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.engineeringShell .copilotModelPicker span,
+.engineeringShell .copilotUsagePicker span {
+  color: var(--eda-muted);
+  font-size: 10.5px;
+}
+
+.engineeringShell .copilotModelPicker svg {
+  width: 14px;
+  height: 14px;
+}
+
+.engineeringShell .copilotModelPicker:hover,
+.engineeringShell .copilotUsagePicker:hover {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+}
+
+/* Codex-style copilot thread: user bubbles, assistant prose. */
+.engineeringShell .edaChatThread {
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 18px;
+  padding: 14px 12px 16px;
+  background: var(--eda-sidebar);
+}
+
+.engineeringShell .edaChatThread article,
+.engineeringShell .edaChatThread article.user,
+.engineeringShell .edaChatThread article.assistant,
+.engineeringShell.theme-light .edaChatThread article,
+.engineeringShell.theme-light .edaChatThread article.user,
+.engineeringShell.theme-light .edaChatThread article.assistant,
+.engineeringShell.theme-dark .edaChatThread article,
+.engineeringShell.theme-dark .edaChatThread article.user,
+.engineeringShell.theme-dark .edaChatThread article.assistant {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.engineeringShell .edaChatThread article.assistant {
+  max-width: 100%;
+  padding: 0 2px;
+}
+
+.engineeringShell .edaChatThread article.user {
+  align-self: flex-end;
+  width: fit-content;
+  max-width: min(88%, 420px);
+  margin-left: 34px;
+  padding: 0;
+}
+
+.engineeringShell .edaAssistantMessageMeta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0 0 8px;
+  color: var(--eda-secondary);
+}
+
+.engineeringShell .edaAssistantMessageMeta span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 999px;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.engineeringShell .edaChatThread strong {
+  color: var(--eda-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.engineeringShell .edaChatThread article.assistant p {
+  margin: 0;
+  color: var(--eda-text);
+}
+
+.engineeringShell .codexMessageBody {
+  display: grid;
+  gap: 10px;
+  color: var(--eda-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.engineeringShell .codexMessageBody p,
+.engineeringShell .codexMessageBody ul,
+.engineeringShell .codexMessageBody ol,
+.engineeringShell .codexMessageBody pre,
+.engineeringShell .codexMessageBody h4 {
+  margin: 0;
+}
+
+.engineeringShell .codexMessageBody h4 {
+  color: var(--eda-text);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.engineeringShell .codexMessageBody ul,
+.engineeringShell .codexMessageBody ol {
+  display: grid;
+  gap: 6px;
+  padding-left: 18px;
+}
+
+.engineeringShell .codexMessageBody li {
+  padding-left: 2px;
+}
+
+.engineeringShell .codexMessageBody strong {
+  color: var(--eda-text);
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.engineeringShell .codexMessageBody code {
+  border: 1px solid var(--eda-divider);
+  border-radius: 5px;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  font-family: "JetBrains Mono", "SF Mono", "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.92em;
+  padding: 1px 4px;
+}
+
+.engineeringShell .codexMessageBody pre {
+  overflow: auto;
+  max-width: 100%;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: var(--eda-panel-elevated);
+  padding: 10px;
+}
+
+.engineeringShell .codexMessageBody pre code {
+  display: block;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  white-space: pre;
+}
+
+.engineeringShell .edaChatThread article.user p {
+  margin: 0;
+  padding: 10px 13px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 14px;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  line-height: 1.45;
+}
+
+.engineeringShell .edaChatThread article.user time {
+  display: block;
+  margin-top: 6px;
+  padding-right: 4px;
+  text-align: right;
+}
+
+.engineeringShell .edaChatThread article.assistant time {
+  margin-left: auto;
+}
+
+.engineeringShell.theme-dark .edaChatThread article.user p {
+  border-color: #2b2b2b;
+  background: #2a2d2e;
+}
+
+.engineeringShell.theme-light .edaChatThread article.user p {
+  border-color: rgba(16, 24, 40, 0.1);
+  background: #eef3f8;
+}
+
+/* Engineering Console readability + module-local actions */
+.engineeringShell {
+  font-size: 14px;
+}
+
+.engineeringShell .edaTopProject strong {
+  font-size: 16px;
+}
+
+.engineeringShell .edaNavList strong,
+.engineeringShell .edaArtifactList strong,
+.engineeringShell .edaExecutionList span,
+.engineeringShell .codexTaskList strong {
+  font-size: 13.5px;
+}
+
+.engineeringShell .edaNavList small,
+.engineeringShell .edaArtifactList small,
+.engineeringShell .edaExecutionList small,
+.engineeringShell .edaAgentBadge,
+.engineeringShell .edaReviewBadge {
+  font-size: 11.5px;
+}
+
+.engineeringShell .edaWorkspaceTabs button {
+  font-size: 13.5px;
+}
+
+.engineeringShell .edaPanelHeader h3,
+.engineeringShell .edaWorkspace .panel h2,
+.engineeringShell .edaWorkspace .panelHeader h2,
+.engineeringShell .edaConsoleOutput h3 {
+  font-size: 14px;
+}
+
+.engineeringShell .edaRequirementsPanel p,
+.engineeringShell .edaWorkspace .panelHeader p,
+.engineeringShell .edaWorkspace .panel > p,
+.engineeringShell .edaWorkspace .energyCard p,
+.engineeringShell .edaChatThread p,
+.engineeringShell .codexMessageBody {
+  font-size: 14px;
+}
+
+.engineeringShell .edaTable,
+.engineeringShell .edaTable td,
+.engineeringShell .bomDecisionTable,
+.engineeringShell .bomDecisionTable td {
+  font-size: 13px;
+}
+
+.engineeringShell .edaLogList div {
+  font-size: 12.75px;
+}
+
+.engineeringShell .edaLogList b,
+.engineeringShell .edaLogList time {
+  font-size: 12px;
+}
+
+.engineeringShell .edaPromptInput,
+.engineeringShell .edaRequestPicker select,
+.engineeringShell .edaDiyInput {
+  font-size: 13.5px;
+}
+
+.edaModuleRunBar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  padding: 0 10px 0 12px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.edaModuleRunBar span {
+  color: var(--eda-secondary);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.edaModuleRunBar button {
+  min-height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 6px;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.edaModuleRunBar button:hover:not(:disabled) {
+  border-color: var(--eda-active);
+  transform: none;
+  box-shadow: none;
+}
+
+.edaModuleRunBar button:disabled {
+  background: transparent;
+  color: var(--eda-muted);
+}
+
+.requirementKeyMetrics {
+  max-width: 900px;
+  margin: 0 28px 18px;
+  border-top: 1px solid var(--eda-divider);
+  border-bottom: 1px solid var(--eda-divider);
+  background: transparent;
+}
+
+.requirementKeyMetrics header {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+}
+
+.requirementKeyMetrics h4 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.requirementKeyMetrics table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.requirementKeyMetrics th,
+.requirementKeyMetrics td {
+  padding: 8px 0;
+  border-top: 1px solid var(--eda-divider);
+  text-align: left;
+  vertical-align: top;
+}
+
+.requirementKeyMetrics th {
+  width: 220px;
+  color: var(--eda-secondary);
+  font-weight: 500;
+}
+
+.requirementKeyMetrics td {
+  color: var(--eda-text);
+  font-family: var(--eda-font-mono);
+  font-size: 13px;
+}
+
+.requirementPlanSection h4,
+.requirementReviewInspector h4 {
+  font-size: 15px;
+}
+
+.requirementPlanSection > header p,
+.requirementSectionExpanded ul,
+.requirementPlanSection ul {
+  font-size: 14px;
+}
+
+.requirementReviewInspector ul,
+.requirementReviewInspector p {
+  font-size: 13px;
+}
+
+/* Codex-style model and usage controls */
+.engineeringShell .copilotModelPicker,
+.engineeringShell .copilotUsagePicker {
+  display: grid;
+  grid-template-columns: auto minmax(0, max-content) auto auto;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  max-width: none;
+  padding: 0 8px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 7px;
+  background: transparent;
+  color: var(--eda-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: none;
+  transform: none;
+}
+
+.engineeringShell .copilotUsagePicker {
+  grid-template-columns: minmax(0, max-content) auto auto;
+}
+
+.engineeringShell .copilotModelPicker:hover,
+.engineeringShell .copilotUsagePicker:hover,
+.engineeringShell .copilotModelPicker:focus-visible,
+.engineeringShell .copilotUsagePicker:focus-visible {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  box-shadow: none;
+  transform: none;
+}
+
+.engineeringShell .copilotModelPicker svg,
+.engineeringShell .copilotUsagePicker svg {
+  width: 14px;
+  height: 14px;
+}
+
+.engineeringShell .copilotPickerMain {
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.engineeringShell .copilotPickerSub {
+  color: var(--eda-muted);
+  font-size: 10.75px;
+  font-weight: 500;
+}
+
+.engineeringShell.theme-light .edaPromptBox .copilotModelPicker,
+.engineeringShell.theme-light .edaPromptBox .copilotUsagePicker {
+  border-color: rgba(16, 24, 40, 0.12);
+  background: #f8fafc;
+  color: #1f2937;
+}
+
+.engineeringShell.theme-light .edaPromptBox .copilotModelPicker:hover,
+.engineeringShell.theme-light .edaPromptBox .copilotUsagePicker:hover,
+.engineeringShell.theme-light .edaPromptBox .copilotModelPicker:focus-visible,
+.engineeringShell.theme-light .edaPromptBox .copilotUsagePicker:focus-visible {
+  border-color: rgba(17, 24, 39, 0.24);
+  background: #eef2f7;
+  color: #111827;
+  box-shadow: none;
+  transform: none;
+}
+
+.engineeringShell.theme-light .edaPromptBox .copilotModelPicker svg,
+.engineeringShell.theme-light .edaPromptBox .copilotUsagePicker svg,
+.engineeringShell.theme-light .copilotPickerMain {
+  color: #1f2937;
+}
+
+.engineeringShell.theme-light .copilotPickerSub {
+  color: #64748b;
+}
+
+.engineeringShell .copilotComposerFooter > button:last-child {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--eda-divider);
+  border-radius: 999px;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  box-shadow: none;
+}
+
+.engineeringShell .copilotComposerFooter > button:last-child:hover:not(:disabled) {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-selected);
+  transform: none;
+  box-shadow: none;
+}
+
+.engineeringShell .copilotFloatingMenu {
+  gap: 6px;
+  padding: 7px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--eda-panel) 92%, #000 8%);
+}
+
+.engineeringShell .copilotFloatingMenu section {
+  gap: 1px;
+  padding-bottom: 6px;
+}
+
+.engineeringShell .copilotFloatingMenu section > span {
+  padding: 5px 8px;
+  font-size: 11px;
+  text-transform: none;
+}
+
+.engineeringShell .copilotFloatingMenu button,
+.engineeringShell .copilotTaskMenu button {
+  min-height: 30px;
+  border-radius: 6px;
+  color: var(--eda-secondary);
+  font-size: 12.5px;
+}
+
+.engineeringShell .copilotFloatingMenu button.selected,
+.engineeringShell .copilotFloatingMenu button:hover,
+.engineeringShell .copilotTaskMenu button:hover {
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  transform: none;
+  box-shadow: none;
+}
+
+.engineeringShell .copilotFloatingMenu b,
+.engineeringShell .copilotTaskMenu b {
+  justify-self: end;
+  color: var(--eda-text);
+  font-weight: 500;
+}
+
+/* Dark mode neutral pass: remove remaining blue-tinted backgrounds. */
+.engineeringShell.theme-dark {
+  --eda-bg: #1e1e1e;
+  --eda-main: #1e1e1e;
+  --eda-sidebar: #181818;
+  --eda-panel: #1e1e1e;
+  --eda-panel-elevated: #252526;
+  --eda-canvas: #1e1e1e;
+  --eda-selected: #2a2d2e;
+  --eda-active-bg: #2a2d2e;
+  --eda-active: #9aa0a6;
+}
+
+.engineeringShell.theme-dark .edaTopActions button.primary,
+.engineeringShell.theme-dark .edaSendDesign:not(:disabled),
+.engineeringShell.theme-dark .edaCollapsedRun,
+.engineeringShell.theme-dark .requirementBriefActions button.primary,
+.engineeringShell.theme-dark .bomFilters button.active,
+.engineeringShell.theme-dark .copilotFloatingMenu button.selected,
+.engineeringShell.theme-dark .copilotTaskMenu button.selected,
+.engineeringShell.theme-dark .edaWorkspaceTabs button.active,
+.engineeringShell.theme-dark .edaNavList button.selected,
+.engineeringShell.theme-dark .edaArtifactList button.selected,
+.engineeringShell.theme-dark .codexTaskList > button.selected,
+.engineeringShell.theme-dark .copilotModelPicker:hover,
+.engineeringShell.theme-dark .copilotUsagePicker:hover,
+.engineeringShell.theme-dark .copilotModelPicker:focus-visible,
+.engineeringShell.theme-dark .copilotUsagePicker:focus-visible {
+  border-color: var(--eda-divider-strong);
+  background: var(--eda-selected);
+  color: var(--eda-text);
+  box-shadow: none;
+}
+
+.engineeringShell.theme-dark .requirementPlanSection.selected,
+.engineeringShell.theme-dark .bomDecisionTable tbody tr.selected,
+.engineeringShell.theme-dark .edaWorkspaceTabs button.active,
+.engineeringShell.theme-dark .edaNavList button.selected,
+.engineeringShell.theme-dark .edaArtifactList button.selected {
+  background: var(--eda-selected);
+}
+
+.engineeringShell.theme-dark .requirementPlanSection.selected,
+.engineeringShell.theme-dark .bomDecisionTable tbody tr.selected {
+  box-shadow: inset 2px 0 0 var(--eda-divider-strong);
+}
+
+.engineeringShell.theme-dark .edaRunProgress b,
+.engineeringShell.theme-dark .edaRightResizeHandle:hover::after,
+.engineeringShell.theme-dark .edaResizingRight .edaRightResizeHandle::after,
+.engineeringShell.theme-dark .edaLeftResizeHandle:hover::after,
+.engineeringShell.theme-dark .edaResizingLeft .edaLeftResizeHandle::after,
+.engineeringShell.theme-dark .edaConsoleResizeHandle:hover::after,
+.engineeringShell.theme-dark .edaResizingConsole .edaConsoleResizeHandle::after,
+.engineeringShell.theme-dark .edaStatusMark.ready span {
+  background: #8b949e;
+}
+
+.engineeringShell.theme-dark .edaReviewBadge i {
+  background: var(--eda-panel);
+}
+
+.engineeringShell.theme-dark .wave.blue {
+  stroke: #a6a6a6;
+}
+
+.engineeringShell.theme-dark .edaPromptBox .copilotModelPicker,
+.engineeringShell.theme-dark .edaPromptBox .copilotUsagePicker {
+  background: var(--eda-panel-elevated);
+}
+
+/* Design/Test phase gate */
+.edaWorkspaceTabs button.test-tab {
+  margin-left: 0;
+}
+
+.edaWorkspaceTabs button.test-tab:first-of-type {
+  border-left-color: var(--eda-divider-strong);
+}
+
+.edaWorkspaceTabs button.locked {
+  color: var(--eda-muted);
+  opacity: 0.58;
+}
+
+.edaWorkspaceGrid.design-locked {
+  position: relative;
+}
+
+.edaWorkspaceGrid.design-locked .edaModuleRunBar,
+.edaWorkspaceGrid.design-locked .edaConsoleOutput {
+  opacity: 1;
+}
+
+.engineeringShell .edaWorkspaceGrid.tab-analysis,
+.engineeringShell .edaWorkspaceGrid.tab-simulation {
+  display: block;
+  padding: 0;
+  overflow: auto;
+}
+
+.skillWorkspace {
+  min-height: 100%;
+  color: var(--eda-text);
+  background: var(--eda-main);
+}
+
+.skillWorkspace.empty {
+  display: grid;
+  place-content: center;
+  min-height: 360px;
+  gap: 10px;
+  text-align: center;
+}
+
+.skillWorkspace.empty h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.skillWorkspace.empty p {
+  margin: 0;
+  color: var(--eda-secondary);
+  font-size: 13.5px;
+}
+
+.skillWorkspace button {
+  min-height: 30px;
+  width: fit-content;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 6px;
+  background: var(--eda-elevated);
+  color: var(--eda-text);
+}
+
+.skillWorkspace button:disabled {
+  color: var(--eda-muted);
+  background: transparent;
+}
+
+.skillSummaryStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.skillSummaryStrip > div {
+  min-height: 58px;
+  padding: 10px 14px;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.skillSummaryStrip span,
+.skillKeyValueGrid span {
+  display: block;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.skillSummaryStrip strong,
+.skillKeyValueGrid strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--eda-text);
+  font-size: 13px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.skillSection {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.skillSection h4 {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.skillSection ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--eda-secondary);
+  line-height: 1.5;
+}
+
+.skillKeyValueGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  background: var(--eda-divider);
+}
+
+.skillKeyValueGrid > div {
+  padding: 10px 12px;
+  background: var(--eda-main);
+}
+
+.equationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.latexEquation {
+  padding: 10px 12px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: var(--eda-panel);
+  overflow-x: auto;
+}
+
+.latexEquation > span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--eda-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.latexEquation .katex-display {
+  margin: 0;
+}
+
+.skillTableWrap {
+  overflow-x: auto;
+  border-top: 1px solid var(--eda-divider);
+}
+
+.skillTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--eda-mono);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.skillTable th,
+.skillTable td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--eda-divider);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.skillTable th {
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.artifactPlotGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.artifactPlotGrid figure {
+  margin: 0;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: var(--eda-panel);
+  overflow: hidden;
+}
+
+.artifactPlotGrid img {
+  display: block;
+  width: 100%;
+  background: #f7f8fa;
+}
+
+.artifactPlotGrid figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--eda-divider);
+  font-size: 12px;
+}
+
+.artifactPlotGrid figcaption strong {
+  font-weight: 600;
+}
+
+.artifactPlotGrid figcaption span,
+.artifactList a {
+  color: var(--eda-secondary);
+}
+
+.skillNotice {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--eda-divider);
+  color: var(--eda-warning);
+  background: color-mix(in srgb, var(--eda-warning) 8%, transparent);
+  font-size: 12.5px;
+}
+
+.skillTwoColumn {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+}
+
+.skillTwoColumn .skillSection:first-child {
+  border-right: 1px solid var(--eda-divider);
+}
+
+.skillSection pre {
+  max-height: 260px;
+  margin: 0;
+  padding: 10px;
+  overflow: auto;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: var(--eda-app);
+  color: var(--eda-secondary);
+  font-family: var(--eda-mono);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.artifactList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.artifactList a,
+.artifactList span {
+  padding: 6px 8px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: var(--eda-panel);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.engineeringShell .edaWorkspaceGrid.tab-pcb,
+.engineeringShell .edaWorkspaceGrid.tab-codes,
+.engineeringShell .edaWorkspaceGrid.tab-tuning,
+.engineeringShell .edaWorkspaceGrid.tab-data,
+.engineeringShell .edaWorkspaceGrid.tab-report {
+  display: block;
+  padding: 0;
+  overflow: auto;
+}
+
+.engineeringShell .edaWorkspaceGrid.tab-pcb .edaModuleRunBar,
+.engineeringShell .edaWorkspaceGrid.tab-codes .edaModuleRunBar,
+.engineeringShell .edaWorkspaceGrid.tab-tuning .edaModuleRunBar,
+.engineeringShell .edaWorkspaceGrid.tab-data .edaModuleRunBar,
+.engineeringShell .edaWorkspaceGrid.tab-report .edaModuleRunBar {
+  min-height: 34px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.engineeringShell .edaWorkspaceGrid.tab-pcb > .edaPanel,
+.engineeringShell .edaWorkspaceGrid.tab-pcb > .panel {
+  min-height: 0;
+}
+
+.engineeringShell .edaArtifactList button {
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+}
+
+.engineeringShell .edaArtifactList em {
+  display: none;
+}
+
+.engineeringShell.theme-dark .edaNavList button.selected,
+.engineeringShell.theme-dark .edaArtifactList button.selected {
+  background: rgba(245, 158, 11, 0.12);
+  box-shadow: inset 2px 0 0 rgba(245, 158, 11, 0.78);
+}
+
+.engineeringShell.theme-light .edaNavList button.selected,
+.engineeringShell.theme-light .edaArtifactList button.selected {
+  background: rgba(31, 41, 55, 0.08);
+  box-shadow: inset 2px 0 0 rgba(31, 41, 55, 0.72);
+}
+
+.engineeringShell.theme-dark .requirementPlanSection.selected {
+  background: rgba(245, 158, 11, 0.08);
+  box-shadow: inset 2px 0 0 rgba(245, 158, 11, 0.7);
+}
+
+.engineeringShell.theme-dark .requirementPlanSection.reviewed.selected,
+.engineeringShell.theme-dark .requirementPlanSection.approved.selected {
+  background: rgba(34, 197, 94, 0.075);
+  box-shadow: inset 2px 0 0 var(--eda-pass);
+}
+
+.engineeringShell .requirementKeyMetrics th,
+.engineeringShell .requirementKeyMetrics td {
+  background: transparent;
+}
+
+.engineeringShell.theme-dark .requirementKeyMetrics th {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.engineeringShell.theme-light .requirementKeyMetrics th {
+  background: rgba(17, 24, 39, 0.045);
+}
+
+.engineeringShell .bomDecisionWorkspace,
+.engineeringShell .bomDecisionTable,
+.engineeringShell .bomDecisionTable thead th,
+.engineeringShell .bomDecisionTable tbody tr,
+.engineeringShell .bomSummaryStrip,
+.engineeringShell .bomEvidenceNotice {
+  background-color: transparent;
+}
+
+.engineeringShell.theme-dark .bomDecisionTable thead th {
+  background: #252526;
+}
+
+.engineeringShell.theme-light .bomDecisionTable thead th {
+  background: rgba(17, 24, 39, 0.045);
+}
+
+.engineeringShell.theme-dark .bomEvidenceNotice {
+  background: rgba(245, 158, 11, 0.08);
+}
+
+.engineeringShell.theme-light .bomEvidenceNotice {
+  background: rgba(245, 158, 11, 0.10);
+}
+
+.engineeringShell.theme-dark .bomFilters button.active {
+  border-color: rgba(245, 158, 11, 0.34);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.engineeringShell.theme-light .bomFilters button.active {
+  border-color: rgba(31, 41, 55, 0.22);
+  background: rgba(31, 41, 55, 0.08);
+}
+
+.engineeringShell.theme-dark .bomDecisionTable tbody tr.selected {
+  background: rgba(245, 158, 11, 0.08);
+  box-shadow: inset 2px 0 0 rgba(245, 158, 11, 0.7);
+}
+
+.edaStatusMark.locked span {
+  background: var(--eda-muted);
+  box-shadow: inset 0 0 0 1px var(--eda-divider-strong);
+}
+
+.testLockedState {
+  min-height: 180px;
+}
+
+.edaTestWorkspace {
+  display: grid;
+  align-content: start;
+  gap: 0;
+  min-height: 100%;
+  overflow: auto;
+  background: var(--eda-main);
+  color: var(--eda-text);
+}
+
+.testWorkspaceHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.testWorkspaceHeader span,
+.testSummaryGrid span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.testWorkspaceHeader h3 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.testWorkspaceHeader p {
+  max-width: 760px;
+  margin: 5px 0 0;
+  color: var(--eda-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.testSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  border-bottom: 1px solid var(--eda-divider);
+  background: var(--eda-panel);
+}
+
+.testSummaryGrid > div {
+  min-width: 0;
+  padding: 11px 14px;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.testSummaryGrid strong {
+  display: block;
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.testTwoCol {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.testTwoCol > section {
+  min-width: 0;
+  padding: 16px 18px;
+  border-right: 1px solid var(--eda-divider);
+}
+
+.testTwoCol h4,
+.testFeedbackComposer h4,
+.testFeedbackList h4 {
+  margin: 0 0 10px;
+  color: var(--eda-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.testTwoCol ul,
+.testFeedbackList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--eda-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.testTwoCol pre {
+  overflow: auto;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: var(--eda-sidebar);
+  color: var(--eda-text);
+  font-family: var(--eda-font-mono);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.testDataTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.testDataTable th,
+.testDataTable td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--eda-divider);
+  color: var(--eda-secondary);
+  font-size: 12.5px;
+  text-align: left;
+}
+
+.testDataTable th {
+  background: var(--eda-panel);
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.testFeedbackComposer {
+  display: grid;
+  gap: 9px;
+  max-width: 760px;
+  margin: 18px;
+  padding: 12px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: var(--eda-panel);
+}
+
+.testFeedbackComposer header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.testFeedbackComposer select,
+.testFeedbackComposer input,
+.testFeedbackComposer textarea {
+  border: 1px solid var(--eda-divider);
+  border-radius: 5px;
+  background: var(--eda-sidebar);
+  color: var(--eda-text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.testFeedbackComposer select,
+.testFeedbackComposer input {
+  min-height: 30px;
+  padding: 0 8px;
+}
+
+.testFeedbackComposer textarea {
+  resize: vertical;
+  min-height: 72px;
+  padding: 8px;
+  line-height: 1.45;
+}
+
+.testFeedbackComposer button,
+.testTwoCol button {
+  justify-self: start;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 5px;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.testFeedbackList {
+  margin: 14px 18px 0;
+  padding: 12px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 6px;
+  background: var(--eda-panel);
+}
+
+.testFeedbackList div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  color: var(--eda-secondary);
+}
+
+@media (max-width: 980px) {
+  .testTwoCol {
+    grid-template-columns: 1fr;
+  }
+}
+
+.edaPhaseTabs {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  border-bottom: 1px solid var(--eda-line);
+  background: var(--eda-panel);
+}
+
+.edaPhaseTabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 30px;
+  min-width: 118px;
+  padding: 0 14px;
+  border: 0;
+  border-right: 1px solid var(--eda-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--eda-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.edaPhaseTabs button.active {
+  color: var(--eda-text);
+  background: color-mix(in srgb, var(--eda-panel-elevated) 68%, transparent);
+}
+
+.edaPhaseIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 5px;
+  background: var(--eda-panel-elevated);
+  color: var(--eda-text-muted);
+  font-family: var(--eda-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.edaPhaseTabs button.active .edaPhaseIcon {
+  border-color: var(--eda-active);
+  color: var(--eda-active);
+}
+
+.requirementModuleList section {
+  display: contents;
+}
+
+.requirementModuleList h5 {
+  grid-column: 1 / -1;
+  margin: 8px 0 2px;
+  color: var(--eda-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.edaGenericModulePanel {
+  padding: 18px 22px;
+  display: grid;
+  gap: 14px;
+  max-width: 980px;
+}
+
+.edaGenericModulePanel header {
+  display: grid;
+  gap: 5px;
+  border-bottom: 1px solid var(--eda-line);
+  padding-bottom: 12px;
+}
+
+.edaGenericModulePanel header span {
+  color: var(--eda-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.edaGenericModulePanel h3 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.edaGenericModulePanel p {
+  margin: 0;
+  color: var(--eda-text-secondary);
+  line-height: 1.45;
+}
+
+.projectRouteShell {
+  display: block;
+  grid-template-columns: none;
+  height: 100vh;
+  min-height: 100vh;
+  background: var(--eda-bg);
+  color: var(--eda-text);
+  overflow: auto;
+}
+
+.projectRouteNotice {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+}
+
+.projectPage {
+  width: min(1180px, calc(100vw - 48px));
+  margin: 0 auto;
+  padding: 34px 0 56px;
+}
+
+.projectPageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.projectPageHeader span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--eda-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.projectPageHeader h1 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 28px;
+  font-weight: 650;
+  line-height: 1.18;
+}
+
+.projectPageHeader p {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: var(--eda-secondary);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.projectPageActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.projectPageActions button,
+.projectPageActions select,
+.projectEmptyState button,
+.projectCard footer button,
+.proposalRow button {
+  min-height: 30px;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 6px;
+  background: var(--eda-panel);
+  color: var(--eda-text);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.projectPageActions button,
+.projectEmptyState button,
+.projectCard footer button,
+.proposalRow button {
+  padding: 0 11px;
+}
+
+.projectPageActions button.primary {
+  background: var(--eda-panel-elevated);
+}
+
+.projectCardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  padding-top: 18px;
+}
+
+.projectCard,
+.projectDetailPanel,
+.projectDetailSummary {
+  border: 1px solid var(--eda-divider);
+  border-radius: 8px;
+  background: var(--eda-panel);
+}
+
+.projectCard {
+  overflow: hidden;
+}
+
+.projectCardMain {
+  display: grid;
+  gap: 12px;
+  width: 100%;
+  padding: 15px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.projectCardMain:hover {
+  background: color-mix(in srgb, var(--eda-panel-elevated) 55%, transparent);
+}
+
+.projectCardMain header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.projectCardMain strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--eda-text);
+  font-size: 16px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projectCardMain p {
+  display: -webkit-box;
+  min-height: 38px;
+  margin: 0;
+  overflow: hidden;
+  color: var(--eda-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.projectCardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: var(--eda-muted);
+  font-size: 12px;
+}
+
+.projectCard footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--eda-divider);
+}
+
+.projectSourceBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 7px;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 999px;
+  color: var(--eda-secondary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.projectSourceBadge.demo {
+  color: var(--eda-warn);
+}
+
+.projectProgressLine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.projectProgressLine i {
+  display: block;
+  height: 7px;
+  overflow: hidden;
+  border: 1px solid var(--eda-divider);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--eda-muted) 16%, transparent);
+}
+
+.projectProgressLine b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--eda-pass);
+}
+
+.projectProgressLine span {
+  color: var(--eda-secondary);
+  font-family: var(--eda-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.projectEmptyState {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 54px 20px;
+  border: 1px dashed var(--eda-divider-strong);
+  border-radius: 8px;
+  color: var(--eda-secondary);
+  text-align: center;
+}
+
+.projectEmptyState h2,
+.projectDetailPanel h2 {
+  margin: 0;
+  color: var(--eda-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.projectDetailSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+.projectDetailSummary > div {
+  min-width: 0;
+  padding: 13px 14px;
+  border-right: 1px solid var(--eda-divider);
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.projectDetailSummary > div.wide {
+  grid-column: span 4;
+}
+
+.projectDetailSummary span,
+.projectDetailPanel dt,
+.proposalRow span,
+.projectTaskRow span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--eda-muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.projectDetailSummary strong,
+.projectDetailPanel dd {
+  color: var(--eda-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.projectDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.projectDetailPanel {
+  padding: 14px;
+}
+
+.projectDetailPanel p {
+  margin: 9px 0 0;
+  color: var(--eda-secondary);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.projectDetailPanel dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.projectDetailPanel dt,
+.projectDetailPanel dd {
+  margin: 0;
+}
+
+.projectModuleTimeline {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.projectModuleTimeline div,
+.projectTaskRow,
+.proposalRow {
+  display: grid;
+  gap: 5px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--eda-divider);
+}
+
+.projectModuleTimeline div {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.projectModuleTimeline strong,
+.projectTaskRow strong {
+  color: var(--eda-text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.projectModuleTimeline em {
+  color: var(--eda-muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.proposalRow div {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .projectPage {
+    width: calc(100vw - 24px);
+    padding-top: 18px;
+  }
+
+  .projectPageHeader,
+  .projectPageActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .projectDetailSummary,
+  .projectDetailGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .projectDetailSummary > div.wide {
+    grid-column: auto;
+  }
+}
+
+/* My Projects dashboard polish */
+.projectRouteShell {
+  display: block;
+  grid-template-columns: none;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 50% -20%, color-mix(in srgb, var(--eda-accent) 8%, transparent), transparent 34%),
+    var(--eda-bg);
+}
+
+.projectRouteTopbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 58px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--eda-divider);
+  background: color-mix(in srgb, var(--eda-bg) 88%, transparent);
+  backdrop-filter: blur(18px);
+}
+
+.projectRouteTopbar .themeIconSwitch button,
+.projectRouteTopbar .languageSwitch button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--eda-muted);
+  box-shadow: none;
+}
+
+.projectRouteTopbar .languageSwitch button {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.projectRouteTopbar .languageSwitch button:last-child {
+  width: 32px;
+}
+
+.projectRouteTopbar .themeIconSwitch button.active,
+.projectRouteTopbar .languageSwitch button.active {
+  background: var(--eda-text);
+  color: var(--eda-bg);
+}
+
+.projectRouteBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  border: 0;
+  background: transparent;
+  color: var(--eda-text);
+  font: inherit;
+}
+
+.projectRouteLogo {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid var(--eda-divider-strong);
+  border-radius: 8px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--eda-accent) 22%, var(--eda-panel)), var(--eda-panel-elevated));
+  color: var(--eda-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.projectRouteBrand strong {
+  color: color-mix(in srgb, var(--eda-text) 76%, var(--eda-accent));
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.projectRouteNav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.projectRouteStatus,
+.projectRoutePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 13px;
+  border: 1px solid var(--eda-divider);
+  border-radius: 999px;
+  background: var(--eda-panel);
+  color: var(--eda-text);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px color-mix(in srgb, #000 10%, transparent);
+}
+
+.projectRouteStatus i {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--eda-pass);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--eda-pass) 12%, transparent);
+}
+
+.projectRoutePill.active {
+  background: var(--eda-panel-elevated);
+}
+
+.projectRouteAvatar {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 999px;
+  background: #5b37b7;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.projectPage {
+  width: min(1200px, calc(100vw - 56px));
+  padding: 34px 0 72px;
+}
+
+.projectPageHeader {
+  align-items: flex-end;
+  border-bottom: 0;
+  padding: 0 0 18px;
+}
+
+.projectPageHeader h1 {
+  font-size: 32px;
+  letter-spacing: 0;
+}
+
+.projectPageHeader p {
+  max-width: 740px;
+  margin-top: 7px;
+  color: var(--eda-secondary);
+  font-size: 15px;
+}
+
+.projectPageActions select,
+.projectPageActions button {
+  min-height: 34px;
+  border-radius: 999px;
+  background: var(--eda-panel);
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 8%, transparent);
+}
+
+.projectPageActions button.primary {
+  border-color: color-mix(in srgb, var(--eda-pass) 35%, var(--eda-divider));
+  background: #059669;
+  color: white;
+}
+
+.projectCardGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.projectCard {
+  border-color: color-mix(in srgb, var(--eda-divider-strong) 70%, transparent);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--eda-panel) 92%, var(--eda-bg));
+  box-shadow:
+    0 18px 50px color-mix(in srgb, #000 12%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 36%, transparent);
+}
+
+.projectCardMain {
+  gap: 16px;
+  padding: 20px 20px 14px;
+}
+
+.projectCardMain:hover {
+  background: color-mix(in srgb, var(--eda-panel-elevated) 32%, transparent);
+}
+
+.projectCardMain header {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.projectCardMain header .projectSourceBadge {
+  order: 2;
+}
+
+.projectCardMain header strong {
+  order: 1;
+}
+
+.projectCardMain header > div:first-child {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.projectCardMain strong {
+  font-size: 17px;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.projectCardMain p {
+  min-height: 20px;
+  color: var(--eda-secondary);
+  font-size: 13px;
+  -webkit-line-clamp: 1;
+}
+
+.projectCardTools {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.projectDots {
+  color: var(--eda-muted);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.projectSourceBadge {
+  height: 22px;
+  border: 0;
+  background: #059669;
+  color: white;
+}
+
+.projectSourceBadge.demo {
+  background: color-mix(in srgb, var(--eda-warn) 88%, #fff);
+  color: #111827;
+}
+
+.projectCardMeta {
+  padding-top: 12px;
+  border-top: 1px solid var(--eda-divider);
+  font-size: 12.5px;
+}
+
+.projectProgressLine i {
+  height: 8px;
+  border: 0;
+  background: color-mix(in srgb, var(--eda-muted) 14%, transparent);
+}
+
+.projectProgressLine b {
+  background: #059669;
+}
+
+.projectCard footer {
+  padding: 0 18px 16px;
+  border-top: 0;
+}
+
+.projectCard footer button {
+  border-radius: 999px;
+  background: transparent;
+}
+
+.projectEmptyState {
+  margin-top: 22px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--eda-panel) 60%, transparent);
+}
+
+.engineeringShell.theme-light.projectRouteShell {
+  --eda-bg: #f8fafc;
+  --eda-panel: #ffffff;
+  --eda-panel-elevated: #f1f5f9;
+  --eda-text: #0f172a;
+  --eda-secondary: #64748b;
+  --eda-muted: #94a3b8;
+  --eda-divider: rgba(15, 23, 42, 0.10);
+  --eda-divider-strong: rgba(15, 23, 42, 0.16);
+}
+
+.engineeringShell.theme-dark.projectRouteShell {
+  --eda-bg: #0f1115;
+  --eda-panel: #181b20;
+  --eda-panel-elevated: #20242b;
+  --eda-text: #e5e7eb;
+  --eda-secondary: #a1a1aa;
+  --eda-muted: #71717a;
+  --eda-divider: rgba(255, 255, 255, 0.08);
+  --eda-divider-strong: rgba(255, 255, 255, 0.13);
+}
+
+.engineeringShell.theme-dark .projectCard {
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+@media (max-width: 900px) {
+  .projectRouteTopbar {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 12px 16px;
+  }
+
+  .projectRouteNav {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .projectCardGrid {
+    grid-template-columns: 1fr;
   }
 }

@@ -3,10 +3,15 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.env
+.env.local
+.env.*.local
 .venv/
 venv/
 env/
 results/
+data/
+*.sqlite3
 *.log
 build/
 dist/

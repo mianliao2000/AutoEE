@@ -1,0 +1,21 @@
+id: power.buck_simulation
+name: Buck Converter Circuit Simulation
+domain: power_electronics
+description: Build a circuit model, run a simulator adapter or mock adapter, and plot waveform artifacts.
+entrypoint: skills.power.buck_simulation.run:run
+timeout: 45
+dependencies:
+  - python
+  - matplotlib
+adapter_requirements:
+  - ngspice optional
+outputs:
+  - circuit_model.cir
+  - circuit_model.json
+  - simulation_setup.json
+  - waveforms.csv
+  - plots/vout.png
+  - plots/inductor_current.png
+  - plots/switch_node.png
+  - simulation_log.txt
+  - adapter_status.json

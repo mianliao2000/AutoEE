@@ -218,6 +218,18 @@ class OpenRouterProvider(OpenAICompatibleProvider):
     pass
 
 
+class MiniMaxProvider(OpenAICompatibleProvider):
+    pass
+
+
+class DeepSeekProvider(OpenAICompatibleProvider):
+    pass
+
+
+class QwenProvider(OpenAICompatibleProvider):
+    pass
+
+
 class CustomOpenAICompatibleProvider(OpenAICompatibleProvider):
     pass
 
@@ -321,4 +333,3 @@ class GeminiProvider(ModelProvider):
 def provider_secret_summary(provider: ModelProvider) -> str:
     key = provider._api_key()
     return redact_secret(key) if key else "not configured"
-
